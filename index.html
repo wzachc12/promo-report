@@ -463,14 +463,31 @@ function renderExec(){
     </div>
 
     <!-- AI Insights -->
-    <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-      <span>AI-generated insights</span>
-      <button id="insights-btn" onclick="runInsights()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;border:1px solid var(--border-med);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);cursor:pointer">
-        ✦ Generate insights
-      </button>
+    <div class="section-title" style="margin-bottom:12px">AI-generated insights</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;font-size:13.5px;line-height:1.8;margin-bottom:1.5rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">10 INSIGHTS · Based on 17 completed promotions · Generated June 8, 2026</span>
+    </div><div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-right:8px">01</span><span style="font-weight:500;color:var(--text)">Pre-Tax Event is the clear YTD performance leader.</span> <span style="color:var(--text2)">At 26.6% full funnel rate — more than 5 percentage points above the 21.2% YTD average — it benefited from the highest order-to-delivery conversion of any promotion and the second-largest SKU count at 68 SKUs.</span>
+    </div><div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-right:8px">02</span><span style="font-weight:500;color:var(--text)">Electronics promotions consistently underperform.</span> <span style="color:var(--text2)">The Electronics Event + Budget Booster Deals posted the worst full funnel rate YTD at 16.2%, with an app-to-order rate of just 25.2% — nearly 6 points below average — suggesting high browse intent that isn't converting downstream.</span>
+    </div><div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-right:8px">03</span><span style="font-weight:500;color:var(--text)">Full funnel rate has been essentially flat all year.</span> <span style="color:var(--text2)">15 of 17 mature promotions landed between 19–23%, indicating the funnel shape is stable. Conversion improvement, not traffic generation, is the primary lever for moving the overall rate.</span>
+    </div><div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-right:8px">04</span><span style="font-weight:500;color:var(--text)">Lucky Deals drives the highest raw demand but doesn't capitalize on it.</span> <span style="color:var(--text2)">At 2,052 apps/day — nearly 2x the YTD average — it generated more daily interest than any other promotion, yet converted at only 21.2% full funnel. The demand ceiling is high; the conversion gap is the opportunity.</span>
+    </div><div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-right:8px">05</span><span style="font-weight:500;color:var(--text)">Furniture categories significantly outperform appliances.</span> <span style="color:var(--text2)">Recliners & Chairs (33.8%), Chests (33.6%), and TV Stands (30.8%) all post full funnel rates well above average. High-volume categories like Refrigerators (25.8%) and Mattresses (25.5%) underperform relative to their application volume.</span>
+    </div><div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-right:8px">06</span><span style="font-weight:500;color:var(--text)">Order-to-delivery conversion is the primary funnel leak.</span> <span style="color:var(--text2)">The YTD app-to-order rate is 30.9% but full funnel drops to 21.2%, meaning roughly 1 in 3 confirmed orders never becomes a delivery. This gap represents the single largest opportunity in the funnel.</span>
+    </div><div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-right:8px">07</span><span style="font-weight:500;color:var(--text)">Memorial Day Event underdelivered relative to its demand.</span> <span style="color:var(--text2)">With 14,133 applications — second highest of any promotion — Memorial Day Event posted only a 19.9% full funnel rate. The mismatch between demand volume and conversion suggests fulfillment pressure or SKU mix issues during the period.</span>
+    </div><div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-right:8px">08</span><span style="font-weight:500;color:var(--text)">May promotions show a consistent improvement trend.</span> <span style="color:var(--text2)">May BOM (23.2%), May BOM + Mother's Day (22.3%), and Memorial Day Early Access (22.3%) all exceeded the January–February average of ~20%, indicating gradual improvement in conversion quality heading into summer.</span>
+    </div><div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-right:8px">09</span><span style="font-weight:500;color:var(--text)">TV Stands are the most efficient category in the catalog.</span> <span style="color:var(--text2)">With a 46.1% app-to-order rate — nearly 15 points above the 30.9% YTD average — TV Stands convert interested shoppers to orders at the highest rate of any sub-category, making them strong candidates for expanded promo placement.</span>
+    </div><div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-right:8px">10</span><span style="font-weight:500;color:var(--text)">Shorter promotions (5–6 days) consistently underperform.</span> <span style="color:var(--text2)">Hot Deals (6d, 19.1%), EOM Flash Sale (8d, 19.0%), and Electronics Event (5d, 16.2%) all fall below the YTD average. Promotions running 8+ days with broader SKU counts — Pre-Tax, Lucky Deals, Living Room & Laundry — tend to outperform.</span>
     </div>
-    <div id="insights-output" style="display:none;margin-bottom:1.5rem">
-      <div id="insights-content" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;font-size:13.5px;line-height:1.8;color:var(--text)"></div>
     </div>
 
     <!-- Promotion status table -->
@@ -943,9 +960,20 @@ FULL FUNNEL TREND (completed promos in order):
 ${trendLines}`;
 
   try {
+    const apiKey=document.getElementById("insights-api-key").value.trim();
+    if(!apiKey){
+      content.innerHTML='<span style="color:var(--amber)">Please enter your Anthropic API key above to generate insights.</span>';
+      btn.disabled=false;btn.innerHTML="✦ Generate insights";
+      return;
+    }
     const res=await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key":apiKey,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
       body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1500,messages:[{role:"user",content:prompt}]})
     });
     const data=await res.json();
@@ -963,7 +991,7 @@ ${trendLines}`;
 
     content.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${insights.length} INSIGHTS · Based on ${completedSorted.length} completed promotions</span><button onclick="runInsights()" style="font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif">↺ Regenerate</button></div>${cards||text}`;
   } catch(e){
-    content.innerHTML='<span style="color:var(--red)">Something went wrong. Please try again.</span>';
+    content.innerHTML=`<span style="color:var(--red)">Request failed: ${e.message}. Check your API key and try again.</span>`;
   }
   btn.disabled=false;
   btn.innerHTML="✦ Generate insights";
