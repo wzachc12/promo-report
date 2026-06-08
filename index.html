@@ -284,7 +284,7 @@ function heatKey(){
     <div class="hk-seg" style="background:rgb(184,48,48)"></div><div class="hk-seg" style="background:rgb(161,72,24)"></div>
     <div class="hk-seg" style="background:rgb(138,96,0)"></div><div class="hk-seg" style="background:rgb(82,109,41)"></div>
     <div class="hk-seg" style="background:rgb(26,122,82)"></div>
-  </div><span style="color:var(--green)">High</span><span style="margin-left:12px;color:var(--text3)">Colour is relative within each column</span></div>`;
+  </div><span style="color:var(--green)">High</span><span style="margin-left:12px;color:var(--text3)">Colour is relative within each row (normalized to each placement's own range)</span></div>`;
 }
 
 function deltaHtml(curr,prev,suffix="%"){
@@ -590,8 +590,11 @@ function renderAssetsTab(){
     borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.3,spanGaps:true,
   }));
 
-  const allCtrs=assetRows.flatMap(a=>a.data.map(d=>d.ctr)).filter(v=>v!==null);
-  const minCtr=Math.min(...allCtrs),maxCtr=Math.max(...allCtrs);
+  // Per-asset min/max for normalized heatmap (each row colored relative to its own range)
+  const assetCtrRanges=assetRows.map(a=>{
+    const ctrs=a.data.map(d=>d.ctr).filter(v=>v!==null);
+    return ctrs.length?{min:Math.min(...ctrs),max:Math.max(...ctrs)}:{min:0,max:0};
+  });
 
   const hmHeaders=promos.map((p,i)=>{
     const isSel=i===selIdx&&selIdx>=0;
@@ -601,6 +604,7 @@ function renderAssetsTab(){
   }).join("");
 
   const hmRows=assetRows.map((a,ai)=>{
+    const {min:rowMin,max:rowMax}=assetCtrRanges[ai];
     const cells=a.data.map((d,i)=>{
       const isSel=i===selIdx&&selIdx>=0;
       if(d.ctr===null)return`<td style="text-align:center;color:var(--text3);font-size:10px;${isSel?"background:var(--accent-bg)":""}">—</td>`;
@@ -608,7 +612,7 @@ function renderAssetsTab(){
       const chg=(isSel&&prev&&prev.ctr!==0)?((d.ctr-prev.ctr)/prev.ctr*100):null;
       const chgHtml=chg!==null?`<div style="font-size:9px;margin-top:2px;font-weight:400;color:${chg>0?"#1a7a52":"#b83030"}">${chg>0?"+":""}${chg.toFixed(1)}% vs prior</div>`:"";
       const outline=isSel?"outline:2px solid var(--accent);outline-offset:-2px;":"";
-      return`<td style="text-align:center;${heatColor(d.ctr,minCtr,maxCtr)};padding:5px 4px;${outline}"><div style="font-size:11px;font-weight:500">${fmt(d.ctr)}%</div>${chgHtml}</td>`;
+      return`<td style="text-align:center;${heatColor(d.ctr,rowMin,rowMax)};padding:5px 4px;${outline}"><div style="font-size:11px;font-weight:500">${fmt(d.ctr)}%</div>${chgHtml}</td>`;
     }).join("");
     return`<tr><td class="left" style="font-weight:500;font-size:12px;white-space:nowrap;padding-right:12px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${palette[ai]};margin-right:6px"></span>${a.name}</td>${cells}</tr>`;
   }).join("");
