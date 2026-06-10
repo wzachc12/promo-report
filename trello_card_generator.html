@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Trello Campaign Card Generator</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f5f7; color: #172b4d; font-size: 14px; line-height: 1.5; }
+  .app { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #5e6c84; margin-bottom: 24px; }
+
+  .card { background: #fff; border-radius: 8px; border: 1px solid #dfe1e6; padding: 20px; margin-bottom: 16px; }
+  .card-title { font-size: 12px; font-weight: 600; color: #5e6c84; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 14px; }
+
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 12px; font-weight: 500; color: #5e6c84; margin-bottom: 4px; }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid #dfe1e6; border-radius: 4px;
+    font-size: 13px; font-family: inherit; color: #172b4d; background: #fafbfc;
+    outline: none; transition: border-color .15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #0052cc; background: #fff; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  .slot-block { border: 1px solid #dfe1e6; border-radius: 6px; margin-bottom: 8px; overflow: hidden; background: #fafbfc; }
+  .slot-header { display: flex; align-items: center; gap: 10px; padding: 10px 12px; cursor: pointer; background: #fff; border-bottom: 1px solid transparent; user-select: none; }
+  .slot-header:hover { background: #f4f5f7; }
+  .slot-header.open { border-bottom-color: #dfe1e6; }
+  .slot-name { font-size: 13px; font-weight: 500; flex: 1; }
+  .slot-body { padding: 12px; display: none; }
+  .slot-body.open { display: block; }
+  .ver-row { display: grid; grid-template-columns: 36px 1fr auto; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .ver-label { font-size: 12px; font-weight: 500; color: #5e6c84; text-align: right; }
+  .ver-input { padding: 6px 8px; border: 1px solid #dfe1e6; border-radius: 4px; font-size: 13px; font-family: inherit; background: #fafbfc; outline: none; width: 100%; }
+  .ver-input:focus { border-color: #0052cc; background: #fff; }
+  .add-ver { font-size: 12px; color: #0052cc; background: none; border: 1px dashed #b3d4ff; border-radius: 4px; padding: 5px 12px; cursor: pointer; margin-top: 4px; width: 100%; }
+  .add-ver:hover { background: #e9f0ff; }
+  .rm-ver { font-size: 18px; color: #bf2600; background: none; border: none; cursor: pointer; line-height: 1; padding: 0 4px; }
+  .rm-ver:hover { color: #de350b; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: #e3fcef; color: #006644; font-weight: 500; }
+  .badge.off { background: #f4f5f7; color: #97a0af; }
+  .chk-row { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 8px; }
+  .chk-row input[type=checkbox] { width: 14px; height: 14px; cursor: pointer; accent-color: #0052cc; }
+  .dmt-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #5e6c84; margin-bottom: 10px; }
+  .dmt-row input { width: 13px; height: 13px; accent-color: #0052cc; }
+  .sku-field { margin-bottom: 10px; }
+  .sku-field label { font-size: 12px; color: #5e6c84; display: block; margin-bottom: 3px; }
+  .sku-field input { width: 100%; padding: 6px 8px; border: 1px solid #dfe1e6; border-radius: 4px; font-size: 13px; background: #fafbfc; outline: none; }
+  .sku-field input:focus { border-color: #0052cc; background: #fff; }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 0; border-bottom: 2px solid #dfe1e6; }
+  .tab { font-size: 13px; padding: 8px 16px; border: none; background: none; cursor: pointer; color: #5e6c84; border-bottom: 2px solid transparent; margin-bottom: -2px; font-family: inherit; }
+  .tab:hover { color: #172b4d; }
+  .tab.active { color: #0052cc; border-bottom-color: #0052cc; font-weight: 500; }
+  .tab-content { display: none; padding: 16px 0 0; }
+  .tab-content.active { display: block; }
+
+  .output-box { background: #f4f5f7; border: 1px solid #dfe1e6; border-radius: 4px; padding: 12px 14px; font-size: 12px; font-family: 'SFMono-Regular', Consolas, monospace; white-space: pre-wrap; word-break: break-word; color: #172b4d; line-height: 1.6; max-height: 340px; overflow-y: auto; }
+  .output-label { font-size: 12px; font-weight: 500; color: #5e6c84; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+
+  .cl-block { border: 1px solid #dfe1e6; border-radius: 6px; margin-bottom: 10px; overflow: hidden; }
+  .cl-head { font-size: 13px; font-weight: 500; padding: 8px 12px; background: #fff; border-bottom: 1px solid #dfe1e6; display: flex; justify-content: space-between; align-items: center; }
+  .cl-items { padding: 8px 12px; background: #fafbfc; }
+  .cl-item { font-size: 12px; font-family: monospace; color: #5e6c84; padding: 2px 0; display: flex; gap: 8px; }
+  .cl-item::before { content: '☐'; color: #97a0af; flex-shrink: 0; }
+
+  .btn { padding: 8px 16px; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; font-family: inherit; transition: background .15s, opacity .15s; }
+  .btn-primary { background: #0052cc; color: #fff; }
+  .btn-primary:hover { background: #0065ff; }
+  .btn-secondary { background: #f4f5f7; color: #172b4d; border: 1px solid #dfe1e6; }
+  .btn-secondary:hover { background: #ebecf0; }
+  .btn-success { background: #00875a; color: #fff; }
+  .btn-success:hover { background: #006644; }
+  .btn-success:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn-full { width: 100%; padding: 11px; font-size: 15px; margin-bottom: 16px; }
+
+  .trello-section { border: 2px solid #0052cc; border-radius: 8px; padding: 20px; margin-bottom: 16px; background: #fff; }
+  .trello-title { font-size: 13px; font-weight: 600; color: #0052cc; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .trello-title svg { flex-shrink: 0; }
+
+  .status-bar { padding: 10px 14px; border-radius: 4px; font-size: 13px; margin-top: 12px; display: none; }
+  .status-bar.info { background: #deebff; color: #0747a6; display: block; }
+  .status-bar.success { background: #e3fcef; color: #006644; display: block; }
+  .status-bar.error { background: #ffebe6; color: #bf2600; display: block; }
+
+  .progress-list { margin-top: 8px; font-size: 12px; font-family: monospace; list-style: none; }
+  .progress-list li { padding: 2px 0; }
+  .progress-list li::before { content: '→ '; color: #0052cc; }
+  .progress-list li.done::before { content: '✓ '; color: #00875a; }
+  .progress-list li.err::before { content: '✗ '; color: #bf2600; }
+
+  select optgroup { font-weight: 600; }
+  .select-wrap { position: relative; }
+
+  @media (max-width: 600px) {
+    .row2, .row3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>Trello Campaign Card Generator</h1>
+  <p class="subtitle">Fill in campaign details, then send directly to your Trello board.</p>
+
+  <!-- TRELLO CONNECTION -->
+  <div class="trello-section">
+    <div class="trello-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#0052cc"><rect x="2" y="2" width="9" height="14" rx="2"/><rect x="13" y="2" width="9" height="9" rx="2"/></svg>
+      Trello connection
+    </div>
+    <div class="row2">
+      <div class="field"><label>API Key</label><input id="apiKey" type="password" placeholder="Your Trello API key" value="f5d3d633c1681e203282a4e2a9632df4"/></div>
+      <div class="field"><label>Token</label><input id="apiToken" type="password" placeholder="Your Trello token" value="ATTA7e77ca44be095df32c5c0a70ee1c7937376fb296b0789391c7a4186d65a5612c0162B560"/></div>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="loadBoards()">Load boards & lists</button>
+    <div id="board-select-wrap" style="display:none;margin-top:12px;">
+      <div class="row2">
+        <div class="field">
+          <label>Board</label>
+          <select id="boardSelect" onchange="loadLists()"><option value="">— select board —</option></select>
+        </div>
+        <div class="field">
+          <label>List (column)</label>
+          <select id="listSelect"><option value="">— select list —</option></select>
+        </div>
+      </div>
+    </div>
+    <div id="conn-status" class="status-bar"></div>
+  </div>
+
+  <!-- CAMPAIGN INFO -->
+  <div class="card">
+    <div class="card-title">Campaign info</div>
+    <div class="row2">
+      <div class="field"><label>Campaign name / theme</label><input id="theme" placeholder='"Hot Picks" Summer Deals'/></div>
+      <div class="field"><label>Tagline / offer</label><input id="tagline" placeholder='$0.01 PAYG'/></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>Start date (MM/DD/YY)</label><input id="startDate" placeholder='06/22/26'/></div>
+      <div class="field"><label>End date (MM/DD/YY)</label><input id="endDate" placeholder='06/30/26'/></div>
+      <div class="field"><label>Channel</label>
+        <select id="channel"><option>In-Store & Online</option><option>Online Only</option><option>In-Store Only</option></select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Disclaimer</label><input id="disclaimer" placeholder='No long-term commitment*'/></div>
+      <div class="field"><label>Restrictions</label><input id="restrictions" placeholder='Product exclusions and other restrictions apply'/></div>
+    </div>
+  </div>
+
+  <!-- CONTENT SLOTS -->
+  <div class="card">
+    <div class="card-title">Content slots</div>
+    <p style="font-size:12px;color:#5e6c84;margin-bottom:12px;">Toggle each slot on/off, click to expand, and add as many versions as needed.</p>
+    <div id="slots-container"></div>
+  </div>
+
+  <!-- STANDARD ASSETS -->
+  <div class="card">
+    <div class="card-title">Standard assets</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;">
+      <label class="chk-row" style="margin:0;"><input type="checkbox" id="chk-social" checked/> Social media (1x1 & 9x16)</label>
+      <label class="chk-row" style="margin:0;"><input type="checkbox" id="chk-gdn" checked/> Display ads – GDN</label>
+      <label class="chk-row" style="margin:0;"><input type="checkbox" id="chk-copy" checked/> Copy checklist</label>
+    </div>
+  </div>
+
+  <!-- GENERATE -->
+  <button class="btn btn-primary btn-full" onclick="generate()">Generate card content</button>
+
+  <!-- OUTPUT -->
+  <div id="output-section" style="display:none;">
+    <div class="card" style="padding-bottom:0;">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('name',this)">Card name</button>
+        <button class="tab" onclick="switchTab('desc',this)">Description</button>
+        <button class="tab" onclick="switchTab('checklists',this)">Checklists</button>
+      </div>
+      <div id="tab-name" class="tab-content active">
+        <div class="output-label">Card name <button class="btn btn-secondary btn-sm" onclick="copyEl('out-name')">Copy</button></div>
+        <div class="output-box" id="out-name"></div>
+      </div>
+      <div id="tab-desc" class="tab-content">
+        <div class="output-label">Description <button class="btn btn-secondary btn-sm" onclick="copyEl('out-desc')">Copy</button></div>
+        <div class="output-box" id="out-desc"></div>
+      </div>
+      <div id="tab-checklists" class="tab-content">
+        <p style="font-size:12px;color:#5e6c84;margin-bottom:12px;">Each block = one Trello checklist, created in this order.</p>
+        <div id="checklists-render"></div>
+        <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:4px;" onclick="copyAllChecklists()">Copy all as text</button>
+      </div>
+      <div style="padding:16px 0 4px;">
+        <button class="btn btn-success btn-full" id="send-btn" onclick="sendToTrello()" disabled>Send to Trello</button>
+        <div id="send-status" class="status-bar"></div>
+        <ul class="progress-list" id="progress-list"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SLOT_DEFS = [
+  { id:'homepage-hero',  name:'Homepage Hero',              dmt:true,  group:'hero' },
+  { id:'ltd1',           name:'Limited Time Deal 1',        dmt:true,  group:'ltd', sku:true },
+  { id:'ltd2',           name:'Limited Time Deal 2',        dmt:true,  group:'ltd', sku:true },
+  { id:'ltd3',           name:'Limited Time Deal 3',        dmt:true,  group:'ltd', sku:true },
+  { id:'ltd4',           name:'Limited Time Deal 4',        dmt:true,  group:'ltd', sku:true },
+  { id:'menu-flyout',    name:'Menu Flyout',                dmt:false, group:'other' },
+  { id:'fdt1',           name:'Featured Deal Tile 1',       dmt:true,  group:'fdt', legacy:true },
+  { id:'fdt2',           name:'Featured Deal Tile 2',       dmt:true,  group:'fdt', legacy:true },
+  { id:'landing-hero',   name:'Landing Page Hero',          dmt:true,  group:'other' },
+  { id:'ribbon-grid',    name:'Ribbon-in-Grid',             dmt:true,  group:'other' },
+  { id:'location-tile',  name:'Location Tile',              dmt:true,  group:'other' },
+  { id:'sale-page-vn',   name:'Sale Page Visual Navigation',dmt:false, group:'other' },
+  { id:'email-ridealong','name':'Email Ridealong Banner',   dmt:false, group:'other' },
+];
+
+const slotState = {};
+let generatedChecklists = [];
+
+function initSlots() {
+  const container = document.getElementById('slots-container');
+  SLOT_DEFS.forEach(def => {
+    slotState[def.id] = { enabled: true, versions: [''], dmt: def.dmt };
+    const block = document.createElement('div');
+    block.className = 'slot-block';
+    block.id = 'slot-block-' + def.id;
+    block.innerHTML = buildSlotHTML(def);
+    container.appendChild(block);
+  });
+}
+
+function buildSlotHTML(def) {
+  const skuField = def.sku ? `<div class="sku-field"><label>SKU / product code</label><input id="sku-${def.id}" placeholder="e.g. G00062S"/></div>` : '';
+  const dmtRow = def.dmt ? `<label class="dmt-row"><input type="checkbox" id="dmt-${def.id}" checked/> Include (D, M, T) in checklist items</label>` : '';
+  const legacyRow = def.legacy ? `<label class="dmt-row"><input type="checkbox" id="legacy-${def.id}" checked/> Include Legacy-Sized & Homepage Redesign-Sized variants</label>` : '';
+  return `
+    <div class="slot-header" id="slot-hdr-${def.id}" onclick="toggleSlot('${def.id}')">
+      <input type="checkbox" id="en-${def.id}" checked onclick="event.stopPropagation();updateBadge('${def.id}')"/>
+      <span class="slot-name">${def.name}</span>
+      <span class="badge" id="vbadge-${def.id}">1 version</span>
+      <span style="font-size:18px;color:#97a0af;transition:transform .2s;" id="chev-${def.id}">›</span>
+    </div>
+    <div class="slot-body" id="slot-body-${def.id}">
+      ${skuField}${dmtRow}${legacyRow}
+      <div id="vers-${def.id}"></div>
+      <button class="add-ver" onclick="addVersion('${def.id}')">+ Add version</button>
+    </div>`;
+}
+
+function toggleSlot(id) {
+  const body = document.getElementById('slot-body-' + id);
+  const hdr = document.getElementById('slot-hdr-' + id);
+  const chev = document.getElementById('chev-' + id);
+  const open = body.classList.toggle('open');
+  hdr.classList.toggle('open', open);
+  chev.style.transform = open ? 'rotate(90deg)' : '';
+  if (open) renderVersionInputs(id);
+}
+
+function renderVersionInputs(id) {
+  const state = slotState[id];
+  const container = document.getElementById('vers-' + id);
+  container.innerHTML = '';
+  state.versions.forEach((v, i) => {
+    const row = document.createElement('div');
+    row.className = 'ver-row';
+    row.innerHTML = `
+      <span class="ver-label">v.${i+1}</span>
+      <input class="ver-input" id="ver-${id}-${i}" placeholder="Version ${i+1} copy" value="${escAttr(v)}" oninput="slotState['${id}'].versions[${i}]=this.value"/>
+      ${i>0 ? `<button class="rm-ver" onclick="removeVersion('${id}',${i})" title="Remove">×</button>` : '<span></span>'}`;
+    container.appendChild(row);
+  });
+  updateBadge(id);
+}
+
+function updateBadge(id) {
+  const enabled = document.getElementById('en-' + id).checked;
+  const n = slotState[id].versions.length;
+  const badge = document.getElementById('vbadge-' + id);
+  badge.textContent = enabled ? `${n} version${n!==1?'s':''}` : 'off';
+  badge.className = enabled ? 'badge' : 'badge off';
+}
+
+function addVersion(id) {
+  slotState[id].versions.push('');
+  renderVersionInputs(id);
+}
+
+function removeVersion(id, i) {
+  slotState[id].versions.splice(i, 1);
+  renderVersionInputs(id);
+}
+
+function syncDOM(id) {
+  const state = slotState[id];
+  state.enabled = document.getElementById('en-' + id).checked;
+  state.versions = state.versions.map((_, i) => {
+    const el = document.getElementById(`ver-${id}-${i}`);
+    return el ? el.value.trim() : '';
+  });
+  const dmtEl = document.getElementById('dmt-' + id);
+  if (dmtEl) state.dmt = dmtEl.checked;
+}
+
+function getSku(id) { const el = document.getElementById('sku-'+id); return el ? el.value.trim() : ''; }
+function getLegacy(id) { const el = document.getElementById('legacy-'+id); return el ? el.checked : false; }
+
+function generate() {
+  SLOT_DEFS.forEach(def => syncDOM(def.id));
+
+  const theme = document.getElementById('theme').value.trim() || 'Campaign';
+  const tagline = document.getElementById('tagline').value.trim();
+  const startDate = document.getElementById('startDate').value.trim();
+  const endDate = document.getElementById('endDate').value.trim();
+  const channel = document.getElementById('channel').value;
+  const disclaimer = document.getElementById('disclaimer').value.trim();
+  const restrictions = document.getElementById('restrictions').value.trim();
+
+  const tagPart = tagline ? ` + ${tagline}` : '';
+  const cardName = `(CAMPAIGN) ${startDate} - ${endDate} "${theme}"${tagPart} ${channel}`;
+
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const ms = startDate.match(/(\d+)\/(\d+)\/(\d+)/);
+  const me = endDate.match(/(\d+)\/(\d+)\/(\d+)/);
+  const dateLine = (ms && me) ? `${months[parseInt(ms[1])-1]} ${parseInt(ms[2])} - ${parseInt(me[2])}, 20${me[3]}` : '';
+
+  let tileNum = 1, tilesLines = '';
+  SLOT_DEFS.forEach(def => {
+    const state = slotState[def.id];
+    if (!state.enabled) return;
+    const versions = state.versions.filter(v => v);
+    const sku = getSku(def.id);
+    const skuPart = sku ? `: **${sku}**` : '';
+    tilesLines += `${tileNum++}. **${def.name}**${skuPart} **(${versions.length} Version${versions.length!==1?'s':''}):**\n`;
+    versions.forEach((v, i) => { tilesLines += `   ${i+1}. ${v}\n`; });
+  });
+
+  const desc = `**"${theme}"${tagPart} (${channel})**\n${disclaimer?disclaimer+'\n':''}${dateLine?dateLine+'\n':''}${restrictions?restrictions+'\n':''}\n**Tiles Needed**\n\n${tilesLines.trimEnd()}`;
+
+  document.getElementById('out-name').textContent = cardName;
+  document.getElementById('out-desc').textContent = desc;
+
+  generatedChecklists = buildChecklists();
+  renderChecklists();
+
+  const sendBtn = document.getElementById('send-btn');
+  const listId = document.getElementById('listSelect').value;
+  sendBtn.disabled = !listId;
+  sendBtn.textContent = listId ? 'Send to Trello' : 'Send to Trello (select a list first)';
+
+  document.getElementById('output-section').style.display = 'block';
+  document.getElementById('output-section').scrollIntoView({behavior:'smooth'});
+}
+
+function buildChecklists() {
+  const chkSocial = document.getElementById('chk-social').checked;
+  const chkGdn = document.getElementById('chk-gdn').checked;
+  const chkCopy = document.getElementById('chk-copy').checked;
+  const lists = [];
+
+  SLOT_DEFS.forEach(def => {
+    const state = slotState[def.id];
+    if (!state.enabled) return;
+    const versions = state.versions.filter(v => v);
+    if (!versions.length) return;
+    const dmt = state.dmt ? ' (D, M, T)' : '';
+    const sku = getSku(def.id);
+    const skuPart = sku ? `${sku} - ` : '';
+    const legacy = getLegacy(def.id);
+
+    if (def.group === 'hero') {
+      versions.forEach((v, i) => {
+        const label = versions.length > 1 ? ` v.${i+1}: ${v}` : `: ${v}`;
+        lists.push({ name: def.name + label, items: ['Desktop','Mobile','Tablet'] });
+      });
+    } else if (def.group === 'fdt') {
+      const items = [];
+      versions.forEach((v, i) => {
+        const vn = `v.${i+1}`;
+        if (legacy) {
+          items.push(`${def.name} Legacy-Sized ${vn}: ${skuPart}${v}${dmt}`);
+          items.push(`${def.name} Homepage Redesign-Sized ${vn}: ${skuPart}${v}${dmt}`);
+        } else {
+          items.push(`${def.name} ${vn}: ${skuPart}${v}${dmt}`);
+        }
+      });
+      lists.push({ name: def.name + 's', items });
+    } else if (def.group === 'ltd') {
+      let ltdList = lists.find(l => l.name === 'Limited Time Deals Tiles');
+      if (!ltdList) { ltdList = { name: 'Limited Time Deals Tiles', items: [] }; lists.push(ltdList); }
+      versions.forEach((v, i) => { ltdList.items.push(`${def.name} v.${i+1}: ${skuPart}${v}${dmt}`); });
+    } else {
+      let otherList = lists.find(l => l.name === 'Other Tiles');
+      if (!otherList) { otherList = { name: 'Other Tiles', items: [] }; lists.push(otherList); }
+      versions.forEach((v, i) => {
+        const vn = versions.length > 1 ? ` v.${i+1}:` : ':';
+        otherList.items.push(`${def.name}${vn} ${skuPart}${v}${dmt}`);
+      });
+    }
+  });
+
+  if (chkSocial) lists.push({ name: 'Social Media - See Creative Matrix For Details', items: ['Conversion Assets: 1x1 & 9x16 (2 - 3 Versions)'] });
+  if (chkGdn) lists.push({ name: "Display Ads - Nati'l (GDN)", items: ['160x600','300x250','300x600','728x90','1080x1920','970x250','320x50','960x1200','1200x1200','1200x628'] });
+  if (chkCopy) lists.push({ name: 'Copy Checklist', items: ['Homepage Hero','Featured Deal Tile','Locations Page Tile','Paid Social'] });
+
+  return lists;
+}
+
+function renderChecklists() {
+  const container = document.getElementById('checklists-render');
+  container.innerHTML = '';
+  generatedChecklists.forEach(cl => {
+    const div = document.createElement('div');
+    div.className = 'cl-block';
+    div.innerHTML = `
+      <div class="cl-head">
+        <span>${cl.name}</span>
+        <span style="display:flex;gap:6px;align-items:center;">
+          <span style="font-size:11px;background:#e3fcef;color:#006644;padding:2px 8px;border-radius:20px;">${cl.items.length} items</span>
+        </span>
+      </div>
+      <div class="cl-items">${cl.items.map(i=>`<div class="cl-item">${i}</div>`).join('')}</div>`;
+    container.appendChild(div);
+  });
+}
+
+function copyAllChecklists() {
+  const text = generatedChecklists.map(cl => '=== '+cl.name+' ===\n'+cl.items.map(i=>'☐ '+i).join('\n')).join('\n\n');
+  navigator.clipboard.writeText(text);
+}
+
+// ---- TRELLO API ----
+
+async function loadBoards() {
+  const key = document.getElementById('apiKey').value.trim();
+  const token = document.getElementById('apiToken').value.trim();
+  setConnStatus('info', 'Loading boards...');
+  try {
+    const res = await fetch(`https://api.trello.com/1/members/me/boards?key=${key}&token=${token}&fields=name,id&filter=open`);
+    if (!res.ok) throw new Error('Auth failed — check your key and token.');
+    const boards = await res.json();
+    const sel = document.getElementById('boardSelect');
+    sel.innerHTML = '<option value="">— select board —</option>';
+    boards.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      opt.textContent = b.name;
+      if (b.name === 'Digital Creative') opt.selected = true;
+      sel.appendChild(opt);
+    });
+    document.getElementById('board-select-wrap').style.display = 'block';
+    setConnStatus('success', `Loaded ${boards.length} boards.`);
+    if (sel.value) loadLists();
+  } catch(e) {
+    setConnStatus('error', e.message);
+  }
+}
+
+async function loadLists() {
+  const key = document.getElementById('apiKey').value.trim();
+  const token = document.getElementById('apiToken').value.trim();
+  const boardId = document.getElementById('boardSelect').value;
+  if (!boardId) return;
+  try {
+    const res = await fetch(`https://api.trello.com/1/boards/${boardId}/lists?key=${key}&token=${token}&filter=open&fields=name,id`);
+    const lists = await res.json();
+    const sel = document.getElementById('listSelect');
+    sel.innerHTML = '<option value="">— select list —</option>';
+    lists.forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l.id;
+      opt.textContent = l.name;
+      if (l.name === '01. Incoming Projects') opt.selected = true;
+      sel.appendChild(opt);
+    });
+    setConnStatus('success', 'Ready. Generate your card content below, then click Send to Trello.');
+  } catch(e) {
+    setConnStatus('error', 'Could not load lists: ' + e.message);
+  }
+}
+
+async function sendToTrello() {
+  const key = document.getElementById('apiKey').value.trim();
+  const token = document.getElementById('apiToken').value.trim();
+  const listId = document.getElementById('listSelect').value;
+  if (!listId) { setStatus('error', 'Please select a board and list first.'); return; }
+
+  const cardName = document.getElementById('out-name').textContent;
+  const cardDesc = document.getElementById('out-desc').textContent;
+
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  const progress = document.getElementById('progress-list');
+  progress.innerHTML = '';
+
+  function addProgress(text, state) {
+    const li = document.createElement('li');
+    li.textContent = text;
+    if (state) li.className = state;
+    progress.appendChild(li);
+    return li;
+  }
+
+  setStatus('info', 'Creating card...');
+
+  try {
+    // 1. Create card
+    const p1 = addProgress('Creating card...');
+    const cardRes = await fetch(`https://api.trello.com/1/cards?key=${key}&token=${token}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: cardName, desc: cardDesc, idList: listId, pos: 'bottom' })
+    });
+    if (!cardRes.ok) throw new Error('Failed to create card: ' + await cardRes.text());
+    const card = await cardRes.json();
+    p1.className = 'done';
+    p1.textContent = `Card created: "${card.name.substring(0,50)}..."`;
+
+    // 2. Add labels — Site (yellow), Standard Campaign (purple), COPY REQ. (black)
+    const labelIds = ['5af1b78d5d7c631d566e7e43','5a9d9eef35b91abfde73ea21','5e2b065919f14c836cce7103'];
+    for (const lid of labelIds) {
+      await fetch(`https://api.trello.com/1/cards/${card.id}/idLabels?key=${key}&token=${token}`, {
+        method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({value: lid})
+      }).catch(() => {}); // non-fatal if label doesn't exist on this board
+    }
+
+    // 3. Create checklists
+    for (const cl of generatedChecklists) {
+      const p = addProgress(`Creating checklist: ${cl.name}...`);
+      const clRes = await fetch(`https://api.trello.com/1/checklists?key=${key}&token=${token}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idCard: card.id, name: cl.name, pos: 'bottom' })
+      });
+      if (!clRes.ok) { p.className='err'; p.textContent=`Failed: ${cl.name}`; continue; }
+      const checklist = await clRes.json();
+
+      for (const item of cl.items) {
+        await fetch(`https://api.trello.com/1/checklists/${checklist.id}/checkItems?key=${key}&token=${token}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: item, checked: false })
+        });
+      }
+      p.className = 'done';
+      p.textContent = `✓ ${cl.name} (${cl.items.length} items)`;
+    }
+
+    setStatus('success', `🎉 Card created successfully! <a href="${card.shortUrl}" target="_blank" style="color:#006644;font-weight:600;">Open in Trello →</a>`);
+    btn.textContent = 'Send to Trello';
+    btn.disabled = false;
+
+  } catch(e) {
+    setStatus('error', 'Error: ' + e.message);
+    btn.textContent = 'Send to Trello';
+    btn.disabled = false;
+  }
+}
+
+function setStatus(type, html) {
+  const el = document.getElementById('send-status');
+  el.className = 'status-bar ' + type;
+  el.innerHTML = html;
+}
+
+function setConnStatus(type, text) {
+  const el = document.getElementById('conn-status');
+  el.className = 'status-bar ' + type;
+  el.textContent = text;
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function copyEl(id) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent);
+}
+
+function escAttr(s) { return s.replace(/"/g,'&quot;'); }
+
+initSlots();
+
+// Auto-load boards on page open
+window.addEventListener('DOMContentLoaded', () => {
+  const key = document.getElementById('apiKey').value;
+  const token = document.getElementById('apiToken').value;
+  if (key && token) loadBoards();
+});
+</script>
+</body>
+</html>
