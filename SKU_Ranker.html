@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKU Asset Ranker</title>
+<style>
+  :root {
+    --ink: #111827;
+    --soft: #6b7280;
+    --muted: #9ca3af;
+    --surface: #f9fafb;
+    --white: #fff;
+    --border: #e5e7eb;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --amber: #d97706;
+    --amber-bg: #fffbeb;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --r: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--surface); color: var(--ink); min-height: 100vh; }
+
+  header { background: var(--ink); color: #fff; padding: 18px 28px; display: flex; align-items: center; gap: 12px; }
+  header .icon { background: var(--accent); border-radius: 7px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  header h1 { font-size: 16px; font-weight: 700; }
+  header p { font-size: 12px; color: #9ca3af; margin-top: 1px; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 28px 20px; }
+
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); padding: 22px; margin-bottom: 18px; }
+  .card h2 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .card .sub { font-size: 12px; color: var(--soft); margin-bottom: 14px; line-height: 1.5; }
+
+  .upload-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media(max-width:600px){ .upload-row { grid-template-columns: 1fr; } }
+
+  .upload-box { border: 2px dashed var(--border); border-radius: var(--r); padding: 22px 16px; text-align: center; cursor: pointer; transition: all .15s; background: var(--surface); }
+  .upload-box:hover { border-color: var(--accent); background: var(--accent-bg); }
+  .upload-box.ok { border-style: solid; border-color: var(--green); background: var(--green-bg); }
+  .upload-box .ico { font-size: 26px; margin-bottom: 6px; }
+  .upload-box p { font-size: 12px; color: var(--soft); }
+  .upload-box .fn { font-size: 12px; font-weight: 600; color: var(--green); margin-top: 5px; }
+  .upload-box input { display: none; }
+
+  textarea { width: 100%; min-height: 110px; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--r); font-size: 13px; font-family: 'SF Mono', 'Consolas', monospace; resize: vertical; outline: none; transition: border-color .15s; }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); }
+
+  .btn { padding: 10px 22px; border-radius: var(--r); font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all .15s; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-primary:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+  .btn-ghost:hover { background: var(--accent-bg); }
+
+  .msg { padding: 10px 14px; border-radius: var(--r); font-size: 13px; margin-top: 10px; display: none; }
+  .msg.err  { background: var(--red-bg);   color: var(--red);   border: 1px solid #fecaca; display: block; }
+  .msg.info { background: var(--accent-bg); color: var(--accent); border: 1px solid #bfdbfe; display: block; }
+
+  /* ── RESULTS ── */
+  #results { display: none; }
+
+  .rank-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+  .sku-row {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--r);
+    display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 0;
+    overflow: hidden; transition: box-shadow .15s;
+  }
+  .sku-row:hover { box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+
+  .rank-num {
+    font-size: 15px; font-weight: 800; color: var(--white);
+    background: var(--accent); height: 100%; display: flex; align-items: center; justify-content: center;
+    min-height: 72px;
+  }
+  .rank-num.r1 { background: #b45309; }
+  .rank-num.r2 { background: #6b7280; }
+  .rank-num.r3 { background: #92400e; }
+
+  .sku-body { padding: 12px 14px; }
+  .sku-id { font-size: 13px; font-weight: 700; }
+  .sku-cat { font-size: 11px; color: var(--soft); margin-top: 1px; }
+  .sku-signals { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 7px; }
+  .sig { font-size: 11px; padding: 2px 7px; border-radius: 20px; font-weight: 600; }
+  .sig-green  { background: var(--green-bg); color: var(--green); }
+  .sig-amber  { background: var(--amber-bg); color: var(--amber); }
+  .sig-blue   { background: var(--accent-bg); color: var(--accent); }
+  .sig-gray   { background: #f3f4f6; color: #6b7280; }
+
+  .sku-score { padding: 12px 16px; text-align: right; }
+  .score-val { font-size: 22px; font-weight: 800; color: var(--ink); }
+  .score-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+  .score-bar-wrap { width: 60px; height: 5px; background: var(--border); border-radius: 3px; margin: 4px 0 0 auto; }
+  .score-bar { height: 5px; border-radius: 3px; background: var(--accent); }
+
+  .reasoning-block {
+    background: var(--ink); border-radius: var(--r); padding: 20px 22px; margin-bottom: 20px;
+  }
+  .reasoning-block h3 { font-size: 12px; font-weight: 700; color: #93c5fd; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; }
+  .reasoning-item { display: flex; gap: 10px; margin-bottom: 10px; }
+  .reasoning-item .n { font-size: 13px; font-weight: 800; color: #60a5fa; min-width: 22px; }
+  .reasoning-item p { font-size: 13px; color: #e2e8f0; line-height: 1.6; }
+  .reasoning-item strong { color: #fff; }
+
+  .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading { text-align: center; padding: 40px; }
+  .loading p { font-size: 13px; color: var(--soft); }
+
+  .not-found-list { font-size: 12px; color: var(--soft); margin-top: 8px; }
+  .not-found-list span { display: inline-block; background: #f3f4f6; padding: 2px 7px; border-radius: 4px; margin: 2px; font-family: monospace; }
+
+  .api-field { margin-top: 14px; }
+  .api-field label { font-size: 12px; font-weight: 600; display: block; margin-bottom: 5px; }
+  input[type=password] { width: 100%; padding: 9px 11px; border: 1.5px solid var(--border); border-radius: var(--r); font-size: 13px; outline: none; transition: border-color .15s; }
+  input[type=password]:focus { border-color: var(--accent); }
+  .api-link { font-size: 11px; color: var(--accent); margin-top: 3px; display: inline-block; }
+
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .top-bar h2 { font-size: 15px; font-weight: 700; }
+  .top-bar p { font-size: 12px; color: var(--soft); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="icon">🏆</div>
+  <div>
+    <h1>SKU Asset Ranker</h1>
+    <p>Paste a list of SKUs → get a ranked hierarchy for homepage asset placement</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- STEP 1: DATA FILES -->
+  <div class="card" id="card-files">
+    <h2>1. Load your data files</h2>
+    <p class="sub">Upload both files once. They stay loaded until you refresh the page.</p>
+    <div class="upload-row">
+      <div class="upload-box" id="box-promo" onclick="document.getElementById('f-promo').click()">
+        <div class="ico">📊</div>
+        <p><strong>Promo Data Template</strong></p>
+        <p style="margin-top:3px">Funnel Data sheet</p>
+        <div class="fn" id="fn-promo"></div>
+        <input type="file" id="f-promo" accept=".xlsx,.xls" onchange="loadPromo(event)">
+      </div>
+      <div class="upload-box" id="box-site" onclick="document.getElementById('f-site').click()">
+        <div class="ico">📈</div>
+        <p><strong>Sitewide SKU Performance</strong></p>
+        <p style="margin-top:3px">Optional but recommended</p>
+        <div class="fn" id="fn-site"></div>
+        <input type="file" id="f-site" accept=".xlsx,.xls" onchange="loadSitewide(event)">
+      </div>
+    </div>
+    <div class="msg" id="msg-files"></div>
+  </div>
+
+  <!-- STEP 2: SKU LIST -->
+  <div class="card">
+    <h2>2. Paste your SKU list</h2>
+    <p class="sub">One SKU per line, or comma/space separated. These are the SKUs you're considering for the upcoming promotion's homepage assets.</p>
+    <textarea id="sku-input" placeholder="7301LWS&#10;8842REF&#10;G0003TJ&#10;7801QZU&#10;..."></textarea>
+    <div class="api-field">
+      <label>Anthropic API Key <span style="font-weight:400;color:var(--muted)">(for AI reasoning)</span></label>
+      <input type="password" id="api-key" placeholder="sk-ant-...">
+      <a class="api-link" href="https://console.anthropic.com" target="_blank">Get a key →</a>
+    </div>
+    <div style="margin-top:14px; display:flex; gap:10px; align-items:center;">
+      <button class="btn btn-primary" onclick="runRanker()">Rank these SKUs ✦</button>
+      <button class="btn btn-ghost" onclick="clearResults()">Clear</button>
+    </div>
+    <div class="msg" id="msg-skus"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="loading" id="loading" style="display:none">
+      <div class="spinner"></div>
+      <p id="loading-msg">Scoring SKUs…</p>
+    </div>
+
+    <div id="output" style="display:none">
+      <div class="reasoning-block" id="reasoning-block"></div>
+
+      <div class="top-bar">
+        <div>
+          <h2>Ranked SKUs</h2>
+          <p id="rank-sub"></p>
+        </div>
+      </div>
+
+      <div class="rank-grid" id="rank-grid"></div>
+
+      <div id="not-found-block" style="display:none" class="card">
+        <h2 style="color:var(--amber)">SKUs not found in data</h2>
+        <p class="sub">These SKUs weren't found in either the promo template or sitewide data. Check the SKU numbers.</p>
+        <div class="not-found-list" id="not-found-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+let promoHistory = {};   // sku -> {appearances, apps, orders, deliveries, days, funnel, appsPerDay, appToOrder}
+let sitewideMap  = {};   // sku -> {pageViews, apps, orders, cvr, leaseRev, category, subcat}
+let promoLoaded  = false;
+let siteLoaded   = false;
+
+// ── LOAD PROMO ──────────────────────────────────────────────────────────────
+function loadPromo(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const wb = XLSX.read(ev.target.result, {type:'array'});
+    // find Funnel Data sheet
+    const sheetName = wb.SheetNames.find(n => /funnel/i.test(n)) || wb.SheetNames[0];
+    const ws = wb.Sheets[sheetName];
+    // Use header:1 to get raw arrays, then find the real header row
+    const raw = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+    // Find the row that has 'Promotion' and 'SKU'
+    let headerIdx = raw.findIndex(row => row.some(c => String(c).trim() === 'Promotion') && row.some(c => String(c).trim() === 'SKU'));
+    if (headerIdx === -1) headerIdx = 0;
+    const headers = raw[headerIdx].map(c => String(c).trim());
+    const promoIdx  = headers.indexOf('Promotion');
+    const skuIdx    = headers.indexOf('SKU');
+    const catIdx    = headers.indexOf('Category');
+    const subcatIdx = headers.indexOf('Sub-Category');
+    const appsIdx   = headers.indexOf('Applications Started');
+    const ordersIdx = headers.indexOf('Gross Orders');
+    const delsIdx   = headers.indexOf('Deliveries');
+    const daysIdx   = headers.indexOf('Number of Promo Days');
+
+    promoHistory = {};
+    for (let i = headerIdx + 1; i < raw.length; i++) {
+      const row = raw[i];
+      const sku = String(row[skuIdx] || '').trim();
+      if (!sku) continue;
+      const apps  = parseNum(row[appsIdx]);
+      const ords  = parseNum(row[ordersIdx]);
+      const dels  = parseNum(row[delsIdx]);
+      const days  = parseNum(row[daysIdx]) || 1;
+      if (!promoHistory[sku]) {
+        promoHistory[sku] = {
+          appearances: 0, apps: 0, orders: 0, deliveries: 0, days: 0,
+          category: String(row[catIdx]||'').trim(),
+          subcat: String(row[subcatIdx]||'').trim()
+        };
+      }
+      promoHistory[sku].appearances++;
+      promoHistory[sku].apps       += apps;
+      promoHistory[sku].orders     += ords;
+      promoHistory[sku].deliveries += dels;
+      promoHistory[sku].days       += days;
+    }
+    // compute derived metrics
+    Object.values(promoHistory).forEach(h => {
+      h.appsPerDay  = h.days > 0 ? h.apps / h.days : 0;
+      h.funnel      = h.apps > 0 ? h.deliveries / h.apps : 0;
+      h.appToOrder  = h.apps > 0 ? h.orders / h.apps : 0;
+    });
+
+    promoLoaded = true;
+    const skuCount = Object.keys(promoHistory).length;
+    document.getElementById('fn-promo').textContent = `✓ ${file.name} (${skuCount} SKUs)`;
+    document.getElementById('box-promo').classList.add('ok');
+    showMsg('msg-files', 'info', `Promo data loaded: ${skuCount} unique SKUs across all promotions.`);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── LOAD SITEWIDE ───────────────────────────────────────────────────────────
+function loadSitewide(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const wb = XLSX.read(ev.target.result, {type:'array'});
+    const sheetName = wb.SheetNames.find(n => /sitewide|performance/i.test(n)) || wb.SheetNames.find(n => n !== 'README') || wb.SheetNames[0];
+    const ws = wb.Sheets[sheetName];
+    const raw = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+    // header is row 0: SKU, Product Name, Category, Sub-Category, Page Views, Applications Started, Gross Orders, Conversion Rate, Revenue
+    // actual data mapping (column shift — no product name in data):
+    // col1(ProductName)=Category, col2(Category)=SubCat, col3(SubCat)=PageViews,
+    // col4(PageViews)=Apps, col5(AppsStarted)=Orders, col7(ConvRate)=CVR, col8(Revenue)=LeaseRev
+    sitewideMap = {};
+    for (let i = 1; i < raw.length; i++) {
+      const row = raw[i];
+      const sku = String(row[0] || '').trim();
+      if (!sku) continue;
+      const pageViews = parseNum(row[3]);
+      const apps      = parseNum(row[4]);
+      const orders    = parseNum(row[5]);
+      const cvr       = apps > 0 ? orders / apps : 0;
+      const leaseRev  = parseNum(row[8]);
+      const category  = String(row[1] || '').trim();
+      const subcat    = String(row[2] || '').trim();
+      sitewideMap[sku] = {pageViews, apps, orders, cvr, leaseRev, category, subcat};
+    }
+    siteLoaded = true;
+    const skuCount = Object.keys(sitewideMap).length;
+    document.getElementById('fn-site').textContent = `✓ ${file.name} (${skuCount} SKUs)`;
+    document.getElementById('box-site').classList.add('ok');
+    const prev = document.getElementById('msg-files').textContent;
+    showMsg('msg-files', 'info', prev + ` Sitewide data loaded: ${skuCount} SKUs.`);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── PARSE HELPERS ───────────────────────────────────────────────────────────
+function parseNum(v) {
+  if (typeof v === 'number') return isNaN(v) ? 0 : v;
+  return parseFloat(String(v).replace(/[^0-9.-]/g,'')) || 0;
+}
+function pct(v) { return (v * 100).toFixed(1) + '%'; }
+function fmt(v) { return v >= 1000 ? (v/1000).toFixed(1)+'k' : v.toFixed(1); }
+
+// ── MAIN RANKER ─────────────────────────────────────────────────────────────
+async function runRanker() {
+  const raw = document.getElementById('sku-input').value;
+  const apiKey = document.getElementById('api-key').value.trim();
+
+  if (!promoLoaded && !siteLoaded) {
+    showMsg('msg-skus', 'err', 'Please upload at least one data file first.');
+    return;
+  }
+  const skus = raw.split(/[\n,\s]+/).map(s => s.trim().toUpperCase()).filter(Boolean);
+  if (!skus.length) {
+    showMsg('msg-skus', 'err', 'Please enter at least one SKU.');
+    return;
+  }
+
+  document.getElementById('msg-skus').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('output').style.display = 'none';
+
+  const msgs = ['Scoring SKUs…','Weighting data sources…','Building composite scores…','Ranking by engagement potential…'];
+  let mi = 0;
+  const iv = setInterval(() => { document.getElementById('loading-msg').textContent = msgs[++mi % msgs.length]; }, 1800);
+
+  // ── SCORE EACH SKU ──
+  const notFound = [];
+  const scored = [];
+
+  // Compute normalization max values across ALL known SKUs (not just the input list)
+  const allPromoAppsPerDay = Object.values(promoHistory).map(h => h.appsPerDay);
+  const allPromoFunnel     = Object.values(promoHistory).map(h => h.funnel);
+  const allSiteApps        = Object.values(sitewideMap).map(h => h.apps);
+  const allSiteCvr         = Object.values(sitewideMap).map(h => h.cvr);
+  const maxPromoAppsDay = Math.max(...allPromoAppsPerDay, 0.01);
+  const maxPromoFunnel  = Math.max(...allPromoFunnel, 0.01);
+  const maxSiteApps     = Math.max(...allSiteApps, 0.01);
+  const maxSiteCvr      = Math.max(...allSiteCvr, 0.01);
+
+  skus.forEach(sku => {
+    const promo = promoHistory[sku] || promoHistory[sku.toLowerCase()] || null;
+    const site  = sitewideMap[sku]  || sitewideMap[sku.toLowerCase()]  || null;
+
+    if (!promo && !site) { notFound.push(sku); return; }
+
+    // Promo score (0-1)
+    let promoScore = null;
+    if (promo && promo.apps > 0) {
+      promoScore = (promo.appsPerDay / maxPromoAppsDay) * 0.45
+                 + (promo.funnel     / maxPromoFunnel)  * 0.40
+                 + Math.min(promo.appearances / 5, 1)   * 0.15;
+    }
+
+    // Sitewide score (0-1)
+    let siteScore = null;
+    if (site && site.apps > 0) {
+      siteScore = (site.apps / maxSiteApps) * 0.50
+                + (site.cvr  / maxSiteCvr)  * 0.50;
+    }
+
+    // Weight by data availability & sample size
+    let promoW, siteW;
+    const appearances = promo?.appearances || 0;
+    if (promoScore !== null && siteScore !== null) {
+      // Both available — weight promo more heavily with more appearances
+      if (appearances >= 3)      { promoW = 0.65; siteW = 0.35; }
+      else if (appearances >= 1) { promoW = 0.50; siteW = 0.50; }
+      else                       { promoW = 0.25; siteW = 0.75; }
+    } else if (promoScore !== null) {
+      promoW = 1.0; siteW = 0.0;
+    } else {
+      promoW = 0.0; siteW = 1.0;
+    }
+
+    const composite = Math.round(((promoScore || 0) * promoW + (siteScore || 0) * siteW) * 100);
+    const category  = promo?.category || site?.category || '';
+    const subcat    = promo?.subcat   || site?.subcat   || '';
+
+    scored.push({
+      sku, composite, promoScore, siteScore, promoW, siteW,
+      category, subcat, appearances,
+      promo, site,
+      dataBasis: promoScore !== null && siteScore !== null ? (appearances >= 3 ? 'Promo-led' : appearances >= 1 ? 'Balanced' : 'Sitewide-led')
+               : promoScore !== null ? 'Promo only'
+               : 'Sitewide only'
+    });
+  });
+
+  scored.sort((a, b) => b.composite - a.composite);
+  clearInterval(iv);
+
+  // ── AI REASONING ──
+  let reasoning = [];
+  if (apiKey.startsWith('sk-ant-') && scored.length) {
+    document.getElementById('loading-msg').textContent = 'Generating AI reasoning…';
+    const payload = scored.map((s, i) => ({
+      rank: i + 1,
+      sku: s.sku,
+      category: s.category,
+      subcat: s.subcat,
+      composite: s.composite,
+      dataBasis: s.dataBasis,
+      promoAppearances: s.appearances,
+      promoAppsPerDay: s.promo ? +s.promo.appsPerDay.toFixed(2) : null,
+      promoFunnelPct: s.promo ? +(s.promo.funnel * 100).toFixed(1) : null,
+      promoAppToOrderPct: s.promo ? +(s.promo.appToOrder * 100).toFixed(1) : null,
+      siteApps: s.site?.apps || null,
+      siteCvr: s.site ? +(s.site.cvr * 100).toFixed(1) : null,
+      siteLeaseRev: s.site?.leaseRev || null,
+    }));
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1200,
+          messages: [{
+            role: 'user',
+            content: `You are a retail merchandising analyst. You've scored these SKUs for homepage asset placement based on promo history and sitewide engagement. Provide 4-6 concise insights explaining the ranking — why the top SKUs earned their positions, any notable patterns, and any caveats about lower-ranked SKUs that still merit consideration.
+
+SCORED SKUs (ranked 1=best):
+${JSON.stringify(payload, null, 2)}
+
+Scoring notes:
+- Composite score 0-100 (higher = stronger engagement signal)
+- Promo score weights: 45% apps/day, 40% full funnel rate, 15% # of promotions (sample size)
+- Sitewide score weights: 50% total sitewide applications, 50% order/app CVR
+- Weight split between promo vs sitewide varies by sample size
+
+Respond ONLY with valid JSON array, no markdown:
+[{"headline":"...","body":"..."},...]`
+          }]
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.content.map(b => b.text || '').join('');
+        reasoning = JSON.parse(text.replace(/```json|```/g, '').trim());
+      }
+    } catch(e) { /* reasoning stays empty, we still show scores */ }
+  }
+
+  renderResults(scored, notFound, reasoning);
+}
+
+// ── RENDER ──────────────────────────────────────────────────────────────────
+function renderResults(scored, notFound, reasoning) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('output').style.display = 'block';
+
+  // reasoning
+  const rb = document.getElementById('reasoning-block');
+  if (reasoning.length) {
+    rb.style.display = 'block';
+    rb.innerHTML = '<h3>✦ AI Analysis</h3>' +
+      reasoning.map((r, i) => `
+        <div class="reasoning-item">
+          <div class="n">${i+1}</div>
+          <p><strong>${r.headline}</strong> — ${r.body}</p>
+        </div>`).join('');
+  } else {
+    rb.style.display = 'none';
+  }
+
+  document.getElementById('rank-sub').textContent =
+    `${scored.length} SKU${scored.length !== 1 ? 's' : ''} ranked · scores normalized across your full dataset`;
+
+  const grid = document.getElementById('rank-grid');
+  grid.innerHTML = '';
+  const maxScore = scored[0]?.composite || 1;
+
+  scored.forEach((s, i) => {
+    const rankClass = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+    const signals = [];
+
+    if (s.promo && s.promo.apps > 0) {
+      signals.push(`<span class="sig sig-blue">${fmt(s.promo.appsPerDay)} apps/day on promo</span>`);
+      signals.push(`<span class="sig ${s.promo.funnel > .22 ? 'sig-green' : 'sig-amber'}">${pct(s.promo.funnel)} funnel</span>`);
+      if (s.appearances > 1) signals.push(`<span class="sig sig-gray">${s.appearances} promos</span>`);
+    } else if (s.promo) {
+      signals.push(`<span class="sig sig-gray">In ${s.appearances} promo${s.appearances>1?'s':''} — no data yet</span>`);
+    }
+
+    if (s.site && s.site.apps > 0) {
+      signals.push(`<span class="sig sig-blue">${s.site.apps.toLocaleString()} sitewide apps</span>`);
+      if (s.site.cvr > 0) signals.push(`<span class="sig ${s.site.cvr > .30 ? 'sig-green' : 'sig-amber'}">${pct(s.site.cvr)} CVR sitewide</span>`);
+    }
+
+    const basisColor = {'Promo-led':'sig-blue','Balanced':'sig-amber','Sitewide-led':'sig-green','Promo only':'sig-blue','Sitewide only':'sig-green'}[s.dataBasis] || 'sig-gray';
+
+    grid.innerHTML += `
+      <div class="sku-row">
+        <div class="rank-num ${rankClass}">${i+1}</div>
+        <div class="sku-body">
+          <div class="sku-id">${s.sku}</div>
+          <div class="sku-cat">${[s.category, s.subcat].filter(Boolean).join(' › ')}</div>
+          <div class="sku-signals">
+            ${signals.join('')}
+            <span class="sig ${basisColor}">${s.dataBasis}</span>
+          </div>
+        </div>
+        <div class="sku-score">
+          <div class="score-val">${s.composite}</div>
+          <div class="score-lbl">Score</div>
+          <div class="score-bar-wrap"><div class="score-bar" style="width:${Math.round(s.composite/maxScore*100)}%"></div></div>
+        </div>
+      </div>
+    `;
+  });
+
+  // not found
+  const nfBlock = document.getElementById('not-found-block');
+  if (notFound.length) {
+    nfBlock.style.display = 'block';
+    document.getElementById('not-found-list').innerHTML = notFound.map(s => `<span>${s}</span>`).join('');
+  } else {
+    nfBlock.style.display = 'none';
+  }
+}
+
+function clearResults() {
+  document.getElementById('sku-input').value = '';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('msg-skus').style.display = 'none';
+}
+
+function showMsg(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = 'msg ' + type;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+</script>
+</body>
+</html>
