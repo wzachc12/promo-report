@@ -62,7 +62,7 @@
             background: #f0f7ff;
             border: 2px dashed #0066cc;
             border-radius: 8px;
-            padding: 20px;
+            padding: 30px;
             margin-bottom: 30px;
             text-align: center;
         }
@@ -78,29 +78,18 @@
             margin-bottom: 15px;
         }
         
-        .file-input-wrapper {
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
-        }
-        
-        .file-input-wrapper input[type=file] {
-            display: none;
-        }
-        
-        .upload-btn {
+        #fileInput {
+            padding: 12px 30px;
             background: #0066cc;
             color: white;
-            padding: 12px 30px;
+            border: none;
             border-radius: 6px;
             font-weight: 500;
-            border: none;
             cursor: pointer;
             font-size: 14px;
-            transition: background 0.2s;
         }
         
-        .upload-btn:hover {
+        #fileInput:hover {
             background: #0052a3;
         }
         
@@ -339,6 +328,7 @@
             padding: 15px;
             border-radius: 6px;
             margin-bottom: 20px;
+            display: none;
         }
         
         .success {
@@ -348,6 +338,7 @@
             padding: 15px;
             border-radius: 6px;
             margin-bottom: 20px;
+            display: none;
         }
         
         .empty-state {
@@ -372,15 +363,12 @@
         <div class="upload-section">
             <h3>📤 Upload Excel Template</h3>
             <p>Select your completed 2026_homepage_content_calendar_template.xlsx file</p>
-            <div class="file-input-wrapper">
-                <button class="upload-btn">Choose File & Upload</button>
-                <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="handleFileUpload(event)">
-            </div>
+            <input type="file" id="fileInput" accept=".xlsx,.xls">
             <div class="file-name" id="fileName"></div>
         </div>
         
-        <div id="errorMessage" class="error" style="display:none;"></div>
-        <div id="successMessage" class="success" style="display:none;"></div>
+        <div id="errorMessage" class="error"></div>
+        <div id="successMessage" class="success"></div>
         
         <div id="calendarContainer" style="display:none;">
             <div class="calendar-controls">
@@ -425,6 +413,12 @@
             '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
             '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B88B', '#A8E6CF'
         ];
+
+        // Attach event listener when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileInput');
+            fileInput.addEventListener('change', handleFileUpload);
+        });
 
         function getPromoColor(promoName) {
             if (!promoColors[promoName]) {
@@ -551,7 +545,7 @@
                 for (let day = 1; day <= daysInMonth; day++) {
                     const cellDate = new Date(year, month, day);
                     const cellContent = getCellContent(slot.name, cellDate);
-                    html += `<td class="day-cell" onclick="showDetails('${slot.name}', ${cellDate.getTime()})">${cellContent}</td>`;
+                    html += `<td class="day-cell" onclick="showDetails('${slot.name.replace(/'/g, "\\'")}', ${cellDate.getTime()})">${cellContent}</td>`;
                 }
                 
                 html += '</tr>';
