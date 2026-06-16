@@ -19,7 +19,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026 Homepage Content Calendar</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -304,23 +304,6 @@
             margin-bottom: 15px;
         }
         
-        .modal-label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #333;
-            font-size: 13px;
-        }
-        
-        .modal-value {
-            background: #f5f5f5;
-            padding: 10px;
-            border-radius: 4px;
-            color: #555;
-            font-size: 13px;
-            word-break: break-word;
-        }
-        
         .error {
             background: #fee;
             border: 1px solid #fcc;
@@ -351,6 +334,13 @@
             margin-bottom: 10px;
             color: #666;
         }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #0066cc;
+        }
     </style>
 </head>
 <body>
@@ -369,6 +359,7 @@
         
         <div id="errorMessage" class="error"></div>
         <div id="successMessage" class="success"></div>
+        <div class="loading" id="loading">Loading calendar...</div>
         
         <div id="calendarContainer" style="display:none;">
             <div class="calendar-controls">
@@ -414,8 +405,8 @@
             '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B88B', '#A8E6CF'
         ];
 
-        // Attach event listener when page loads
-        document.addEventListener('DOMContentLoaded', function() {
+        // Wait for page to load and XLSX to be available
+        window.addEventListener('load', function() {
             const fileInput = document.getElementById('fileInput');
             fileInput.addEventListener('change', handleFileUpload);
         });
@@ -433,23 +424,38 @@
             if (!file) return;
 
             document.getElementById('fileName').textContent = `✓ ${file.name}`;
+            document.getElementById('loading').style.display = 'block';
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
+                    // Check if XLSX is loaded
+                    if (typeof XLSX === 'undefined') {
+                        throw new Error('XLSX library failed to load. Please refresh the page and try again.');
+                    }
+
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
 
                     // Read Promotions sheet
                     const promos_sheet = workbook.Sheets['Promotions'];
+                    if (!promos_sheet) {
+                        throw new Error('Promotions sheet not found in Excel file');
+                    }
                     promotions = XLSX.utils.sheet_to_json(promos_sheet).filter(row => row['Promo Name']);
 
                     // Read Slot Messaging sheet
                     const messaging_sheet = workbook.Sheets['Slot Messaging'];
+                    if (!messaging_sheet) {
+                        throw new Error('Slot Messaging sheet not found in Excel file');
+                    }
                     slotMessaging = XLSX.utils.sheet_to_json(messaging_sheet).filter(row => row['Slot Name']);
 
                     // Read Slot Rankings sheet for all slots
                     const rankings_sheet = workbook.Sheets['Slot Rankings'];
+                    if (!rankings_sheet) {
+                        throw new Error('Slot Rankings sheet not found in Excel file');
+                    }
                     allSlots = XLSX.utils.sheet_to_json(rankings_sheet).filter(row => row['Slot Name']).map(row => ({
                         name: row['Slot Name'],
                         ranking: row['Ranking'] || 999
@@ -457,6 +463,7 @@
 
                     if (promotions.length === 0 || slotMessaging.length === 0) {
                         showError('Template incomplete. Please fill in Promotions and Slot Messaging sheets.');
+                        document.getElementById('loading').style.display = 'none';
                         return;
                     }
 
@@ -473,10 +480,12 @@
                     // Show calendar
                     document.getElementById('emptyState').style.display = 'none';
                     document.getElementById('calendarContainer').style.display = 'block';
+                    document.getElementById('loading').style.display = 'none';
                     renderCalendar();
                     showSuccess('Calendar loaded successfully!');
 
                 } catch (error) {
+                    document.getElementById('loading').style.display = 'none';
                     showError('Error reading file: ' + error.message);
                     console.error(error);
                 }
@@ -521,7 +530,6 @@
             document.getElementById('monthDisplay').textContent = 
                 currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-            const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
             const daysInMonth = lastDay.getDate();
 
@@ -545,7 +553,8 @@
                 for (let day = 1; day <= daysInMonth; day++) {
                     const cellDate = new Date(year, month, day);
                     const cellContent = getCellContent(slot.name, cellDate);
-                    html += `<td class="day-cell" onclick="showDetails('${slot.name.replace(/'/g, "\\'")}', ${cellDate.getTime()})">${cellContent}</td>`;
+                    const slotKey = slot.name.replace(/'/g, "\\'");
+                    html += `<td class="day-cell" onclick="showDetails('${slotKey}', ${cellDate.getTime()})">${cellContent}</td>`;
                 }
                 
                 html += '</tr>';
@@ -578,15 +587,15 @@
                         promo: promo['Promo Name'],
                         tier: slot['Tier'] || 'All Tiers',
                         messaging: slot['Messaging (Headline / Copy)'] || '',
-                        priority: slot['Priority'] || 999
+                        priority: slot['Priority']
                     });
                 });
             });
 
-            // Sort by priority (lower number = higher priority)
+            // Sort by priority (1 = highest priority)
             messages.sort((a, b) => {
-                const aPriority = a.priority === 1 ? 0 : 1;
-                const bPriority = b.priority === 1 ? 0 : 1;
+                const aPriority = Number(a.priority) || 999;
+                const bPriority = Number(b.priority) || 999;
                 return aPriority - bPriority;
             });
 
@@ -596,7 +605,8 @@
 
             // Show only highest priority
             const topMessage = messages[0];
-            const html = `<div class="promo-bar ${topMessage.priority === 1 ? 'priority-1' : ''}" 
+            const isPriority = topMessage.priority === 1 || topMessage.priority === '1';
+            const html = `<div class="promo-bar ${isPriority ? 'priority-1' : ''}" 
                 style="background-color: ${getPromoColor(topMessage.promo)}">
                 <span class="tier-label">${topMessage.tier}</span>
                 <span>${topMessage.messaging}</span>
@@ -647,7 +657,7 @@
                         details += `<p style="color: #999; font-size: 12px; margin-top: 8px;">No messaging for this slot</p>`;
                     } else {
                         slots.forEach(slot => {
-                            const priority = slot['Priority'] === 1 ? '⚠️ PRIORITY' : '';
+                            const priority = slot['Priority'] === 1 || slot['Priority'] === '1' ? '⚠️ PRIORITY' : '';
                             details += `
                                 <div style="margin-top: 10px; padding: 8px; background: #f5f5f5; border-radius: 4px;">
                                     <p style="font-size: 11px; color: #666; margin-bottom: 5px;">
@@ -677,7 +687,7 @@
             errorDiv.style.display = 'block';
             setTimeout(() => {
                 errorDiv.style.display = 'none';
-            }, 5000);
+            }, 7000);
         }
 
         function showSuccess(message) {
