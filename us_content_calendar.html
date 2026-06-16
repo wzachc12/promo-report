@@ -1,0 +1,713 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Homepage Content Calendar</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #222;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .upload-section {
+            background: #f0f7ff;
+            border: 2px dashed #0066cc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .upload-section h3 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        
+        .upload-section p {
+            color: #555;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+        
+        .file-input-wrapper {
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: #0066cc;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        
+        .upload-btn:hover {
+            background: #0052a3;
+        }
+        
+        .file-name {
+            margin-top: 10px;
+            color: #22c55e;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .month-nav {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .month-nav button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        
+        .month-nav button:hover {
+            background: #0052a3;
+        }
+        
+        .month-display {
+            font-size: 16px;
+            font-weight: 600;
+            color: #222;
+            min-width: 150px;
+            text-align: center;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            font-size: 13px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+        
+        .calendar-wrapper {
+            overflow-x: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+        
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+        
+        .calendar thead {
+            background: #f5f5f5;
+        }
+        
+        .calendar th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+        
+        .calendar td {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            vertical-align: top;
+            font-size: 12px;
+        }
+        
+        .calendar tr:hover {
+            background: #fafafa;
+        }
+        
+        .slot-name {
+            font-weight: 600;
+            color: #222;
+            width: 200px;
+            min-width: 200px;
+            background: #f9f9f9;
+        }
+        
+        .day-cell {
+            min-width: 100px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .day-cell:hover {
+            background: #f0f7ff;
+        }
+        
+        .day-header {
+            font-weight: 600;
+            color: #222;
+            padding: 15px 12px;
+            background: #f0f7ff;
+            border-bottom: 2px solid #0066cc;
+        }
+        
+        .day-number {
+            display: block;
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 3px;
+        }
+        
+        .promo-bar {
+            padding: 8px;
+            margin-bottom: 4px;
+            border-radius: 3px;
+            font-size: 11px;
+            line-height: 1.4;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .promo-bar:hover {
+            opacity: 0.9;
+        }
+        
+        .promo-bar.priority-1 {
+            border: 2px solid #dc2626;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+        }
+        
+        .tier-label {
+            display: block;
+            font-size: 10px;
+            opacity: 0.9;
+            margin-bottom: 2px;
+        }
+        
+        .default-cell {
+            color: #999;
+            font-style: italic;
+            font-size: 11px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .modal-close {
+            color: #999;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .modal-close:hover {
+            color: #333;
+        }
+        
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #222;
+        }
+        
+        .modal-row {
+            margin-bottom: 15px;
+        }
+        
+        .modal-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 13px;
+        }
+        
+        .modal-value {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            color: #555;
+            font-size: 13px;
+            word-break: break-word;
+        }
+        
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .success {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 2026 Homepage Content Calendar</h1>
+            <p class="subtitle">Upload your completed template to view the calendar</p>
+        </div>
+        
+        <div class="upload-section">
+            <h3>📤 Upload Excel Template</h3>
+            <p>Select your completed 2026_homepage_content_calendar_template.xlsx file</p>
+            <div class="file-input-wrapper">
+                <button class="upload-btn">Choose File & Upload</button>
+                <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="handleFileUpload(event)">
+            </div>
+            <div class="file-name" id="fileName"></div>
+        </div>
+        
+        <div id="errorMessage" class="error" style="display:none;"></div>
+        <div id="successMessage" class="success" style="display:none;"></div>
+        
+        <div id="calendarContainer" style="display:none;">
+            <div class="calendar-controls">
+                <div class="month-nav">
+                    <button onclick="previousMonth()">← Previous</button>
+                    <div class="month-display" id="monthDisplay"></div>
+                    <button onclick="nextMonth()">Next →</button>
+                </div>
+            </div>
+            
+            <div class="legend" id="legend"></div>
+            
+            <div class="calendar-wrapper">
+                <table class="calendar" id="calendar"></table>
+            </div>
+        </div>
+        
+        <div id="emptyState" class="empty-state">
+            <h3>👆 Upload your template to get started</h3>
+            <p>Your calendar will appear here once you upload your Excel file</p>
+        </div>
+    </div>
+    
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Promo Details</h2>
+            <div id="modalDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentMonth = new Date();
+        let promotions = [];
+        let slotMessaging = [];
+        let allSlots = [];
+        let promoColors = {};
+        let colorIndex = 0;
+
+        const colorPalette = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+            '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B88B', '#A8E6CF'
+        ];
+
+        function getPromoColor(promoName) {
+            if (!promoColors[promoName]) {
+                promoColors[promoName] = colorPalette[colorIndex % colorPalette.length];
+                colorIndex++;
+            }
+            return promoColors[promoName];
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('fileName').textContent = `✓ ${file.name}`;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+
+                    // Read Promotions sheet
+                    const promos_sheet = workbook.Sheets['Promotions'];
+                    promotions = XLSX.utils.sheet_to_json(promos_sheet).filter(row => row['Promo Name']);
+
+                    // Read Slot Messaging sheet
+                    const messaging_sheet = workbook.Sheets['Slot Messaging'];
+                    slotMessaging = XLSX.utils.sheet_to_json(messaging_sheet).filter(row => row['Slot Name']);
+
+                    // Read Slot Rankings sheet for all slots
+                    const rankings_sheet = workbook.Sheets['Slot Rankings'];
+                    allSlots = XLSX.utils.sheet_to_json(rankings_sheet).filter(row => row['Slot Name']).map(row => ({
+                        name: row['Slot Name'],
+                        ranking: row['Ranking'] || 999
+                    }));
+
+                    if (promotions.length === 0 || slotMessaging.length === 0) {
+                        showError('Template incomplete. Please fill in Promotions and Slot Messaging sheets.');
+                        return;
+                    }
+
+                    // Parse dates
+                    promotions = promotions.map(p => ({
+                        ...p,
+                        'Start Date': parseDate(p['Start Date']),
+                        'End Date': parseDate(p['End Date'])
+                    }));
+
+                    // Build legend
+                    buildLegend();
+
+                    // Show calendar
+                    document.getElementById('emptyState').style.display = 'none';
+                    document.getElementById('calendarContainer').style.display = 'block';
+                    renderCalendar();
+                    showSuccess('Calendar loaded successfully!');
+
+                } catch (error) {
+                    showError('Error reading file: ' + error.message);
+                    console.error(error);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            if (typeof dateStr === 'number') {
+                // Excel serial date
+                return new Date((dateStr - 25569) * 86400 * 1000);
+            }
+            return new Date(dateStr);
+        }
+
+        function buildLegend() {
+            const legendDiv = document.getElementById('legend');
+            legendDiv.innerHTML = '';
+
+            promotions.forEach(promo => {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                
+                const color = document.createElement('div');
+                color.className = 'legend-color';
+                color.style.backgroundColor = getPromoColor(promo['Promo Name']);
+                
+                const label = document.createElement('span');
+                label.textContent = promo['Promo Name'];
+                
+                item.appendChild(color);
+                item.appendChild(label);
+                legendDiv.appendChild(item);
+            });
+        }
+
+        function renderCalendar() {
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            
+            document.getElementById('monthDisplay').textContent = 
+                currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+
+            // Build header
+            let html = '<thead><tr><th class="slot-name">Slot Name</th>';
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                html += `<th class="day-header">
+                    <span class="day-number">${dayName}</span>
+                    ${day}
+                </th>`;
+            }
+            html += '</tr></thead>';
+
+            // Build body
+            html += '<tbody>';
+            allSlots.forEach(slot => {
+                html += `<tr><td class="slot-name">${slot.name}</td>`;
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const cellDate = new Date(year, month, day);
+                    const cellContent = getCellContent(slot.name, cellDate);
+                    html += `<td class="day-cell" onclick="showDetails('${slot.name}', ${cellDate.getTime()})">${cellContent}</td>`;
+                }
+                
+                html += '</tr>';
+            });
+            html += '</tbody>';
+
+            document.getElementById('calendar').innerHTML = html;
+        }
+
+        function getCellContent(slotName, date) {
+            // Find all promos active on this date
+            const activePromos = promotions.filter(p => {
+                return date >= p['Start Date'] && date <= p['End Date'];
+            });
+
+            if (activePromos.length === 0) {
+                return '<span class="default-cell">default</span>';
+            }
+
+            // Get messaging for this slot/promo combination, sorted by priority
+            const messages = [];
+            activePromos.forEach(promo => {
+                const slots = slotMessaging.filter(m => 
+                    m['Slot Name'] === slotName && 
+                    m['Promo Name'] === promo['Promo Name']
+                );
+
+                slots.forEach(slot => {
+                    messages.push({
+                        promo: promo['Promo Name'],
+                        tier: slot['Tier'] || 'All Tiers',
+                        messaging: slot['Messaging (Headline / Copy)'] || '',
+                        priority: slot['Priority'] || 999
+                    });
+                });
+            });
+
+            // Sort by priority (lower number = higher priority)
+            messages.sort((a, b) => {
+                const aPriority = a.priority === 1 ? 0 : 1;
+                const bPriority = b.priority === 1 ? 0 : 1;
+                return aPriority - bPriority;
+            });
+
+            if (messages.length === 0) {
+                return '<span class="default-cell">default</span>';
+            }
+
+            // Show only highest priority
+            const topMessage = messages[0];
+            const html = `<div class="promo-bar ${topMessage.priority === 1 ? 'priority-1' : ''}" 
+                style="background-color: ${getPromoColor(topMessage.promo)}">
+                <span class="tier-label">${topMessage.tier}</span>
+                <span>${topMessage.messaging}</span>
+            </div>`;
+
+            return html;
+        }
+
+        function previousMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function showDetails(slotName, dateTime) {
+            const date = new Date(dateTime);
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const day = date.getDate();
+
+            const cellDate = new Date(year, month, day);
+
+            // Find active promos
+            const activePromos = promotions.filter(p => {
+                return cellDate >= p['Start Date'] && cellDate <= p['End Date'];
+            });
+
+            let details = `<p><strong>Date:</strong> ${cellDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>`;
+            details += `<p><strong>Slot:</strong> ${slotName}</p>`;
+
+            if (activePromos.length === 0) {
+                details += `<div class="modal-row"><p style="color: #999;">No active promotions</p></div>`;
+            } else {
+                activePromos.forEach(promo => {
+                    const slots = slotMessaging.filter(m => 
+                        m['Slot Name'] === slotName && 
+                        m['Promo Name'] === promo['Promo Name']
+                    );
+
+                    details += `<div class="modal-row" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">`;
+                    details += `<strong style="color: ${getPromoColor(promo['Promo Name'])}; font-size: 14px;">${promo['Promo Name']}</strong>`;
+
+                    if (slots.length === 0) {
+                        details += `<p style="color: #999; font-size: 12px; margin-top: 8px;">No messaging for this slot</p>`;
+                    } else {
+                        slots.forEach(slot => {
+                            const priority = slot['Priority'] === 1 ? '⚠️ PRIORITY' : '';
+                            details += `
+                                <div style="margin-top: 10px; padding: 8px; background: #f5f5f5; border-radius: 4px;">
+                                    <p style="font-size: 11px; color: #666; margin-bottom: 5px;">
+                                        <strong>${slot['Tier'] || 'All Tiers'}</strong> ${priority}
+                                    </p>
+                                    <p style="font-size: 12px; color: #333;">${slot['Messaging (Headline / Copy)'] || 'No message'}</p>
+                                </div>
+                            `;
+                        });
+                    }
+                    details += `</div>`;
+                });
+            }
+
+            document.getElementById('modalTitle').textContent = slotName;
+            document.getElementById('modalDetails').innerHTML = details;
+            document.getElementById('detailModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
