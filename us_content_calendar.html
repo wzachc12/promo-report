@@ -1,431 +1,660 @@
-
-                        <!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-							<style>
-								body {
-									background-color: white; /* Ensure the iframe has a white background */
-								}
-
-								
-							</style>
-                        </head>
-                        <body>
-                            <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Homepage Content Calendar</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 30px;
-        }
-        
-        .header {
-            margin-bottom: 30px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 20px;
-        }
-        
-        h1 {
-            color: #222;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-        
-        .subtitle {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .calendar-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .month-nav {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .month-nav button {
-            background: #0066cc;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .month-nav button:hover {
-            background: #0052a3;
-        }
-        
-        .month-display {
-            font-size: 18px;
-            font-weight: 600;
-            color: #222;
-            min-width: 180px;
-            text-align: center;
-        }
-        
-        .legend {
-            display: flex;
-            gap: 25px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            font-size: 13px;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .legend-color {
-            width: 24px;
-            height: 24px;
-            border-radius: 3px;
-        }
-        
-        .calendar-wrapper {
-            overflow-x: auto;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-        }
-        
-        .calendar {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .calendar thead {
-            background: #f5f5f5;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        
-        .calendar th {
-            padding: 12px;
-            text-align: center;
-            font-weight: 600;
-            color: #333;
-            border: 1px solid #e0e0e0;
-            font-size: 12px;
-            min-width: 100px;
-        }
-        
-        .calendar td {
-            padding: 8px;
-            border: 1px solid #e0e0e0;
-            vertical-align: top;
-            font-size: 11px;
-            min-height: 120px;
-        }
-        
-        .calendar tbody tr:hover {
-            background: #fafafa;
-        }
-        
-        .slot-header {
-            font-weight: 600;
-            color: #222;
-            width: 180px;
-            min-width: 180px;
-            background: #f9f9f9;
-            border-right: 2px solid #ddd;
-            position: sticky;
-            left: 0;
-            z-index: 5;
-            padding: 12px !important;
-        }
-        
-        .day-header {
-            font-weight: 600;
-            color: #222;
-            padding: 12px;
-            background: #f0f7ff;
-            border-bottom: 2px solid #0066cc;
-            text-align: center;
-        }
-        
-        .day-number {
-            display: block;
-            font-size: 10px;
-            color: #999;
-            margin-bottom: 4px;
-            font-weight: 500;
-        }
-        
-        .spanning-promo {
-            padding: 8px;
-            margin-bottom: 4px;
-            border-radius: 4px;
-            font-size: 9px;
-            line-height: 1.3;
-            color: white;
-            font-weight: 500;
-        }
-        
-        .tier-block {
-            padding: 3px;
-            margin-bottom: 2px;
-            border-radius: 2px;
-            font-size: 9px;
-            line-height: 1.25;
-        }
-        
-        .tier-label {
-            font-size: 7px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            margin-bottom: 1px;
-            opacity: 0.9;
-        }
-        
-        .tier-message {
-            font-size: 9px;
-            line-height: 1.25;
-        }
-        
-        .default-cell {
-            color: #d0d0d0;
-            font-style: italic;
-            font-size: 10px;
-            text-align: center;
-            padding: 8px !important;
-        }
-        
-        .p19-bg {
-            background: rgba(0, 0, 0, 0.15);
-        }
-        
-        .national-bg {
-            background: rgba(0, 0, 0, 0.2);
-        }
-        
-        .all-tiers-bg {
-            background: rgba(0, 0, 0, 0.1);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homepage Content Calendar</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:13px;color:#1e293b;background:#f1f5f9;min-height:100vh}
+.page{max-width:100%;padding:16px}
+h1{font-size:18px;font-weight:700;color:#0f172a;margin-bottom:4px}
+.subtitle{font-size:12px;color:#64748b;margin-bottom:14px}
+
+/* Toolbar */
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;justify-content:space-between}
+.toolbar-left{display:flex;align-items:center;gap:6px}
+.month-nav{display:flex;align-items:center;gap:4px}
+.month-label{font-size:15px;font-weight:700;color:#0f172a;min-width:150px;text-align:center}
+.btn{display:inline-flex;align-items:center;gap:5px;border:1px solid #cbd5e1;border-radius:7px;padding:6px 13px;cursor:pointer;font-size:12px;font-weight:500;background:#fff;color:#334155;transition:background .12s}
+.btn:hover{background:#f8fafc}
+.btn-blue{background:#2563eb;border-color:#2563eb;color:#fff}
+.btn-blue:hover{background:#1d4ed8}
+.btn-ghost{background:transparent;border-color:#e2e8f0;color:#64748b}
+
+/* Calendar wrapper */
+.cal-wrap{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.cal-scroll{overflow-x:auto}
+table{border-collapse:collapse;table-layout:fixed}
+colgroup col.col-slot{width:164px;min-width:164px}
+colgroup col.col-day{width:42px;min-width:42px}
+
+/* Header */
+thead th{background:#f8fafc;padding:0;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;vertical-align:bottom;position:sticky;top:0;z-index:10}
+thead th:last-child{border-right:none}
+.th-slot{text-align:left;padding:9px 11px;font-size:11px;font-weight:600;color:#64748b;letter-spacing:.03em;text-transform:uppercase;position:sticky;left:0;z-index:12;background:#f8fafc}
+.day-hdr{display:flex;flex-direction:column;align-items:center;padding:6px 2px 0;gap:2px;width:42px}
+.d-num{font-size:12px;font-weight:600;color:#0f172a;line-height:1}
+.d-dow{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em}
+.d-bar-wrap{display:flex;flex-direction:column;width:100%;gap:1px;margin-top:4px;min-height:4px}
+.d-bar{height:3px;width:100%}
+.today-chip{background:#2563eb;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+
+/* Body rows */
+tbody tr{border-bottom:1px solid #e2e8f0}
+tbody tr:last-child{border-bottom:none}
+.group-row td{background:#f1f5f9;padding:5px 11px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e8f0}
+.slot-td{padding:0 10px;font-size:11px;font-weight:600;color:#334155;border-right:1px solid #e2e8f0;background:#fafafa;vertical-align:middle;position:sticky;left:0;z-index:5;width:164px;min-width:164px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+td.dc{padding:0;border-right:1px solid #e2e8f0;vertical-align:top;position:relative;width:42px;min-width:42px}
+td.dc:last-child{border-right:none}
+td.dc.wk{background:#fafbfc}
+
+/* Promo bars */
+.bar-container{position:absolute;top:4px;bottom:4px;display:flex;flex-direction:column;gap:2px;z-index:2;overflow:hidden}
+.promo-bar{display:flex;flex-direction:column;overflow:hidden;cursor:pointer;transition:filter .1s}
+.promo-bar:hover{filter:brightness(.93)}
+.tier-row{display:flex;flex-direction:column;justify-content:center;padding:5px 8px;flex:1;min-height:0;overflow:hidden}
+.tier-row+.tier-row{border-top:1px solid rgba(255,255,255,.3)}
+.promo-name{font-size:8px;font-weight:700;opacity:.55;line-height:1;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tier-name{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;line-height:1;margin-bottom:2px;opacity:.85}
+.copy-text{font-size:10px;line-height:1.4;word-break:break-word;white-space:normal}
+
+/* Legend */
+.legend{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center;padding:0 2px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#475569}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:200;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:12px;padding:1.5rem;width:440px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal h2{font-size:15px;font-weight:700;margin-bottom:1rem;color:#0f172a}
+.modal-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;line-height:1;margin-top:-2px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;font-weight:600;color:#64748b;margin-bottom:4px;letter-spacing:.02em}
+.field input,.field textarea,.field select{width:100%;padding:7px 10px;font-size:13px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;color:#1e293b;outline:none}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.field textarea{resize:vertical;min-height:52px;line-height:1.45}
+.tier-block{border:1px solid #e2e8f0;border-radius:8px;padding:.75rem;margin-bottom:8px}
+.tier-block-title{font-size:11px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:#334155}
+.tier-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem;border-top:1px solid #f1f5f9;padding-top:1rem}
+.ctx-badge{display:inline-block;padding:2px 10px;border-radius:5px;font-size:11px;font-weight:600;margin-bottom:10px}
+
+/* Upload zone */
+.upload-zone{border:2px dashed #cbd5e1;border-radius:8px;padding:1.5rem;text-align:center;cursor:pointer;margin-bottom:.75rem;transition:background .12s}
+.upload-zone:hover{background:#f8fafc}
+.upload-zone .icon{font-size:32px;margin-bottom:.5rem}
+.upload-status{font-size:12px;padding:7px 11px;border-radius:7px;margin-top:8px}
+.upload-status.ok{background:#dcfce7;color:#166534}
+.upload-status.err{background:#fee2e2;color:#991b1b}
+
+/* Promo chip in manager */
+.promo-chip{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:5px;background:#fafafa}
+.promo-chip .name{flex:1;font-weight:600;font-size:12px}
+.promo-chip .dates{font-size:11px;color:#94a3b8}
+.promo-chip button{background:none;border:none;cursor:pointer;color:#94a3b8;font-size:18px;line-height:1;padding:0 2px}
+.promo-chip button:hover{color:#dc2626}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📅 2026 Homepage Content Calendar</h1>
-            <p class="subtitle">All promotional messaging by slot and date</p>
-        </div>
-        
-        <div class="calendar-controls">
-            <div class="month-nav">
-                <button onclick="previousMonth()">← Previous</button>
-                <div class="month-display" id="monthDisplay"></div>
-                <button onclick="nextMonth()">Next →</button>
-            </div>
-        </div>
-        
-        <div class="legend" id="legend"></div>
-        
-        <div class="calendar-wrapper">
-            <table class="calendar" id="calendar"></table>
-        </div>
+<div class="page">
+  <h1>Homepage Content Calendar</h1>
+  <p class="subtitle">Slot messaging by promotion · P19 and National stacked where copy differs · Priority 1 overrides during overlaps</p>
+
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <div class="month-nav">
+        <button class="btn btn-ghost" onclick="changeMonth(-1)">&#8249;</button>
+        <span class="month-label" id="month-label"></span>
+        <button class="btn btn-ghost" onclick="changeMonth(1)">&#8250;</button>
+      </div>
     </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="openUpload()">&#8679;&nbsp;Upload template</button>
+      <button class="btn" onclick="openPromoMgr()">&#128197;&nbsp;Promos</button>
+    </div>
+  </div>
 
-    <script>
-        let currentMonth = new Date(2026, 5); // June 2026
+  <div class="cal-wrap"><div class="cal-scroll"><table id="board"></table></div></div>
+  <div class="legend" id="legend"></div>
+</div>
 
-        const promotions = [
-            { name: 'Hello Summer Sale', startDate: new Date(2026, 5, 2), endDate: new Date(2026, 5, 10) },
-            { name: 'No Payments until July 1st', startDate: new Date(2026, 5, 11), endDate: new Date(2026, 5, 17) },
-            { name: 'Weekend Flash Sale', startDate: new Date(2026, 5, 18), endDate: new Date(2026, 5, 21) },
-            { name: 'Hot Summer Savings', startDate: new Date(2026, 5, 22), endDate: new Date(2026, 5, 30) },
-            { name: 'Black Friday All Month Long', startDate: new Date(2026, 6, 1), endDate: new Date(2026, 6, 31) },
-            { name: '4th of July Weekend Flash Sale', startDate: new Date(2026, 6, 3), endDate: new Date(2026, 6, 6) },
-            { name: 'Sizzling Summer Savings', startDate: new Date(2026, 6, 16), endDate: new Date(2026, 6, 24) },
-            { name: 'Last Chance: Black Friday All Month Long', startDate: new Date(2026, 6, 25), endDate: new Date(2026, 6, 31) }
-        ];
+<!-- Edit modal -->
+<div class="overlay" id="edit-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeEdit()">&times;</button>
+    <h2 id="em-title">Edit messaging</h2>
+    <div id="em-ctx"></div>
+    <div class="field">
+      <label>PRIORITY <span style="font-weight:400;color:#94a3b8;text-transform:none">(1 = takes precedence when promos overlap on this slot)</span></label>
+      <select id="em-pri"><option value="">— None</option><option value="1">1 — High priority</option></select>
+    </div>
+    <div class="tier-block">
+      <div class="tier-block-title"><div class="tier-dot" style="background:#2563eb"></div>All Tiers</div>
+      <div class="field" style="margin:0"><textarea id="em-all" rows="2" placeholder="Shared copy — leave blank if P19 and National differ"></textarea></div>
+    </div>
+    <div class="tier-block">
+      <div class="tier-block-title"><div class="tier-dot" style="background:#16a34a"></div>P19 only</div>
+      <div class="field" style="margin:0"><textarea id="em-p19" rows="2" placeholder="Leave blank if using All Tiers"></textarea></div>
+    </div>
+    <div class="tier-block">
+      <div class="tier-block-title"><div class="tier-dot" style="background:#ea580c"></div>National only</div>
+      <div class="field" style="margin:0"><textarea id="em-nat" rows="2" placeholder="Leave blank if using All Tiers"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="clearEdit()" style="color:#dc2626;margin-right:auto">&#128465; Clear</button>
+      <button class="btn" onclick="closeEdit()">Cancel</button>
+      <button class="btn btn-blue" onclick="saveEdit()">Save</button>
+    </div>
+  </div>
+</div>
 
-        const slotMessaging = [
-            { slot: 'Hero', promo: 'Hello Summer Sale', tier: 'P19', message: 'Up to $900 Off Your Lease on Select Products', priority: null },
-            { slot: 'Hero', promo: 'Hello Summer Sale', tier: 'National', message: 'Up to $200 Off Your Lease on Select Products', priority: null },
-            { slot: 'Limited Time Deal 1', promo: 'Hello Summer Sale', tier: 'P19', message: 'Element 65" TV Starting At $59.99/MO', priority: null },
-            { slot: 'Limited Time Deal 1', promo: 'Hello Summer Sale', tier: 'National', message: 'Save Big on Select TVs', priority: null },
-            { slot: 'Limited Time Deal 2', promo: 'Hello Summer Sale', tier: 'P19', message: 'Up to $100 Off Mowers', priority: null },
-            { slot: 'Limited Time Deal 2', promo: 'Hello Summer Sale', tier: 'National', message: 'All Mowers On Sale Now', priority: null },
-            { slot: 'Limited Time Deal 3', promo: 'Hello Summer Sale', tier: 'P19', message: 'Laundry Event: Up to $40 Off/Month', priority: null },
-            { slot: 'Limited Time Deal 3', promo: 'Hello Summer Sale', tier: 'National', message: 'Laundry Event: Limited Time Savings on Select Washers/Dryers', priority: null },
-            { slot: 'Limited Time Deal 4', promo: 'Hello Summer Sale', tier: 'All Tiers', message: 'Even Lower Payments Starting at $9.24/WK', priority: null },
-            { slot: 'Featured Deal Tile 1', promo: 'Hello Summer Sale', tier: 'P19', message: 'Up to $900 Off Your Lease on Select Products', priority: null },
-            { slot: 'Featured Deal Tile 1', promo: 'Hello Summer Sale', tier: 'National', message: 'Up to $200 Off Your Lease on Select Products', priority: null },
-            { slot: 'Menu Flyout 1', promo: 'Hello Summer Sale', tier: 'P19', message: 'Up to $900 Off Your Lease on Select Products', priority: null },
-            { slot: 'Menu Flyout 1', promo: 'Hello Summer Sale', tier: 'National', message: 'Up to $200 Off Your Lease on Select Products', priority: null },
-            { slot: 'Ribbon in Grid', promo: 'Hello Summer Sale', tier: 'P19', message: 'Up to $900 Off Your Lease on Select Products', priority: null },
-            { slot: 'Ribbon in Grid', promo: 'Hello Summer Sale', tier: 'National', message: 'Up to $200 Off Your Lease on Select Products', priority: null },
-            { slot: 'Sale Page Visual Nav', promo: 'Hello Summer Sale', tier: 'P19', message: 'Up to $900 Off Your Lease on Select Products', priority: null },
-            { slot: 'Sale Page Visual Nav', promo: 'Hello Summer Sale', tier: 'National', message: 'Up to $200 Off Your Lease on Select Products', priority: null },
-            { slot: 'Location Page Tile', promo: 'Hello Summer Sale', tier: 'All Tiers', message: 'Up to $200 Off Your Lease on Select Products', priority: null },
-            { slot: 'Google Posting', promo: 'Hello Summer Sale', tier: 'All Tiers', message: 'Up to $200 Off Your Lease on Select Products', priority: null },
-            { slot: 'Hero', promo: 'No Payments until July 1st', tier: 'All Tiers', message: 'No Payments Until July 1', priority: null },
-            { slot: 'Limited Time Deal 1', promo: 'No Payments until July 1st', tier: 'P19', message: '20% Off Select Washers/Dryers', priority: null },
-            { slot: 'Limited Time Deal 1', promo: 'No Payments until July 1st', tier: 'National', message: 'Save Big on Select Washers/Dryers', priority: null },
-            { slot: 'Limited Time Deal 2', promo: 'No Payments until July 1st', tier: 'P19', message: 'Up to $100 Off Mowers', priority: null },
-            { slot: 'Limited Time Deal 2', promo: 'No Payments until July 1st', tier: 'National', message: 'All Mowers On Sale Now', priority: null },
-            { slot: 'Limited Time Deal 3', promo: 'No Payments until July 1st', tier: 'P19', message: 'Bedroom Sets Starting at $19.63/WK', priority: null },
-            { slot: 'Limited Time Deal 3', promo: 'No Payments until July 1st', tier: 'National', message: 'Bedroom Sets on Sale', priority: null },
-            { slot: 'Limited Time Deal 4', promo: 'No Payments until July 1st', tier: 'All Tiers', message: 'Drive Into Summer Sweepstakes', priority: null },
-            { slot: 'Featured Deal Tile 1', promo: 'No Payments until July 1st', tier: 'All Tiers', message: 'No Payments Until July 1', priority: null },
-            { slot: 'Menu Flyout 1', promo: 'No Payments until July 1st', tier: 'All Tiers', message: 'No Payments Until July 1', priority: null },
-            { slot: 'Ribbon in Grid', promo: 'No Payments until July 1st', tier: 'All Tiers', message: 'No Payments Until July 1', priority: null },
-            { slot: 'Sale Page Visual Nav', promo: 'No Payments until July 1st', tier: 'All Tiers', message: 'No Payments Until July 1', priority: null },
-            { slot: 'Location Page Tile', promo: 'No Payments until July 1st', tier: 'All Tiers', message: 'No Payments Until July 1', priority: null },
-            { slot: 'Google Posting', promo: 'No Payments until July 1st', tier: 'All Tiers', message: 'No Payments Until July 1', priority: null }
-        ];
+<!-- Upload modal -->
+<div class="overlay" id="upload-overlay">
+  <div class="modal" style="width:460px">
+    <button class="modal-close" onclick="closeUpload()">&times;</button>
+    <h2>Upload template</h2>
+    <div class="upload-zone" onclick="document.getElementById('file-in').click()">
+      <div class="icon">&#128196;</div>
+      <p style="color:#334155;font-weight:500">Click to select your filled-in template</p>
+      <p style="font-size:11px;color:#94a3b8;margin-top:4px">Content_Calendar_Template.xlsx</p>
+    </div>
+    <input type="file" id="file-in" accept=".xlsx" style="display:none" onchange="handleUpload(event)">
+    <div id="upload-status"></div>
+    <div class="modal-actions"><button class="btn" onclick="closeUpload()">Close</button></div>
+  </div>
+</div>
 
-        const slots = [...new Set(slotMessaging.map(m => m.slot))];
+<!-- Promo manager -->
+<div class="overlay" id="promo-overlay">
+  <div class="modal" style="width:500px">
+    <button class="modal-close" onclick="closePromoMgr()">&times;</button>
+    <h2>Manage promotions</h2>
+    <div id="promo-list" style="margin-bottom:.75rem"></div>
+    <div style="border-top:1px solid #f1f5f9;padding-top:.75rem">
+      <div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Add promotion</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="field" style="margin:0;grid-column:1/-1"><label>Name</label><input type="text" id="np-name" placeholder="e.g. Fall Kickoff"></div>
+        <div class="field" style="margin:0"><label>Start date</label><input type="date" id="np-start"></div>
+        <div class="field" style="margin:0"><label>End date</label><input type="date" id="np-end"></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px">
+        <button class="btn btn-blue" onclick="addPromo()">+ Add promotion</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-        const colorPalette = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B88B', '#A8E6CF'];
-        let promoColors = {};
-        let colorIndex = 0;
+<script>
+// ── Color palette (promo colors) ──────────────────────────────────────────────
+const PC  = ['#1e40af','#6d28d9','#b91c1c','#065f46','#92400e','#0e7490','#1e3a5f','#4c1d95'];
+const PBG = ['#dbeafe','#ede9fe','#fee2e2','#d1fae5','#fef3c7','#cffafe','#dde6f7','#ede0ff'];
+const PT  = ['#1e3a8a','#4c1d95','#7f1d1d','#064e3b','#78350f','#164e63','#1e3a5f','#3b0764'];
 
-        function getPromoColor(promoName) {
-            if (!promoColors[promoName]) {
-                promoColors[promoName] = colorPalette[colorIndex % colorPalette.length];
-                colorIndex++;
-            }
-            return promoColors[promoName];
+// Tier sub-tinting inside a bar
+const TIER_TINT = {
+  'All Tiers': { bg: 'rgba(255,255,255,.15)', lc: 'rgba(255,255,255,.8)' },
+  'P19':       { bg: 'rgba(22,163,74,.2)',    lc: '#16a34a' },
+  'National':  { bg: 'rgba(234,88,12,.2)',    lc: '#ea580c' },
+};
+
+// ── Slot groups ───────────────────────────────────────────────────────────────
+const SLOT_GROUPS = [
+  { label: 'Report slots', slots: [
+    'Hero','Limited Time Deal 1','Limited Time Deal 2','Limited Time Deal 3',
+    'Limited Time Deal 4','Featured Deal Tile 1','Featured Deal Tile 2'
+  ]},
+  { label: 'Additional placements', slots: [
+    'Menu Flyout 1','Menu Flyout 2','Ribbon in Grid',
+    'Sale Page Visual Nav','Location Page Tile','Google Posting'
+  ]},
+];
+
+// ── Promotions ────────────────────────────────────────────────────────────────
+let promos = [
+  {id:1, name:'Hello Summer Sale',                       start:'2026-06-02', end:'2026-06-10', ci:0},
+  {id:2, name:'No Payments until July 1st',              start:'2026-06-11', end:'2026-06-17', ci:1},
+  {id:3, name:'Weekend Flash Sale',                      start:'2026-06-18', end:'2026-06-21', ci:2},
+  {id:4, name:'Hot Summer Savings',                      start:'2026-06-22', end:'2026-06-30', ci:3},
+  {id:5, name:'Black Friday All Month Long',             start:'2026-07-01', end:'2026-07-31', ci:4},
+  {id:6, name:'4th of July Weekend Flash Sale',          start:'2026-07-03', end:'2026-07-06', ci:5},
+  {id:7, name:'Sizzling Summer Savings',                 start:'2026-07-16', end:'2026-07-24', ci:6},
+  {id:8, name:'Last Chance: Black Friday All Month Long',start:'2026-07-25', end:'2026-07-31', ci:7},
+];
+let nextId = 9;
+
+// ── Messaging store ───────────────────────────────────────────────────────────
+// store[promoName][slot] = { all, p19, nat, priority }
+const store = {};
+
+function getE(promo, slot) { return store[promo] && store[promo][slot] ? store[promo][slot] : null; }
+function hasMsg(e) { return e && (e.all || e.p19 || e.nat); }
+function setE(promo, slot, all, p19, nat, pri) {
+  if (!store[promo]) store[promo] = {};
+  if (!all && !p19 && !nat) { delete store[promo][slot]; return; }
+  store[promo][slot] = { all: all||'', p19: p19||'', nat: nat||'', priority: pri||'' };
+}
+
+function tierRows(e) {
+  if (!e) return [];
+  if (e.all) return [{ tier: 'All Tiers', copy: e.all }];
+  const r = [];
+  if (e.p19) r.push({ tier: 'P19', copy: e.p19 });
+  if (e.nat) r.push({ tier: 'National', copy: e.nat });
+  return r;
+}
+
+// ── Resolution logic ──────────────────────────────────────────────────────────
+function activeOnDate(ds) { return promos.filter(p => ds >= p.start && ds <= p.end); }
+
+function resolveSlot(slot, ds) {
+  const active = activeOnDate(ds);
+  const withMsg = active.filter(p => hasMsg(getE(p.name, slot)));
+  if (!withMsg.length) return [];
+  const pri1 = withMsg.filter(p => getE(p.name, slot).priority === '1');
+  if (!pri1.length) return withMsg;
+  // If multiple pri1 promos compete on this slot, the more recently started promo wins
+  if (pri1.length === 1) return pri1;
+  const newest = pri1.reduce((a, b) => new Date(a.start) >= new Date(b.start) ? a : b);
+  return [newest];
+}
+
+// ── Row height ────────────────────────────────────────────────────────────────
+function calcRowH(slot) {
+  const dim = new Date(viewYear, viewMonth + 1, 0).getDate();
+  let max = 0;
+  for (let d = 1; d <= dim; d++) {
+    const ds = dateStr(new Date(viewYear, viewMonth, d));
+    const vis = resolveSlot(slot, ds);
+    const total = vis.reduce((acc, p) => acc + (tierRows(getE(p.name, slot)).length || 1), 0);
+    if (total > max) max = total;
+  }
+  return Math.max(40, max * 48 + 12);
+}
+
+// ── Load data ─────────────────────────────────────────────────────────────────
+const RAW = [
+  ['Hero','Hello Summer Sale','P19',0,'Up to $900 Off Your Lease on Select Products'],
+  ['Hero','Hello Summer Sale','National',0,'Up to $200 Off Your Lease on Select Products'],
+  ['Limited Time Deal 1','Hello Summer Sale','P19',0,'Element 65" TV Starting At $59.99/MO'],
+  ['Limited Time Deal 1','Hello Summer Sale','National',0,'Save Big on Select TVs'],
+  ['Limited Time Deal 2','Hello Summer Sale','P19',0,'Up to $100 Off Mowers'],
+  ['Limited Time Deal 2','Hello Summer Sale','National',0,'All Mowers On Sale Now'],
+  ['Limited Time Deal 3','Hello Summer Sale','P19',0,'Laundry Event: Up to $40 Off/Month'],
+  ['Limited Time Deal 3','Hello Summer Sale','National',0,'Laundry Event: Limited Time Savings on Select Washers/Dryers'],
+  ['Limited Time Deal 4','Hello Summer Sale','All Tiers',0,'Even Lower Payments Starting at $9.24/WK'],
+  ['Featured Deal Tile 1','Hello Summer Sale','P19',0,'Up to $900 Off Your Lease on Select Products'],
+  ['Featured Deal Tile 1','Hello Summer Sale','National',0,'Up to $200 Off Your Lease on Select Products'],
+  ['Menu Flyout 1','Hello Summer Sale','P19',0,'Up to $900 Off Your Lease on Select Products'],
+  ['Menu Flyout 1','Hello Summer Sale','National',0,'Up to $200 Off Your Lease on Select Products'],
+  ['Ribbon in Grid','Hello Summer Sale','P19',0,'Up to $900 Off Your Lease on Select Products'],
+  ['Ribbon in Grid','Hello Summer Sale','National',0,'Up to $200 Off Your Lease on Select Products'],
+  ['Sale Page Visual Nav','Hello Summer Sale','P19',0,'Up to $900 Off Your Lease on Select Products'],
+  ['Sale Page Visual Nav','Hello Summer Sale','National',0,'Up to $200 Off Your Lease on Select Products'],
+  ['Location Page Tile','Hello Summer Sale','All Tiers',0,'Up to $200 Off Your Lease on Select Products'],
+  ['Google Posting','Hello Summer Sale','All Tiers',0,'Up to $200 Off Your Lease on Select Products'],
+  ['Hero','No Payments until July 1st','All Tiers',0,'No Payments Until July 1'],
+  ['Limited Time Deal 1','No Payments until July 1st','P19',0,'20% Off Select Washers/Dryers'],
+  ['Limited Time Deal 1','No Payments until July 1st','National',0,'Save Big on Select Washers/Dryers'],
+  ['Limited Time Deal 2','No Payments until July 1st','P19',0,'Up to $100 Off Mowers'],
+  ['Limited Time Deal 2','No Payments until July 1st','National',0,'All Mowers On Sale Now'],
+  ['Limited Time Deal 3','No Payments until July 1st','P19',0,'Bedroom Sets Starting at $19.63/WK'],
+  ['Limited Time Deal 3','No Payments until July 1st','National',0,'Bedroom Sets on Sale'],
+  ['Limited Time Deal 4','No Payments until July 1st','All Tiers',0,'Drive Into Summer Sweepstakes'],
+  ['Featured Deal Tile 1','No Payments until July 1st','All Tiers',0,'No Payments Until July 1'],
+  ['Menu Flyout 1','No Payments until July 1st','All Tiers',0,'No Payments Until July 1'],
+  ['Ribbon in Grid','No Payments until July 1st','All Tiers',0,'No Payments Until July 1'],
+  ['Sale Page Visual Nav','No Payments until July 1st','All Tiers',0,'No Payments Until July 1'],
+  ['Location Page Tile','No Payments until July 1st','All Tiers',0,'No Payments Until July 1'],
+  ['Google Posting','No Payments until July 1st','All Tiers',0,'No Payments Until July 1'],
+  ['Hero','Black Friday All Month Long','P19',0,'Up to $1,200 Off Select Products'],
+  ['Hero','Black Friday All Month Long','National',1,'Up to $200 Off Select Products'],
+  ['Limited Time Deal 1','Black Friday All Month Long','All Tiers',1,'$0.01 PAYG'],
+  ['Limited Time Deal 2','Black Friday All Month Long','All Tiers',0,'Drive Into Summer Sweepstakes'],
+  ['Limited Time Deal 3','Black Friday All Month Long','P19',0,'Element 3.7/6.7 Cu. Ft. Top Load Electric Laundry Pair: $74.99/MO WAS 94.99/MO'],
+  ['Limited Time Deal 3','Black Friday All Month Long','National',0,'Limited Time Savings on Element 3.7/6.7 Cu. Ft. Top Load Electric Laundry Pair'],
+  ['Limited Time Deal 4','Black Friday All Month Long','P19',0,'Up to 25% Off Select TVs'],
+  ['Limited Time Deal 4','Black Friday All Month Long','National',0,'Popular TVs on Sale Now'],
+  ['Featured Deal Tile 1','Black Friday All Month Long','P19',0,'Up to $1,200 Off Select Products'],
+  ['Featured Deal Tile 1','Black Friday All Month Long','National',0,'Up to $200 Off Select Products'],
+  ['Menu Flyout 1','Black Friday All Month Long','P19',0,'Up to $1,200 Off Select Products'],
+  ['Menu Flyout 1','Black Friday All Month Long','National',0,'Up to $200 Off Select Products'],
+  ['Ribbon in Grid','Black Friday All Month Long','P19',0,'Up to $1,200 Off Select Products'],
+  ['Ribbon in Grid','Black Friday All Month Long','National',0,'Up to $200 Off Select Products'],
+  ['Sale Page Visual Nav','Black Friday All Month Long','P19',0,'Up to $1,200 Off Select Products'],
+  ['Sale Page Visual Nav','Black Friday All Month Long','National',0,'Up to $200 Off Select Products'],
+  ['Location Page Tile','Black Friday All Month Long','All Tiers',0,'Up to $200 Off Select Products'],
+  ['Google Posting','Black Friday All Month Long','All Tiers',0,'Up to $200 Off Select Products'],
+  ['Limited Time Deal 1','Weekend Flash Sale','All Tiers',1,'Drive Into Summer Sweepstakes'],
+  ['Limited Time Deal 2','Weekend Flash Sale','P19',1,'65" 4K UHD Xumo Smart TV: $15.01/Week WAS $17.32/Week'],
+  ['Limited Time Deal 2','Weekend Flash Sale','National',1,'Flash Discount: 65" 4K UHD Xumo Smart TV'],
+  ['Limited Time Deal 3','Weekend Flash Sale','P19',1,'Up to 35% Off Select Sofas & Loveseats'],
+  ['Limited Time Deal 3','Weekend Flash Sale','National',1,'Limited Time Markdowns on Select Sofas & Loveseats'],
+  ['Limited Time Deal 4','Weekend Flash Sale','P19',1,'4th of July Weekend Flash Sale: Products Under $17.76/Week'],
+  ['Limited Time Deal 4','Weekend Flash Sale','National',1,'4th of July Weekend Flash Sale: Generic'],
+  ['Featured Deal Tile 1','Weekend Flash Sale','P19',1,'4th of July Weekend Flash Sale: Products Under $17.76/Week'],
+  ['Featured Deal Tile 1','Weekend Flash Sale','National',1,'4th of July Weekend Flash Sale: Generic'],
+  ['Menu Flyout 1','Weekend Flash Sale','P19',1,'4th of July Weekend Flash Sale: Products Under $17.76/Week'],
+  ['Menu Flyout 1','Weekend Flash Sale','National',1,'4th of July Weekend Flash Sale: Generic'],
+  ['Ribbon in Grid','Weekend Flash Sale','P19',1,'4th of July Weekend Flash Sale: Products Under $17.76/Week'],
+  ['Ribbon in Grid','Weekend Flash Sale','National',1,'4th of July Weekend Flash Sale: Generic'],
+  ['Sale Page Visual Nav','Weekend Flash Sale','P19',1,'4th of July Weekend Flash Sale: Products Under $17.76/Week'],
+  ['Sale Page Visual Nav','Weekend Flash Sale','National',1,'4th of July Weekend Flash Sale: Generic'],
+  ['Location Page Tile','Weekend Flash Sale','All Tiers',1,'4th of July Weekend Flash Sale: Products Under $17.76/Week'],
+  ['Google Posting','Weekend Flash Sale','All Tiers',1,'4th of July Weekend Flash Sale: Generic'],
+  ['Hero','Sizzling Summer Savings','P19',1,'Sizzling Summer Savings: Up to 25% Off Select Products'],
+  ['Hero','Sizzling Summer Savings','National',1,'Sizzling Summer Savings: Generic'],
+  ['Limited Time Deal 1','Sizzling Summer Savings','P19',1,'Recliners Starting at $10.39/Week'],
+  ['Limited Time Deal 1','Sizzling Summer Savings','National',1,'Summer Savings on Select Recliners'],
+  ['Limited Time Deal 2','Sizzling Summer Savings','All Tiers',1,'Drive Into Summer Sweepstakes'],
+  ['Limited Time Deal 3','Sizzling Summer Savings','P19',1,'Washers & Dryers From $23.09/Week'],
+  ['Limited Time Deal 3','Sizzling Summer Savings','National',1,'Save Big on Top Washers & Dryers'],
+  ['Limited Time Deal 4','Sizzling Summer Savings','P19',1,'Black Friday in July All Month Long: Up to $1,200 Off Select Products'],
+  ['Limited Time Deal 4','Sizzling Summer Savings','National',1,'Black Friday in July All Month Long: Up to $200 Off Select Products'],
+  ['Featured Deal Tile 1','Sizzling Summer Savings','P19',1,'Sizzling Summer Savings: Up to 25% Off Select Products'],
+  ['Featured Deal Tile 1','Sizzling Summer Savings','National',1,'Sizzling Summer Savings: Generic'],
+  ['Menu Flyout 1','Sizzling Summer Savings','P19',1,'Sizzling Summer Savings: Up to 25% Off Select Products'],
+  ['Menu Flyout 1','Sizzling Summer Savings','National',1,'Sizzling Summer Savings: Generic'],
+  ['Ribbon in Grid','Sizzling Summer Savings','P19',1,'Sizzling Summer Savings: Up to 25% Off Select Products'],
+  ['Ribbon in Grid','Sizzling Summer Savings','National',1,'Sizzling Summer Savings: Generic'],
+  ['Sale Page Visual Nav','Sizzling Summer Savings','P19',1,'Sizzling Summer Savings: Up to 25% Off Select Products'],
+  ['Sale Page Visual Nav','Sizzling Summer Savings','National',1,'Sizzling Summer Savings: Generic'],
+  ['Location Page Tile','Sizzling Summer Savings','All Tiers',1,'Sizzling Summer Savings: Generic'],
+  ['Google Posting','Sizzling Summer Savings','All Tiers',1,'Sizzling Summer Savings: Generic'],
+  ['Hero','Last Chance: Black Friday All Month Long','P19',1,'LAST Chance: Black Friday in July All Month Long: Up to $1,200 Off Select Products'],
+  ['Hero','Last Chance: Black Friday All Month Long','National',1,'LAST Chance: Black Friday in July All Month Long: Up to $200 Off Select Products'],
+  ['Limited Time Deal 1','Last Chance: Black Friday All Month Long','All Tiers',0,'$0.01 PAYG'],
+  ['Limited Time Deal 2','Last Chance: Black Friday All Month Long','All Tiers',0,'Drive Into Summer Sweepstakes'],
+  ['Limited Time Deal 3','Last Chance: Black Friday All Month Long','P19',0,'Element 3.7/6.7 Cu. Ft. Top Load Electric Laundry Pair: $74.99/MO WAS 94.99/MO'],
+  ['Limited Time Deal 3','Last Chance: Black Friday All Month Long','National',0,'Limited Time Savings on Element 3.7/6.7 Cu. Ft. Top Load Electric Laundry Pair'],
+  ['Limited Time Deal 4','Last Chance: Black Friday All Month Long','P19',0,'Up to 25% Off Select TVs'],
+  ['Limited Time Deal 4','Last Chance: Black Friday All Month Long','National',0,'Popular TVs on Sale Now'],
+  ['Featured Deal Tile 1','Last Chance: Black Friday All Month Long','P19',1,'LAST Chance: Black Friday in July All Month Long: Up to $1,200 Off Select Products'],
+  ['Featured Deal Tile 1','Last Chance: Black Friday All Month Long','National',1,'LAST Chance: Black Friday in July All Month Long: Up to $200 Off Select Products'],
+  ['Menu Flyout 1','Last Chance: Black Friday All Month Long','P19',1,'LAST Chance: Black Friday in July All Month Long: Up to $1,200 Off Select Products'],
+  ['Menu Flyout 1','Last Chance: Black Friday All Month Long','National',1,'LAST Chance: Black Friday in July All Month Long: Up to $200 Off Select Products'],
+  ['Ribbon in Grid','Last Chance: Black Friday All Month Long','P19',1,'LAST Chance: Black Friday in July All Month Long: Up to $1,200 Off Select Products'],
+  ['Ribbon in Grid','Last Chance: Black Friday All Month Long','National',1,'LAST Chance: Black Friday in July All Month Long: Up to $200 Off Select Products'],
+  ['Sale Page Visual Nav','Last Chance: Black Friday All Month Long','P19',1,'LAST Chance: Black Friday in July All Month Long: Up to $1,200 Off Select Products'],
+  ['Sale Page Visual Nav','Last Chance: Black Friday All Month Long','National',1,'LAST Chance: Black Friday in July All Month Long: Up to $200 Off Select Products'],
+  ['Location Page Tile','Last Chance: Black Friday All Month Long','All Tiers',1,'LAST Chance: Black Friday in July All Month Long: Up to $200 Off Select Products'],
+  ['Google Posting','Last Chance: Black Friday All Month Long','All Tiers',1,'LAST Chance: Black Friday in July All Month Long: Up to $200 Off Select Products'],
+];
+
+RAW.forEach(([slot, promo, tier, pri, copy]) => {
+  if (!store[promo]) store[promo] = {};
+  if (!store[promo][slot]) store[promo][slot] = { all:'', p19:'', nat:'', priority:'' };
+  const e = store[promo][slot];
+  if (tier === 'All Tiers') e.all = copy;
+  else if (tier === 'P19')  e.p19 = copy;
+  else if (tier === 'National') e.nat = copy;
+  if (pri) e.priority = '1';
+});
+
+// ── View state ────────────────────────────────────────────────────────────────
+let viewYear = 2026, viewMonth = 5;
+let editCtx = null;
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DOWS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+function dateStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function changeMonth(dir) {
+  viewMonth += dir;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  if (viewMonth < 0)  { viewMonth = 11; viewYear--; }
+  render();
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() {
+  const dim   = new Date(viewYear, viewMonth+1, 0).getDate();
+  const today = dateStr(new Date());
+  const days  = Array.from({length: dim}, (_, i) => new Date(viewYear, viewMonth, i+1));
+  const CW    = 42;
+
+  document.getElementById('month-label').textContent = MONTHS[viewMonth] + ' ' + viewYear;
+
+  let h = '<colgroup><col class="col-slot">';
+  days.forEach(() => h += '<col class="col-day">');
+  h += '</colgroup><thead><tr><th class="th-slot">Slot</th>';
+
+  days.forEach(d => {
+    const ds     = dateStr(d);
+    const active = activeOnDate(ds);
+    const isToday = ds === today;
+    h += '<th><div class="day-hdr">';
+    if (isToday) h += '<div class="today-chip">' + d.getDate() + '</div>';
+    else         h += '<div class="d-num">' + d.getDate() + '</div>';
+    h += '<div class="d-dow">' + DOWS[d.getDay()] + '</div>';
+    h += '<div class="d-bar-wrap">';
+    active.slice(0,2).forEach(p => h += '<div class="d-bar" style="background:' + PC[p.ci % PC.length] + '"></div>');
+    if (!active.length) h += '<div class="d-bar" style="background:transparent"></div>';
+    h += '</div></div></th>';
+  });
+  h += '</tr></thead><tbody>';
+
+  SLOT_GROUPS.forEach(grp => {
+    h += '<tr class="group-row"><td colspan="' + (days.length+1) + '">' + grp.label + '</td></tr>';
+
+    grp.slots.forEach(slot => {
+      const rh = calcRowH(slot);
+      h += '<tr style="height:' + rh + 'px"><td class="slot-td" style="height:' + rh + 'px">' + slot + '</td>';
+
+      let di = 0;
+      while (di < days.length) {
+        const ds  = dateStr(days[di]);
+        const dow = days[di].getDay();
+        const wk  = (dow === 0 || dow === 6) ? ' wk' : '';
+        const vis = resolveSlot(slot, ds);
+
+        if (!vis.length) {
+          h += '<td class="dc' + wk + '" style="height:' + rh + 'px"></td>';
+          di++; continue;
         }
 
-        function buildLegend() {
-            const legendDiv = document.getElementById('legend');
-            legendDiv.innerHTML = '';
-            promotions.forEach(promo => {
-                const item = document.createElement('div');
-                item.className = 'legend-item';
-                const color = document.createElement('div');
-                color.className = 'legend-color';
-                color.style.backgroundColor = getPromoColor(promo.name);
-                const label = document.createElement('span');
-                label.textContent = promo.name;
-                item.appendChild(color);
-                item.appendChild(label);
-                legendDiv.appendChild(item);
+        // Compute span
+        const ck = vis.map(p => p.id).join(',');
+        let span = 0;
+        for (let j = di; j < days.length; j++) {
+          if (resolveSlot(slot, dateStr(days[j])).map(p => p.id).join(',') === ck) span++;
+          else break;
+        }
+        const prevCk = di > 0 ? resolveSlot(slot, dateStr(days[di-1])).map(p => p.id).join(',') : '';
+        const nextCk = (di+span) < days.length ? resolveSlot(slot, dateStr(days[di+span])).map(p => p.id).join(',') : '';
+        const isStart = prevCk !== ck;
+        const isEnd   = nextCk !== ck;
+
+        h += '<td class="dc' + wk + '" colspan="' + span + '" style="height:' + rh + 'px;position:relative;overflow:visible">';
+
+        if (isStart) {
+          const bw  = span * CW - (isStart ? 2 : 0) - (isEnd ? 2 : 0);
+          const lo  = isStart ? 2 : 0;
+          const lr  = isStart ? 5 : 0;
+          const rr  = isEnd   ? 5 : 0;
+
+          h += '<div class="bar-container" style="left:' + lo + 'px;width:' + bw + 'px;border-radius:' + lr + 'px ' + rr + 'px ' + rr + 'px ' + lr + 'px;overflow:hidden">';
+
+          vis.forEach((promo, pi) => {
+            const ci   = promo.ci % PC.length;
+            const bc   = PC[ci], bg = PBG[ci], tc = PT[ci];
+            const e    = getE(promo.name, slot);
+            const trows = tierRows(e);
+            const sep  = pi > 0 ? 'border-top:2px solid rgba(255,255,255,.5)' : '';
+
+            h += '<div class="promo-bar" style="flex:' + (trows.length||1) + ';background:' + bg + ';border-left:3px solid ' + bc + ';' + sep + '"'
+               + ' onclick="openEdit(' + JSON.stringify(slot) + ',' + JSON.stringify(promo.name) + ')">';
+
+            trows.forEach((tr, ti) => {
+              const tt = TIER_TINT[tr.tier];
+              h += '<div class="tier-row" style="background:' + tt.bg + ';' + (ti > 0 ? 'border-top:1px solid ' + tt.lc + '44' : '') + '">';
+              if (ti === 0) h += '<div class="promo-name" style="color:' + bc + '">' + esc(promo.name) + '</div>';
+              if (trows.length > 1) h += '<div class="tier-name" style="color:' + tt.lc + '">' + tr.tier + '</div>';
+              h += '<div class="copy-text" style="color:' + tc + '">' + esc(tr.copy) + '</div>';
+              h += '</div>';
             });
+
+            h += '</div>';
+          });
+
+          h += '</div>';
         }
+        h += '</td>';
+        di += span;
+      }
+      h += '</tr>';
+    });
+  });
 
-        function renderCalendar() {
-            const year = currentMonth.getFullYear();
-            const month = currentMonth.getMonth();
-            
-            document.getElementById('monthDisplay').textContent = 
-                currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  h += '</tbody>';
+  document.getElementById('board').innerHTML = h;
+  renderLegend();
+}
 
-            const lastDay = new Date(year, month + 1, 0).getDate();
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-            let html = '<thead><tr><th class="slot-header">Slot</th>';
-            for (let day = 1; day <= lastDay; day++) {
-                const date = new Date(year, month, day);
-                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-                html += `<th class="day-header"><span class="day-number">${dayName}</span>${day}</th>`;
-            }
-            html += '</tr></thead><tbody>';
+function renderLegend() {
+  const ms = viewYear + '-' + String(viewMonth+1).padStart(2,'0') + '-01';
+  const me = viewYear + '-' + String(viewMonth+1).padStart(2,'0') + '-' + String(new Date(viewYear,viewMonth+1,0).getDate()).padStart(2,'0');
+  const active = promos.filter(p => p.start <= me && p.end >= ms);
+  document.getElementById('legend').innerHTML =
+    active.map(p =>
+      '<div class="leg-item"><div class="leg-dot" style="background:' + PC[p.ci%PC.length] + '"></div>'
+      + '<span>' + esc(p.name) + '</span>'
+      + '<span style="color:#94a3b8;font-size:10px">' + p.start.slice(5) + ' – ' + p.end.slice(5) + '</span></div>'
+    ).join('') +
+    '<div class="leg-item" style="margin-left:auto;color:#94a3b8;font-size:11px">Priority 1 overrides other promos per slot &middot; Slots with no copy are hidden</div>';
+}
 
-            slots.forEach(slot => {
-                html += `<tr><td class="slot-header">${slot}</td>`;
-                
-                let day = 1;
-                while (day <= lastDay) {
-                    const cellDate = new Date(year, month, day);
-                    const activePromo = promotions.find(p => cellDate >= p.startDate && cellDate <= p.endDate);
-                    
-                    if (activePromo) {
-                        // Calculate span
-                        const promoEndDay = Math.min(activePromo.endDate.getDate(), lastDay);
-                        const span = promoEndDay - day + 1;
-                        
-                        // Get all messages for this slot/promo
-                        const messages = slotMessaging.filter(m => 
-                            m.slot === slot && m.promo === activePromo.name
-                        );
-                        
-                        let cellContent = '<span class="default-cell">default</span>';
-                        if (messages.length > 0) {
-                            cellContent = `<div class="spanning-promo" style="background-color: ${getPromoColor(activePromo.name)}">`;
-                            
-                            messages.forEach(msg => {
-                                const bgClass = msg.tier === 'P19' ? 'p19-bg' : msg.tier === 'National' ? 'national-bg' : 'all-tiers-bg';
-                                cellContent += `<div class="tier-block ${bgClass}">
-                                    <div class="tier-label">${msg.tier}</div>
-                                    <div class="tier-message">${msg.message}</div>
-                                </div>`;
-                            });
-                            
-                            cellContent += '</div>';
-                        }
-                        
-                        html += `<td colspan="${span}">${cellContent}</td>`;
-                        day = promoEndDay + 1;
-                    } else {
-                        html += `<td><span class="default-cell">default</span></td>`;
-                        day++;
-                    }
-                }
-                html += '</tr>';
-            });
-            html += '</tbody>';
+// ── Edit modal ────────────────────────────────────────────────────────────────
+function openEdit(slot, pname) {
+  editCtx = { slot, pname };
+  const e  = getE(pname, slot) || {};
+  const p  = promos.find(x => x.name === pname);
+  const ci = p ? p.ci % PC.length : 0;
+  document.getElementById('em-title').textContent = slot;
+  document.getElementById('em-ctx').innerHTML = '<span class="ctx-badge" style="background:' + PBG[ci] + ';color:' + PT[ci] + '">' + esc(pname) + '</span>';
+  document.getElementById('em-all').value = e.all  || '';
+  document.getElementById('em-p19').value = e.p19  || '';
+  document.getElementById('em-nat').value = e.nat  || '';
+  document.getElementById('em-pri').value = e.priority || '';
+  document.getElementById('edit-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('em-all').focus(), 60);
+}
+function closeEdit()  { document.getElementById('edit-overlay').classList.remove('open'); editCtx = null; }
+function saveEdit() {
+  if (!editCtx) return;
+  setE(editCtx.pname, editCtx.slot,
+    document.getElementById('em-all').value.trim(),
+    document.getElementById('em-p19').value.trim(),
+    document.getElementById('em-nat').value.trim(),
+    document.getElementById('em-pri').value);
+  closeEdit(); render();
+}
+function clearEdit() {
+  if (editCtx && store[editCtx.pname]) delete store[editCtx.pname][editCtx.slot];
+  closeEdit(); render();
+}
 
-            document.getElementById('calendar').innerHTML = html;
-        }
+// ── Upload ────────────────────────────────────────────────────────────────────
+function openUpload()  { document.getElementById('upload-overlay').classList.add('open'); }
+function closeUpload() { document.getElementById('upload-overlay').classList.remove('open'); }
 
-        function previousMonth() {
-            currentMonth.setMonth(currentMonth.getMonth() - 1);
-            renderCalendar();
-        }
+function excelDs(v) {
+  if (v instanceof Date) return v.toISOString().slice(0,10);
+  if (typeof v === 'number') return new Date(Math.round((v - 25569) * 86400 * 1000)).toISOString().slice(0,10);
+  return String(v).trim();
+}
 
-        function nextMonth() {
-            currentMonth.setMonth(currentMonth.getMonth() + 1);
-            renderCalendar();
-        }
+function handleUpload(ev) {
+  const file = ev.target.files[0]; if (!file) return;
+  const st = document.getElementById('upload-status');
+  st.innerHTML = '<span style="font-size:12px;color:#64748b">Reading…</span>';
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, { type:'array', cellDates:false });
+      let pc = 0, mc = 0;
+      const ps = wb.Sheets['Promotions'];
+      if (ps) XLSX.utils.sheet_to_json(ps, { defval:'' }).forEach(row => {
+        const name = String(row['Promo Name']||'').trim();
+        const s = row['Start Date'], en = row['End Date'];
+        if (!name || !s || !en) return;
+        const ss = excelDs(s), es = excelDs(en);
+        const ex = promos.find(p => p.name === name);
+        if (ex) { ex.start = ss; ex.end = es; }
+        else { promos.push({ id: nextId++, name, start: ss, end: es, ci: promos.length % PC.length }); pc++; }
+      });
+      const ms2 = wb.Sheets['Slot Messaging'];
+      if (ms2) {
+        let lp = '';
+        XLSX.utils.sheet_to_json(ms2, { defval:'' }).forEach(row => {
+          const slot  = String(row['Slot Name']||'').trim();
+          const pr    = String(row['Promo Name']||'').trim();
+          const promo = pr || lp; if (pr) lp = pr;
+          const tier  = String(row['Tier']||'All Tiers').trim();
+          const pri   = row['Priority'] ? '1' : '';
+          const copy  = String(row['Messaging (Headline / Copy)'] || row['Copy / Headline'] || '').trim();
+          if (!slot || !promo || !copy) return;
+          if (!store[promo]) store[promo] = {};
+          if (!store[promo][slot]) store[promo][slot] = { all:'', p19:'', nat:'', priority:'' };
+          const entry = store[promo][slot];
+          if (tier === 'All Tiers')   entry.all = copy;
+          else if (tier === 'P19')    entry.p19 = copy;
+          else if (tier === 'National') entry.nat = copy;
+          if (pri) entry.priority = '1';
+          mc++;
+        });
+      }
+      st.innerHTML = '<div class="upload-status ok">Loaded ' + pc + ' new promos and ' + mc + ' messaging entries.</div>';
+      render();
+    } catch(err) {
+      st.innerHTML = '<div class="upload-status err">Error reading file: ' + err.message + '</div>';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  ev.target.value = '';
+}
 
-        // Initialize
-        buildLegend();
-        renderCalendar();
-    </script>
+// ── Promo manager ─────────────────────────────────────────────────────────────
+function openPromoMgr()  { renderPromoList(); document.getElementById('promo-overlay').classList.add('open'); }
+function closePromoMgr() { document.getElementById('promo-overlay').classList.remove('open'); }
+
+function renderPromoList() {
+  document.getElementById('promo-list').innerHTML = promos.map(p =>
+    '<div class="promo-chip">'
+    + '<div style="width:9px;height:9px;border-radius:3px;background:' + PC[p.ci%PC.length] + ';flex-shrink:0"></div>'
+    + '<span class="name">' + esc(p.name) + '</span>'
+    + '<span class="dates">' + p.start + ' – ' + p.end + '</span>'
+    + '<button onclick="delPromo(' + p.id + ')" title="Delete">&times;</button>'
+    + '</div>'
+  ).join('');
+}
+function delPromo(id) {
+  if (!confirm('Delete this promotion and all its messaging?')) return;
+  promos = promos.filter(p => p.id !== id);
+  renderPromoList(); render();
+}
+function addPromo() {
+  const name  = document.getElementById('np-name').value.trim();
+  const start = document.getElementById('np-start').value;
+  const end   = document.getElementById('np-end').value;
+  if (!name || !start || !end) { alert('Please fill in name, start date, and end date.'); return; }
+  promos.push({ id: nextId++, name, start, end, ci: promos.length % PC.length });
+  document.getElementById('np-name').value  = '';
+  document.getElementById('np-start').value = '';
+  document.getElementById('np-end').value   = '';
+  renderPromoList(); render();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+render();
+</script>
 </body>
 </html>
-
-							<script>
-                            	
-							</script>
-                        </body>
-                        </html>
-                    
