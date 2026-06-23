@@ -1040,12 +1040,12 @@ function renderCatSum(){
   const ytd=ALL_ROWS.filter(r=>(n(r["Applications Started"])>0||n(r["Gross Orders"])>0)&&r["Sub-Category"]&&isMature(r["End Date"]));
   const map={};
   ytd.forEach(r=>{const k=r["Sub-Category"];const cat=r["Category"]||"Other";if(!map[k])map[k]={sub:k,cat,apps:0,orders:0,del:0,totalDays:0,skuPromos:0};map[k].apps+=n(r["Applications Started"]);map[k].orders+=n(r["Gross Orders"]);map[k].del+=n(r["Deliveries"]);map[k].totalDays+=n(r["Number of Promo Days"]);map[k].skuPromos++;});
-  let data=Object.values(map).map(p=>({sub:p.sub,cat:p.cat,apd:p.totalDays>0?p.apps/p.totalDays:0,opd:p.totalDays>0?p.orders/p.totalDays:0,aoRate:p.apps>0?p.orders/p.apps*100:0,ffRate:p.apps>0?p.del/p.apps*100:0,skuPromos:p.skuPromos}));
+  let data=Object.values(map).map(p=>({sub:p.sub,cat:p.cat,apd:p.totalDays>0?p.apps/p.totalDays:0,opd:p.totalDays>0?p.orders/p.totalDays:0,dpd:p.totalDays>0?p.del/p.totalDays:0,aoRate:p.apps>0?p.orders/p.apps*100:0,ffRate:p.apps>0?p.del/p.apps*100:0,skuPromos:p.skuPromos}));
   if(sortState.tab==='catsum'&&sortState.col){data.sort((a,b)=>{const av=a[sortState.col],bv=b[sortState.col];const an=parseFloat(av),bn=parseFloat(bv);if(!isNaN(an)&&!isNaN(bn))return(an-bn)*sortState.dir;return String(av||'').localeCompare(String(bv||''))*sortState.dir;});}else{data.sort((a,b)=>b.ffRate-a.ffRate);}
-  const cols=["apd","opd","aoRate","ffRate"];const mins={},maxs={};cols.forEach(c=>{const v=data.map(d=>d[c]);mins[c]=Math.min(...v);maxs[c]=Math.max(...v);});
+  const cols=["apd","opd","dpd","aoRate","ffRate"];const mins={},maxs={};cols.forEach(c=>{const v=data.map(d=>d[c]);mins[c]=Math.min(...v);maxs[c]=Math.max(...v);});
   const rows=data.map(d=>`<tr>
     <td class="left">${catBadge(d.cat)}</td><td class="left">${d.sub}</td><td>${d.skuPromos}</td>
-    ${heatCell(d.apd,mins.apd,maxs.apd,fmt(d.apd))}${heatCell(d.opd,mins.opd,maxs.opd,fmt(d.opd))}
+    ${heatCell(d.apd,mins.apd,maxs.apd,fmt(d.apd))}${heatCell(d.opd,mins.opd,maxs.opd,fmt(d.opd))}${heatCell(d.dpd,mins.dpd,maxs.dpd,fmt(d.dpd))}
     ${heatCell(d.aoRate,mins.aoRate,maxs.aoRate,fmt(d.aoRate)+"%")}${heatCell(d.ffRate,mins.ffRate,maxs.ffRate,fmt(d.ffRate)+"%")}
   </tr>`).join("");
   el.innerHTML=`<p style="font-size:12px;color:var(--text2);margin-bottom:12px">YTD averages per sub-category, sorted by full funnel rate.</p>`+
@@ -1056,6 +1056,7 @@ function renderCatSum(){
       <th onclick="sortCatSum('skuPromos')">SKU-promos${sortArrow('catsum','skuPromos')}</th>
       <th onclick="sortCatSum('apd')">Avg apps/day${sortArrow('catsum','apd')}</th>
       <th onclick="sortCatSum('opd')">Avg orders/day${sortArrow('catsum','opd')}</th>
+      <th onclick="sortCatSum('dpd')">Avg deliveries/day${sortArrow('catsum','dpd')}</th>
       <th onclick="sortCatSum('aoRate')">App→order %${sortArrow('catsum','aoRate')}</th>
       <th onclick="sortCatSum('ffRate')">Full funnel %${sortArrow('catsum','ffRate')}</th>
     </tr></thead><tbody>${rows}</tbody></table></div>`;
