@@ -11,8 +11,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-siz
 .page{max-width:100%;padding:16px}
 h1{font-size:18px;font-weight:700;color:#0f172a;margin-bottom:4px}
 .subtitle{font-size:12px;color:#64748b;margin-bottom:14px}
-
-/* Toolbar */
 .toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;justify-content:space-between}
 .toolbar-left{display:flex;align-items:center;gap:6px}
 .month-nav{display:flex;align-items:center;gap:4px}
@@ -22,15 +20,11 @@ h1{font-size:18px;font-weight:700;color:#0f172a;margin-bottom:4px}
 .btn-blue{background:#2563eb;border-color:#2563eb;color:#fff}
 .btn-blue:hover{background:#1d4ed8}
 .btn-ghost{background:transparent;border-color:#e2e8f0;color:#64748b}
-
-/* Calendar wrapper */
 .cal-wrap{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .cal-scroll{overflow-x:auto}
 table{border-collapse:collapse;table-layout:fixed}
 colgroup col.col-slot{width:164px;min-width:164px}
 colgroup col.col-day{width:42px;min-width:42px}
-
-/* Header */
 thead th{background:#f8fafc;padding:0;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;vertical-align:bottom;position:sticky;top:0;z-index:10}
 thead th:last-child{border-right:none}
 .th-slot{text-align:left;padding:9px 11px;font-size:11px;font-weight:600;color:#64748b;letter-spacing:.03em;text-transform:uppercase;position:sticky;left:0;z-index:12;background:#f8fafc}
@@ -40,8 +34,6 @@ thead th:last-child{border-right:none}
 .d-bar-wrap{display:flex;flex-direction:column;width:100%;gap:1px;margin-top:4px;min-height:4px}
 .d-bar{height:3px;width:100%}
 .today-chip{background:#2563eb;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
-
-/* Body rows */
 tbody tr{border-bottom:1px solid #e2e8f0}
 tbody tr:last-child{border-bottom:none}
 .group-row td{background:#f1f5f9;padding:5px 11px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e8f0}
@@ -49,8 +41,6 @@ tbody tr:last-child{border-bottom:none}
 td.dc{padding:0;border-right:1px solid #e2e8f0;vertical-align:top;position:relative;width:42px;min-width:42px}
 td.dc:last-child{border-right:none}
 td.dc.wk{background:#fafbfc}
-
-/* Promo bars */
 .bar-container{position:absolute;top:4px;bottom:4px;display:flex;flex-direction:column;gap:2px;z-index:2;overflow:hidden}
 .promo-bar{display:flex;flex-direction:column;overflow:hidden;cursor:pointer;transition:filter .1s}
 .promo-bar:hover{filter:brightness(.93)}
@@ -59,13 +49,9 @@ td.dc.wk{background:#fafbfc}
 .promo-name{font-size:8px;font-weight:700;opacity:.55;line-height:1;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tier-name{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;line-height:1;margin-bottom:2px;opacity:.85}
 .copy-text{font-size:10px;line-height:1.4;word-break:break-word;white-space:normal}
-
-/* Legend */
 .legend{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center;padding:0 2px}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#475569}
 .leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-
-/* Modal */
 .overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:200;align-items:center;justify-content:center;padding:20px}
 .overlay.open{display:flex}
 .modal{background:#fff;border-radius:12px;padding:1.5rem;width:440px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
@@ -81,16 +67,12 @@ td.dc.wk{background:#fafbfc}
 .tier-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem;border-top:1px solid #f1f5f9;padding-top:1rem}
 .ctx-badge{display:inline-block;padding:2px 10px;border-radius:5px;font-size:11px;font-weight:600;margin-bottom:10px}
-
-/* Upload zone */
 .upload-zone{border:2px dashed #cbd5e1;border-radius:8px;padding:1.5rem;text-align:center;cursor:pointer;margin-bottom:.75rem;transition:background .12s}
 .upload-zone:hover{background:#f8fafc}
 .upload-zone .icon{font-size:32px;margin-bottom:.5rem}
 .upload-status{font-size:12px;padding:7px 11px;border-radius:7px;margin-top:8px}
 .upload-status.ok{background:#dcfce7;color:#166534}
 .upload-status.err{background:#fee2e2;color:#991b1b}
-
-/* Promo chip in manager */
 .promo-chip{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:5px;background:#fafafa}
 .promo-chip .name{flex:1;font-weight:600;font-size:12px}
 .promo-chip .dates{font-size:11px;color:#94a3b8}
@@ -101,8 +83,7 @@ td.dc.wk{background:#fafbfc}
 <body>
 <div class="page">
   <h1>Homepage Content Calendar</h1>
-  <p class="subtitle">Slot messaging by promotion · P19 and National stacked where copy differs · Priority 1 overrides during overlaps</p>
-
+  <p class="subtitle">Slot messaging by promotion · P19 and National stacked where copy differs · Priority 1 overrides during overlaps (most recently started wins ties) · Empty slots have no copy assigned</p>
   <div class="toolbar">
     <div class="toolbar-left">
       <div class="month-nav">
@@ -116,12 +97,10 @@ td.dc.wk{background:#fafbfc}
       <button class="btn" onclick="openPromoMgr()">&#128197;&nbsp;Promos</button>
     </div>
   </div>
-
   <div class="cal-wrap"><div class="cal-scroll"><table id="board"></table></div></div>
   <div class="legend" id="legend"></div>
 </div>
 
-<!-- Edit modal -->
 <div class="overlay" id="edit-overlay">
   <div class="modal">
     <button class="modal-close" onclick="closeEdit()">&times;</button>
@@ -151,7 +130,6 @@ td.dc.wk{background:#fafbfc}
   </div>
 </div>
 
-<!-- Upload modal -->
 <div class="overlay" id="upload-overlay">
   <div class="modal" style="width:460px">
     <button class="modal-close" onclick="closeUpload()">&times;</button>
@@ -167,7 +145,6 @@ td.dc.wk{background:#fafbfc}
   </div>
 </div>
 
-<!-- Promo manager -->
 <div class="overlay" id="promo-overlay">
   <div class="modal" style="width:500px">
     <button class="modal-close" onclick="closePromoMgr()">&times;</button>
@@ -188,93 +165,75 @@ td.dc.wk{background:#fafbfc}
 </div>
 
 <script>
-// ── Color palette (promo colors) ──────────────────────────────────────────────
 const PC  = ['#1e40af','#6d28d9','#b91c1c','#065f46','#92400e','#0e7490','#1e3a5f','#4c1d95'];
 const PBG = ['#dbeafe','#ede9fe','#fee2e2','#d1fae5','#fef3c7','#cffafe','#dde6f7','#ede0ff'];
 const PT  = ['#1e3a8a','#4c1d95','#7f1d1d','#064e3b','#78350f','#164e63','#1e3a5f','#3b0764'];
-
-// Tier sub-tinting inside a bar
 const TIER_TINT = {
   'All Tiers': { bg: 'rgba(255,255,255,.15)', lc: 'rgba(255,255,255,.8)' },
   'P19':       { bg: 'rgba(22,163,74,.2)',    lc: '#16a34a' },
   'National':  { bg: 'rgba(234,88,12,.2)',    lc: '#ea580c' },
 };
-
-// ── Slot groups ───────────────────────────────────────────────────────────────
 const SLOT_GROUPS = [
-  { label: 'Report slots', slots: [
-    'Hero','Limited Time Deal 1','Limited Time Deal 2','Limited Time Deal 3',
-    'Limited Time Deal 4','Featured Deal Tile 1','Featured Deal Tile 2'
-  ]},
-  { label: 'Additional placements', slots: [
-    'Ribbon in Grid','Sale Page Visual Nav','Location Page Tile','Google Posting'
-  ]},
+  { label: 'Report slots', slots: ['Hero','Limited Time Deal 1','Limited Time Deal 2','Limited Time Deal 3','Limited Time Deal 4','Featured Deal Tile 1','Featured Deal Tile 2']},
+  { label: 'Additional placements', slots: ['Ribbon in Grid','Sale Page Visual Nav','Location Page Tile','Google Posting']},
 ];
-
-// ── Promotions ────────────────────────────────────────────────────────────────
 let promos = [
-  {id:1, name:'Hello Summer Sale',                       start:'2026-06-02', end:'2026-06-10', ci:0},
-  {id:2, name:'No Payments until July 1st',              start:'2026-06-11', end:'2026-06-17', ci:1},
-  {id:3, name:'Weekend Flash Sale',                      start:'2026-06-18', end:'2026-06-21', ci:2},
-  {id:4, name:'Hot Summer Savings',                      start:'2026-06-22', end:'2026-06-30', ci:3},
-  {id:5, name:'Black Friday All Month Long',             start:'2026-07-01', end:'2026-07-31', ci:4},
-  {id:6, name:'4th of July Weekend Flash Sale',          start:'2026-07-03', end:'2026-07-06', ci:5},
-  {id:7, name:'Sizzling Summer Savings',                 start:'2026-07-16', end:'2026-07-24', ci:6},
-  {id:8, name:'Last Chance: Black Friday All Month Long',start:'2026-07-25', end:'2026-07-31', ci:7},
+  {id:1,name:"Hello Summer Sale",start:"2026-06-02",end:"2026-06-10",ci:0},
+  {id:2,name:"No Payments until July 1st",start:"2026-06-11",end:"2026-06-17",ci:1},
+  {id:3,name:"Weekend Flash Sale",start:"2026-06-18",end:"2026-06-21",ci:2},
+  {id:4,name:"Hot Summer Savings",start:"2026-06-22",end:"2026-06-30",ci:3},
+  {id:5,name:"Black Friday All Month Long",start:"2026-07-01",end:"2026-07-31",ci:4},
+  {id:6,name:"4th of July Weekend Flash Sale",start:"2026-07-03",end:"2026-07-06",ci:5},
+  {id:7,name:"Sizzling Summer Savings",start:"2026-07-16",end:"2026-07-24",ci:6},
+  {id:8,name:"Last Chance: Black Friday All Month Long",start:"2026-07-25",end:"2026-07-31",ci:7},
+  {id:9,name:"Select Products Sale",start:"2026-08-01",end:"2026-08-10",ci:0},
+  {id:10,name:"$0.01 PAYG + No Payments Until September 1",start:"2026-08-11",end:"2026-08-19",ci:1},
+  {id:11,name:"Upholstery & Laundry Event",start:"2026-08-20",end:"2026-08-27",ci:2},
+  {id:12,name:"Labor Day Event",start:"2026-08-28",end:"2026-09-09",ci:3},
 ];
-let nextId = 9;
-
-// ── Messaging store ───────────────────────────────────────────────────────────
-// store[promoName][slot] = { all, p19, nat, priority }
+let nextId = 13;
 const store = {};
-
-function getE(promo, slot) { return store[promo] && store[promo][slot] ? store[promo][slot] : null; }
-function hasMsg(e) { return e && (e.all || e.p19 || e.nat); }
-function setE(promo, slot, all, p19, nat, pri) {
-  if (!store[promo]) store[promo] = {};
-  if (!all && !p19 && !nat) { delete store[promo][slot]; return; }
-  store[promo][slot] = { all: all||'', p19: p19||'', nat: nat||'', priority: pri||'' };
+function getE(promo,slot){return store[promo]&&store[promo][slot]?store[promo][slot]:null}
+function hasMsg(e){return e&&(e.all.length||e.p19.length||e.nat.length)}
+function setE(promo,slot,all,p19,nat,pri){
+  if(!store[promo])store[promo]={};
+  if(!all&&!p19&&!nat){delete store[promo][slot];return}
+  store[promo][slot]={all:all?[all]:[],p19:p19?[p19]:[],nat:nat?[nat]:[],priority:pri||''}
 }
-
-function tierRows(e) {
-  if (!e) return [];
-  if (e.all) return [{ tier: 'All Tiers', copy: e.all }];
-  const r = [];
-  if (e.p19) r.push({ tier: 'P19', copy: e.p19 });
-  if (e.nat) r.push({ tier: 'National', copy: e.nat });
+function tierRows(e){
+  if(!e)return[];
+  const r=[];
+  if(e.all&&e.all.length){
+    e.all.forEach((copy,i)=>r.push({tier:'All Tiers',copy,rotate:e.all.length>1,rotateIdx:i,rotateTotal:e.all.length}));
+  } else {
+    if(e.p19&&e.p19.length)e.p19.forEach((copy,i)=>r.push({tier:'P19',copy,rotate:e.p19.length>1,rotateIdx:i,rotateTotal:e.p19.length}));
+    if(e.nat&&e.nat.length)e.nat.forEach((copy,i)=>r.push({tier:'National',copy,rotate:e.nat.length>1,rotateIdx:i,rotateTotal:e.nat.length}));
+  }
   return r;
 }
-
-// ── Resolution logic ──────────────────────────────────────────────────────────
-function activeOnDate(ds) { return promos.filter(p => ds >= p.start && ds <= p.end); }
-
-function resolveSlot(slot, ds) {
-  const active = activeOnDate(ds);
-  const withMsg = active.filter(p => hasMsg(getE(p.name, slot)));
-  if (!withMsg.length) return [];
-  const pri1 = withMsg.filter(p => getE(p.name, slot).priority === '1');
-  if (!pri1.length) return withMsg;
-  // If multiple pri1 promos compete on this slot, the more recently started promo wins
-  if (pri1.length === 1) return pri1;
-  const newest = pri1.reduce((a, b) => new Date(a.start) >= new Date(b.start) ? a : b);
-  return [newest];
+function activeOnDate(ds){return promos.filter(p=>ds>=p.start&&ds<=p.end)}
+function resolveSlot(slot,ds){
+  const active=activeOnDate(ds);
+  const withMsg=active.filter(p=>hasMsg(getE(p.name,slot)));
+  if(!withMsg.length)return[];
+  const pri1=withMsg.filter(p=>getE(p.name,slot).priority==='1');
+  if(!pri1.length)return withMsg;
+  if(pri1.length===1)return pri1;
+  const newest=pri1.reduce((a,b)=>new Date(a.start)>=new Date(b.start)?a:b);
+  return[newest];
 }
-
-// ── Row height ────────────────────────────────────────────────────────────────
-function calcRowH(slot) {
-  const dim = new Date(viewYear, viewMonth + 1, 0).getDate();
-  let max = 0;
-  for (let d = 1; d <= dim; d++) {
-    const ds = dateStr(new Date(viewYear, viewMonth, d));
-    const vis = resolveSlot(slot, ds);
-    const total = vis.reduce((acc, p) => acc + (tierRows(getE(p.name, slot)).length || 1), 0);
-    if (total > max) max = total;
+function calcRowH(slot){
+  const dim=new Date(viewYear,viewMonth+1,0).getDate();
+  let max=0;
+  for(let d=1;d<=dim;d++){
+    const ds=dateStr(new Date(viewYear,viewMonth,d));
+    const vis=resolveSlot(slot,ds);
+    const total=vis.reduce((acc,p)=>acc+(tierRows(getE(p.name,slot)).length||1),0);
+    if(total>max)max=total;
   }
-  return Math.max(40, max * 48 + 12);
+  return Math.max(40,max*48+12);
 }
-
-// ── Load data ─────────────────────────────────────────────────────────────────
-const RAW = [
+const RAW=[
   ["Hero","Hello Summer Sale","P19",0,"Up to $900 Off Your Lease on Select Products"],
   ["Hero","Hello Summer Sale","National",0,"Up to $200 Off Your Lease on Select Products"],
   ["Limited Time Deal 1","Hello Summer Sale","P19",0,"Element 65\" TV Starting At $59.99/MO"],
@@ -400,279 +359,247 @@ const RAW = [
   ["Sale Page Visual Nav","Last Chance: Black Friday All Month Long","National",1,"LAST Chance: Black Friday in July All Month Long: Up to $200 Off Select Products"],
   ["Location Page Tile","Last Chance: Black Friday All Month Long","All Tiers",1,"LAST Chance: Black Friday in July All Month Long: Up to $200 Off Select Products"],
   ["Google Posting","Last Chance: Black Friday All Month Long","All Tiers",1,"LAST Chance: Black Friday in July All Month Long: Up to $200 Off Select Products"],
+  ["Hero","Select Products Sale","P19",0,"Up to $900 Off Select Products + $0.01 PAYG"],
+  ["Hero","Select Products Sale","National",0,"Up to $300 Off Select Products + $0.01 PAYG"],
+  ["Limited Time Deal 1","Select Products Sale","P19",0,"Up to 20% Off Select Washers & Dryers"],
+  ["Limited Time Deal 1","Select Products Sale","National",0,"Huge Markdowns on Select Washers & Dryers"],
+  ["Limited Time Deal 2","Select Products Sale","P19",0,"MSi 8GB Gaming Desktop: Save 20%"],
+  ["Limited Time Deal 2","Select Products Sale","National",0,"Select Gaming Desktops on Sale"],
+  ["Limited Time Deal 3","Select Products Sale","P19",0,"Lenore 6-Piece Queen Bedroom Group: $23.09/Week WAS $34.64/Week"],
+  ["Limited Time Deal 3","Select Products Sale","National",0,"Limited Time Savings on Lenore 6-Piece Queen Bedroom Group"],
+  ["Limited Time Deal 4","Select Products Sale","P19",0,"Woodhaven Capitan 2-Piece Sofa/Loveseat: $25.40/Week WAS $34.64"],
+  ["Limited Time Deal 4","Select Products Sale","National",0,"Comfort For Less: Woodhaven Capitan 2-Piece Sofa/Loveseat on Sale Now"],
+  ["Featured Deal Tile 1","Select Products Sale","P19",0,"Up to $900 Off Select Products + $0.01 PAYG"],
+  ["Featured Deal Tile 1","Select Products Sale","National",0,"Up to $300 Off Select Products + $0.01 PAYG"],
+  ["Ribbon in Grid","Select Products Sale","P19",0,"Up to $900 Off Select Products + $0.01 PAYG"],
+  ["Ribbon in Grid","Select Products Sale","National",0,"Up to $300 Off Select Products + $0.01 PAYG"],
+  ["Sale Page Visual Nav","Select Products Sale","P19",0,"Up to $900 Off Select Products + $0.01 PAYG"],
+  ["Sale Page Visual Nav","Select Products Sale","National",0,"Up to $300 Off Select Products + $0.01 PAYG"],
+  ["Location Page Tile","Select Products Sale","All Tiers",0,"Up to $300 Off Select Products + $0.01 PAYG"],
+  ["Google Posting","Select Products Sale","P19",0,"Up to $900 Off Select Products + $0.01 PAYG"],
+  ["Google Posting","Select Products Sale","National",0,"Up to $300 Off Select Products + $0.01 PAYG"],
+  ["Hero","$0.01 PAYG + No Payments Until September 1","All Tiers",0,"$0.01 PAYG + No Payments Until September 1"],
+  ["Limited Time Deal 1","$0.01 PAYG + No Payments Until September 1","P19",0,"Up to $240 Off^^ HP Laptops"],
+  ["Limited Time Deal 1","$0.01 PAYG + No Payments Until September 1","National",0,"Huge Monthly Savings on Select HP Laptops"],
+  ["Limited Time Deal 2","$0.01 PAYG + No Payments Until September 1","P19",0,"$120 Off^^ Element 12,000 BTU Portable AC with Heat"],
+  ["Limited Time Deal 2","$0.01 PAYG + No Payments Until September 1","National",0,"Stay Cool For Less: Element 12,000 BTU Portable AC with Heat on Sale Now"],
+  ["Limited Time Deal 3","$0.01 PAYG + No Payments Until September 1","P19",0,"25% Off Marina Sofa and Loveseat: $20.78/Week WAS $27.71"],
+  ["Limited Time Deal 3","$0.01 PAYG + No Payments Until September 1","National",0,"Bring Comfort Home With Limited Time Savings on Select Sofas & Loveseats"],
+  ["Featured Deal Tile 1","$0.01 PAYG + No Payments Until September 1","All Tiers",0,"$0.01 PAYG + No Payments Until September 1"],
+  ["Ribbon in Grid","$0.01 PAYG + No Payments Until September 1","All Tiers",0,"$0.01 PAYG + No Payments Until September 1"],
+  ["Sale Page Visual Nav","$0.01 PAYG + No Payments Until September 1","All Tiers",0,"$0.01 PAYG + No Payments Until September 1"],
+  ["Location Page Tile","$0.01 PAYG + No Payments Until September 1","All Tiers",0,"$0.01 PAYG + No Payments Until September 1"],
+  ["Google Posting","$0.01 PAYG + No Payments Until September 1","All Tiers",0,"$0.01 PAYG + No Payments Until September 1"],
+  ["Hero","Upholstery & Laundry Event","P19",0,"Up to $1,200 Off Select Products"],
+  ["Hero","Upholstery & Laundry Event","National",0,"Up to $300 Off Select Products"],
+  ["Limited Time Deal 1","Upholstery & Laundry Event","All Tiers",0,"$0.01 PAYG"],
+  ["Limited Time Deal 2","Upholstery & Laundry Event","P19",0,"Up to 20% Off Select Washers/Dryers"],
+  ["Limited Time Deal 2","Upholstery & Laundry Event","National",0,"Save Big on Select Washers/Dryers"],
+  ["Limited Time Deal 3","Upholstery & Laundry Event","P19",0,"Woodhaven Indie Sofa, Ottoman, and Loveseat: $99.98/MO WAS $149.98/MO"],
+  ["Limited Time Deal 3","Upholstery & Laundry Event","National",0,"Huge Discounts on Select Living Room Sets"],
+  ["Limited Time Deal 4","Upholstery & Laundry Event","P19",0,"Man Wah Cowboy Reclining Sofa & Loveseat: $159.99/MO WAS $209.99/MO"],
+  ["Limited Time Deal 4","Upholstery & Laundry Event","National",0,"Select Sofas & Loveseats on Sale Now"],
+  ["Featured Deal Tile 1","Upholstery & Laundry Event","P19",0,"Up to $1,200 Off Select Products"],
+  ["Featured Deal Tile 1","Upholstery & Laundry Event","National",0,"Up to $300 Off Select Products"],
+  ["Ribbon in Grid","Upholstery & Laundry Event","P19",0,"Up to $1,200 Off Select Products"],
+  ["Ribbon in Grid","Upholstery & Laundry Event","National",0,"Up to $300 Off Select Products"],
+  ["Sale Page Visual Nav","Upholstery & Laundry Event","P19",0,"Up to $1,200 Off Select Products"],
+  ["Sale Page Visual Nav","Upholstery & Laundry Event","National",0,"Up to $300 Off Select Products"],
+  ["Location Page Tile","Upholstery & Laundry Event","All Tiers",0,"Up to $300 Off Select Products"],
+  ["Google Posting","Upholstery & Laundry Event","P19",0,"Up to $1,200 Off Select Products"],
+  ["Google Posting","Upholstery & Laundry Event","National",0,"Up to $300 Off Select Products"],
+  ["Hero","Labor Day Event","P19",0,"Labor Day Event: Up to 30% Off Select Products + $0.01 PAYG"],
+  ["Hero","Labor Day Event","National",0,"Labor Day Event: Up to $400 Off Select Products + $0.01 PAYG"],
+  ["Limited Time Deal 1","Labor Day Event","P19",0,"G0006F3: Whirlpool 4.2/7.0 TL Elec Dryer: $20.78/Week WAS $30.02/Week"],
+  ["Limited Time Deal 1","Labor Day Event","P19",0,"G00062S: LG 4.5/7.4 FL Steam Elec Laundy Pair: $35.79/Week WAS $46.19/Week"],
+  ["Limited Time Deal 1","Labor Day Event","National",0,"G0006F3: Laundry For Less: Markdowns on Select Washers/Dryers"],
+  ["Limited Time Deal 2","Labor Day Event","P19",0,"G0002JW: Amalfi Commodore Reclining Sofa & Loveseat: $39.26/Week WAS $50.81/Week"],
+  ["Limited Time Deal 2","Labor Day Event","P19",0,"G0006FX: Woodhaven Kendall 3-Piece Sectional: $33.48/Week WAS $43.88/Week"],
+  ["Limited Time Deal 2","Labor Day Event","P19",0,"G105820: Signature Design by Ashley Allmax Sofa and Loveseat: $24.25/Week WAS $32.33/Week"],
+  ["Limited Time Deal 2","Labor Day Event","National",0,"G0002JW: Limited Time Savings on Select Living Room Furniture"],
+  ["Limited Time Deal 3","Labor Day Event","P19",0,"Mattress Event: Up to $600 Off Select Mattresses"],
+  ["Limited Time Deal 3","Labor Day Event","National",0,"Generic Mattress Event Messaging"],
+  ["Limited Time Deal 4","Labor Day Event","P19",0,"G0004GA: Riversedge Furniture Urban 6-Piece Queen Bedroom Group: $18.47/Week WAS $24.25"],
+  ["Limited Time Deal 4","Labor Day Event","P19",0,"G0004H0: Ideaitalia Adorna Two-Tone 6-Piece Queen Bedroom Goup: $18.47/Week WAS $25.40"],
+  ["Limited Time Deal 4","Labor Day Event","P19",0,"G0004GL: Elements International Titleist Grey 6-Piece Queen Bedroom Group: $27.71/Week WAS $40.41"],
+  ["Limited Time Deal 4","Labor Day Event","National",0,"G0004GA: Hot Deals on Select Bedroom Sets"],
+  ["Featured Deal Tile 1","Labor Day Event","P19",0,"Labor Day Event: Up to 30% Off Select Products + $0.01 PAYG"],
+  ["Featured Deal Tile 1","Labor Day Event","National",0,"Labor Day Event: Up to $400 Off Select Products + $0.01 PAYG"],
+  ["Featured Deal Tile 2","Labor Day Event","P19",0,"Mattress Event: Up to $600 Off Select Mattresses"],
+  ["Featured Deal Tile 2","Labor Day Event","National",0,"Generic Mattress Event Messaging"],
+  ["Ribbon in Grid","Labor Day Event","P19",0,"Labor Day Event: Up to 30% Off Select Products + $0.01 PAYG"],
+  ["Ribbon in Grid","Labor Day Event","National",0,"Labor Day Event: Up to $400 Off Select Products + $0.01 PAYG"],
+  ["Sale Page Visual Nav","Labor Day Event","P19",0,"Labor Day Event: Up to 30% Off Select Products + $0.01 PAYG"],
+  ["Sale Page Visual Nav","Labor Day Event","National",0,"Labor Day Event: Up to $400 Off Select Products + $0.01 PAYG"],
+  ["Location Page Tile","Labor Day Event","All Tiers",0,"Labor Day Event: Up to $400 Off Select Products + $0.01 PAYG"],
+  ["Google Posting","Labor Day Event","P19",0,"Labor Day Event: Up to 30% Off Select Products + $0.01 PAYG"],
+  ["Google Posting","Labor Day Event","National",0,"Labor Day Event: Up to $400 Off Select Products + $0.01 PAYG"],
 ];
-
-RAW.forEach(([slot, promo, tier, pri, copy]) => {
-  if (!store[promo]) store[promo] = {};
-  if (!store[promo][slot]) store[promo][slot] = { all:'', p19:'', nat:'', priority:'' };
-  const e = store[promo][slot];
-  if (tier === 'All Tiers') e.all = copy;
-  else if (tier === 'P19')  e.p19 = copy;
-  else if (tier === 'National') e.nat = copy;
-  if (pri) e.priority = '1';
+RAW.forEach(([slot,promo,tier,pri,copy])=>{
+  if(!store[promo])store[promo]={};
+  if(!store[promo][slot])store[promo][slot]={all:[],p19:[],nat:[],priority:''};
+  const e=store[promo][slot];
+  if(tier==='All Tiers')e.all.push(copy);
+  else if(tier==='P19')e.p19.push(copy);
+  else if(tier==='National')e.nat.push(copy);
+  if(pri)e.priority='1';
 });
-
-// ── View state ────────────────────────────────────────────────────────────────
-let viewYear = 2026, viewMonth = 5;
-let editCtx = null;
-
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const DOWS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-
-function dateStr(d) {
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-}
-function changeMonth(dir) {
-  viewMonth += dir;
-  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
-  if (viewMonth < 0)  { viewMonth = 11; viewYear--; }
-  render();
-}
-
-// ── Render ────────────────────────────────────────────────────────────────────
-function render() {
-  const dim   = new Date(viewYear, viewMonth+1, 0).getDate();
-  const today = dateStr(new Date());
-  const days  = Array.from({length: dim}, (_, i) => new Date(viewYear, viewMonth, i+1));
-  const CW    = 42;
-
-  document.getElementById('month-label').textContent = MONTHS[viewMonth] + ' ' + viewYear;
-
-  let h = '<colgroup><col class="col-slot">';
-  days.forEach(() => h += '<col class="col-day">');
-  h += '</colgroup><thead><tr><th class="th-slot">Slot</th>';
-
-  days.forEach(d => {
-    const ds     = dateStr(d);
-    const active = activeOnDate(ds);
-    const isToday = ds === today;
-    h += '<th><div class="day-hdr">';
-    if (isToday) h += '<div class="today-chip">' + d.getDate() + '</div>';
-    else         h += '<div class="d-num">' + d.getDate() + '</div>';
-    h += '<div class="d-dow">' + DOWS[d.getDay()] + '</div>';
-    h += '<div class="d-bar-wrap">';
-    active.slice(0,2).forEach(p => h += '<div class="d-bar" style="background:' + PC[p.ci % PC.length] + '"></div>');
-    if (!active.length) h += '<div class="d-bar" style="background:transparent"></div>';
-    h += '</div></div></th>';
+let viewYear=2026,viewMonth=5,editCtx=null;
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DOWS=['Su','Mo','Tu','We','Th','Fr','Sa'];
+function dateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function changeMonth(dir){viewMonth+=dir;if(viewMonth>11){viewMonth=0;viewYear++}if(viewMonth<0){viewMonth=11;viewYear--}render()}
+function render(){
+  const dim=new Date(viewYear,viewMonth+1,0).getDate();
+  const today=dateStr(new Date());
+  const days=Array.from({length:dim},(_,i)=>new Date(viewYear,viewMonth,i+1));
+  const CW=42;
+  document.getElementById('month-label').textContent=MONTHS[viewMonth]+' '+viewYear;
+  let h='<colgroup><col class="col-slot">';
+  days.forEach(()=>h+='<col class="col-day">');
+  h+='</colgroup><thead><tr><th class="th-slot">Slot</th>';
+  days.forEach(d=>{
+    const ds=dateStr(d),active=activeOnDate(ds),isToday=ds===today;
+    h+='<th><div class="day-hdr">';
+    h+=isToday?'<div class="today-chip">'+d.getDate()+'</div>':'<div class="d-num">'+d.getDate()+'</div>';
+    h+='<div class="d-dow">'+DOWS[d.getDay()]+'</div><div class="d-bar-wrap">';
+    active.slice(0,2).forEach(p=>h+='<div class="d-bar" style="background:'+PC[p.ci%PC.length]+'"></div>');
+    if(!active.length)h+='<div class="d-bar" style="background:transparent"></div>';
+    h+='</div></div></th>';
   });
-  h += '</tr></thead><tbody>';
-
-  SLOT_GROUPS.forEach(grp => {
-    h += '<tr class="group-row"><td colspan="' + (days.length+1) + '">' + grp.label + '</td></tr>';
-
-    grp.slots.forEach(slot => {
-      const rh = calcRowH(slot);
-      h += '<tr style="height:' + rh + 'px"><td class="slot-td" style="height:' + rh + 'px">' + slot + '</td>';
-
-      let di = 0;
-      while (di < days.length) {
-        const ds  = dateStr(days[di]);
-        const dow = days[di].getDay();
-        const wk  = (dow === 0 || dow === 6) ? ' wk' : '';
-        const vis = resolveSlot(slot, ds);
-
-        if (!vis.length) {
-          h += '<td class="dc' + wk + '" style="height:' + rh + 'px"></td>';
-          di++; continue;
-        }
-
-        // Compute span
-        const ck = vis.map(p => p.id).join(',');
-        let span = 0;
-        for (let j = di; j < days.length; j++) {
-          if (resolveSlot(slot, dateStr(days[j])).map(p => p.id).join(',') === ck) span++;
-          else break;
-        }
-        const prevCk = di > 0 ? resolveSlot(slot, dateStr(days[di-1])).map(p => p.id).join(',') : '';
-        const nextCk = (di+span) < days.length ? resolveSlot(slot, dateStr(days[di+span])).map(p => p.id).join(',') : '';
-        const isStart = prevCk !== ck;
-        const isEnd   = nextCk !== ck;
-
-        h += '<td class="dc' + wk + '" colspan="' + span + '" style="height:' + rh + 'px;position:relative;overflow:visible">';
-
-        if (isStart) {
-          const bw  = span * CW - (isStart ? 2 : 0) - (isEnd ? 2 : 0);
-          const lo  = isStart ? 2 : 0;
-          const lr  = isStart ? 5 : 0;
-          const rr  = isEnd   ? 5 : 0;
-
-          h += '<div class="bar-container" style="left:' + lo + 'px;width:' + bw + 'px;border-radius:' + lr + 'px ' + rr + 'px ' + rr + 'px ' + lr + 'px;overflow:hidden">';
-
-          vis.forEach((promo, pi) => {
-            const ci   = promo.ci % PC.length;
-            const bc   = PC[ci], bg = PBG[ci], tc = PT[ci];
-            const e    = getE(promo.name, slot);
-            const trows = tierRows(e);
-            const sep  = pi > 0 ? 'border-top:2px solid rgba(255,255,255,.5)' : '';
-
-            h += '<div class="promo-bar" style="flex:' + (trows.length||1) + ';background:' + bg + ';border-left:3px solid ' + bc + ';' + sep + '"'
-               + ' onclick="openEdit(' + JSON.stringify(slot) + ',' + JSON.stringify(promo.name) + ')">';
-
-            trows.forEach((tr, ti) => {
-              const tt = TIER_TINT[tr.tier];
-              h += '<div class="tier-row" style="background:' + tt.bg + ';' + (ti > 0 ? 'border-top:1px solid ' + tt.lc + '44' : '') + '">';
-              if (ti === 0) h += '<div class="promo-name" style="color:' + bc + '">' + esc(promo.name) + '</div>';
-              if (trows.length > 1) h += '<div class="tier-name" style="color:' + tt.lc + '">' + tr.tier + '</div>';
-              h += '<div class="copy-text" style="color:' + tc + '">' + esc(tr.copy) + '</div>';
-              h += '</div>';
+  h+='</tr></thead><tbody>';
+  SLOT_GROUPS.forEach(grp=>{
+    h+='<tr class="group-row"><td colspan="'+(days.length+1)+'">'+grp.label+'</td></tr>';
+    grp.slots.forEach(slot=>{
+      const rh=calcRowH(slot);
+      h+='<tr style="height:'+rh+'px"><td class="slot-td" style="height:'+rh+'px">'+slot+'</td>';
+      let di=0;
+      while(di<days.length){
+        const ds=dateStr(days[di]),dow=days[di].getDay(),wk=(dow===0||dow===6)?' wk':'',vis=resolveSlot(slot,ds);
+        if(!vis.length){h+='<td class="dc'+wk+'" style="height:'+rh+'px"></td>';di++;continue}
+        const ck=vis.map(p=>p.id).join(',');
+        let span=0;
+        for(let j=di;j<days.length;j++){if(resolveSlot(slot,dateStr(days[j])).map(p=>p.id).join(',')===ck)span++;else break}
+        const prevCk=di>0?resolveSlot(slot,dateStr(days[di-1])).map(p=>p.id).join(','):'';
+        const nextCk=(di+span)<days.length?resolveSlot(slot,dateStr(days[di+span])).map(p=>p.id).join(','):'';
+        const isStart=prevCk!==ck,isEnd=nextCk!==ck;
+        h+='<td class="dc'+wk+'" colspan="'+span+'" style="height:'+rh+'px;position:relative;overflow:visible">';
+        if(isStart){
+          const bw=span*CW-(isStart?2:0)-(isEnd?2:0),lo=isStart?2:0,lr=isStart?5:0,rr=isEnd?5:0;
+          h+='<div class="bar-container" style="left:'+lo+'px;width:'+bw+'px;border-radius:'+lr+'px '+rr+'px '+rr+'px '+lr+'px;overflow:hidden">';
+          vis.forEach((promo,pi)=>{
+            const ci=promo.ci%PC.length,bc=PC[ci],bg=PBG[ci],tc=PT[ci],e=getE(promo.name,slot),trows=tierRows(e),sep=pi>0?'border-top:2px solid rgba(255,255,255,.5)':'';
+            h+='<div class="promo-bar" style="flex:'+(trows.length||1)+';background:'+bg+';border-left:3px solid '+bc+';'+sep+'" onclick="openEdit('+JSON.stringify(slot)+','+JSON.stringify(promo.name)+')">';
+            trows.forEach((tr,ti)=>{
+              const tt=TIER_TINT[tr.tier];
+              h+='<div class="tier-row" style="background:'+tt.bg+';'+(ti>0?'border-top:1px solid '+tt.lc+'44':'')+'">';
+              if(ti===0)h+='<div class="promo-name" style="color:'+bc+'">'+esc(promo.name)+'</div>';
+              let tl='';
+              if(trows.length>1||tr.rotate)tl=tr.tier;
+              if(tr.rotate)tl+=' (rotation '+(tr.rotateIdx+1)+' of '+tr.rotateTotal+')';
+              if(tl)h+='<div class="tier-name" style="color:'+tt.lc+'">'+tl+'</div>';
+              h+='<div class="copy-text" style="color:'+tc+'">'+esc(tr.copy)+'</div></div>';
             });
-
-            h += '</div>';
+            h+='</div>';
           });
-
-          h += '</div>';
+          h+='</div>';
         }
-        h += '</td>';
-        di += span;
+        h+='</td>';
+        di+=span;
       }
-      h += '</tr>';
+      h+='</tr>';
     });
   });
-
-  h += '</tbody>';
-  document.getElementById('board').innerHTML = h;
+  h+='</tbody>';
+  document.getElementById('board').innerHTML=h;
   renderLegend();
 }
-
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function renderLegend(){
+  const ms=viewYear+'-'+String(viewMonth+1).padStart(2,'0')+'-01';
+  const me=viewYear+'-'+String(viewMonth+1).padStart(2,'0')+'-'+String(new Date(viewYear,viewMonth+1,0).getDate()).padStart(2,'0');
+  const active=promos.filter(p=>p.start<=me&&p.end>=ms);
+  document.getElementById('legend').innerHTML=active.map(p=>'<div class="leg-item"><div class="leg-dot" style="background:'+PC[p.ci%PC.length]+'"></div><span>'+esc(p.name)+'</span><span style="color:#94a3b8;font-size:10px">'+p.start.slice(5)+' \u2013 '+p.end.slice(5)+'</span></div>').join('')+'<div class="leg-item" style="margin-left:auto;color:#94a3b8;font-size:11px">Priority 1 overrides other promos per slot &middot; Slots with no copy are hidden</div>';
 }
-
-function renderLegend() {
-  const ms = viewYear + '-' + String(viewMonth+1).padStart(2,'0') + '-01';
-  const me = viewYear + '-' + String(viewMonth+1).padStart(2,'0') + '-' + String(new Date(viewYear,viewMonth+1,0).getDate()).padStart(2,'0');
-  const active = promos.filter(p => p.start <= me && p.end >= ms);
-  document.getElementById('legend').innerHTML =
-    active.map(p =>
-      '<div class="leg-item"><div class="leg-dot" style="background:' + PC[p.ci%PC.length] + '"></div>'
-      + '<span>' + esc(p.name) + '</span>'
-      + '<span style="color:#94a3b8;font-size:10px">' + p.start.slice(5) + ' – ' + p.end.slice(5) + '</span></div>'
-    ).join('') +
-    '<div class="leg-item" style="margin-left:auto;color:#94a3b8;font-size:11px">Priority 1 overrides other promos per slot &middot; Slots with no copy are hidden</div>';
-}
-
-// ── Edit modal ────────────────────────────────────────────────────────────────
-function openEdit(slot, pname) {
-  editCtx = { slot, pname };
-  const e  = getE(pname, slot) || {};
-  const p  = promos.find(x => x.name === pname);
-  const ci = p ? p.ci % PC.length : 0;
-  document.getElementById('em-title').textContent = slot;
-  document.getElementById('em-ctx').innerHTML = '<span class="ctx-badge" style="background:' + PBG[ci] + ';color:' + PT[ci] + '">' + esc(pname) + '</span>';
-  document.getElementById('em-all').value = e.all  || '';
-  document.getElementById('em-p19').value = e.p19  || '';
-  document.getElementById('em-nat').value = e.nat  || '';
-  document.getElementById('em-pri').value = e.priority || '';
+function openEdit(slot,pname){
+  editCtx={slot,pname};
+  const e=getE(pname,slot)||{},p=promos.find(x=>x.name===pname),ci=p?p.ci%PC.length:0;
+  document.getElementById('em-title').textContent=slot;
+  document.getElementById('em-ctx').innerHTML='<span class="ctx-badge" style="background:'+PBG[ci]+';color:'+PT[ci]+'">'+esc(pname)+'</span>';
+  document.getElementById('em-all').value=e.all&&e.all.length?e.all.join('\n'):'';
+  document.getElementById('em-p19').value=e.p19&&e.p19.length?e.p19.join('\n'):'';
+  document.getElementById('em-nat').value=e.nat&&e.nat.length?e.nat.join('\n'):'';
+  document.getElementById('em-pri').value=e.priority||'';
   document.getElementById('edit-overlay').classList.add('open');
-  setTimeout(() => document.getElementById('em-all').focus(), 60);
+  setTimeout(()=>document.getElementById('em-all').focus(),60);
 }
-function closeEdit()  { document.getElementById('edit-overlay').classList.remove('open'); editCtx = null; }
-function saveEdit() {
-  if (!editCtx) return;
-  setE(editCtx.pname, editCtx.slot,
-    document.getElementById('em-all').value.trim(),
-    document.getElementById('em-p19').value.trim(),
-    document.getElementById('em-nat').value.trim(),
-    document.getElementById('em-pri').value);
-  closeEdit(); render();
+function closeEdit(){document.getElementById('edit-overlay').classList.remove('open');editCtx=null}
+function saveEdit(){
+  if(!editCtx)return;
+  setE(editCtx.pname,editCtx.slot,document.getElementById('em-all').value.trim(),document.getElementById('em-p19').value.trim(),document.getElementById('em-nat').value.trim(),document.getElementById('em-pri').value);
+  closeEdit();render();
 }
-function clearEdit() {
-  if (editCtx && store[editCtx.pname]) delete store[editCtx.pname][editCtx.slot];
-  closeEdit(); render();
-}
-
-// ── Upload ────────────────────────────────────────────────────────────────────
-function openUpload()  { document.getElementById('upload-overlay').classList.add('open'); }
-function closeUpload() { document.getElementById('upload-overlay').classList.remove('open'); }
-
-function excelDs(v) {
-  if (v instanceof Date) return v.toISOString().slice(0,10);
-  if (typeof v === 'number') return new Date(Math.round((v - 25569) * 86400 * 1000)).toISOString().slice(0,10);
+function clearEdit(){if(editCtx&&store[editCtx.pname])delete store[editCtx.pname][editCtx.slot];closeEdit();render()}
+function openUpload(){document.getElementById('upload-overlay').classList.add('open')}
+function closeUpload(){document.getElementById('upload-overlay').classList.remove('open')}
+function excelDs(v){
+  if(v instanceof Date)return v.toISOString().slice(0,10);
+  if(typeof v==='number')return new Date(Math.round((v-25569)*86400*1000)).toISOString().slice(0,10);
   return String(v).trim();
 }
-
-function handleUpload(ev) {
-  const file = ev.target.files[0]; if (!file) return;
-  const st = document.getElementById('upload-status');
-  st.innerHTML = '<span style="font-size:12px;color:#64748b">Reading…</span>';
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const wb = XLSX.read(e.target.result, { type:'array', cellDates:false });
-      let pc = 0, mc = 0;
-      const ps = wb.Sheets['Promotions'];
-      if (ps) XLSX.utils.sheet_to_json(ps, { defval:'' }).forEach(row => {
-        const name = String(row['Promo Name']||'').trim();
-        const s = row['Start Date'], en = row['End Date'];
-        if (!name || !s || !en) return;
-        const ss = excelDs(s), es = excelDs(en);
-        const ex = promos.find(p => p.name === name);
-        if (ex) { ex.start = ss; ex.end = es; }
-        else { promos.push({ id: nextId++, name, start: ss, end: es, ci: promos.length % PC.length }); pc++; }
+function handleUpload(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const st=document.getElementById('upload-status');
+  st.innerHTML='<span style="font-size:12px;color:#64748b">Reading\u2026</span>';
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array',cellDates:false});
+      let pc=0,mc=0;
+      const ps=wb.Sheets['Promotions'];
+      if(ps)XLSX.utils.sheet_to_json(ps,{defval:''}).forEach(row=>{
+        const name=String(row['Promo Name']||'').trim(),s=row['Start Date'],en=row['End Date'];
+        if(!name||!s||!en)return;
+        const ss=excelDs(s),es=excelDs(en),ex=promos.find(p=>p.name===name);
+        if(ex){ex.start=ss;ex.end=es}else{promos.push({id:nextId++,name,start:ss,end:es,ci:promos.length%PC.length});pc++}
       });
-      const ms2 = wb.Sheets['Slot Messaging'];
-      if (ms2) {
-        let lp = '';
-        XLSX.utils.sheet_to_json(ms2, { defval:'' }).forEach(row => {
-          const slot  = String(row['Slot Name']||'').trim();
-          const pr    = String(row['Promo Name']||'').trim();
-          const promo = pr || lp; if (pr) lp = pr;
-          const tier  = String(row['Tier']||'All Tiers').trim();
-          const pri   = row['Priority'] ? '1' : '';
-          const copy  = String(row['Messaging (Headline / Copy)'] || row['Copy / Headline'] || '').trim();
-          if (!slot || !promo || !copy) return;
-          if (!store[promo]) store[promo] = {};
-          if (!store[promo][slot]) store[promo][slot] = { all:'', p19:'', nat:'', priority:'' };
-          const entry = store[promo][slot];
-          if (tier === 'All Tiers')   entry.all = copy;
-          else if (tier === 'P19')    entry.p19 = copy;
-          else if (tier === 'National') entry.nat = copy;
-          if (pri) entry.priority = '1';
+      const ms2=wb.Sheets['Slot Messaging'];
+      if(ms2){
+        let lp='';
+        XLSX.utils.sheet_to_json(ms2,{defval:''}).forEach(row=>{
+          const slot=String(row['Slot Name']||'').trim(),pr=String(row['Promo Name']||'').trim(),promo=pr||lp;
+          if(pr)lp=pr;
+          const tier=String(row['Tier']||'All Tiers').trim(),pri=row['Priority']?'1':'',copy=String(row['Messaging (Headline / Copy)']||row['Copy / Headline']||'').trim();
+          if(!slot||!promo||!copy)return;
+          if(!store[promo])store[promo]={};
+          if(!store[promo][slot])store[promo][slot]={all:[],p19:[],nat:[],priority:''};
+          const entry=store[promo][slot];
+          if(tier==='All Tiers')entry.all.push(copy);
+          else if(tier==='P19')entry.p19.push(copy);
+          else if(tier==='National')entry.nat.push(copy);
+          if(pri)entry.priority='1';
           mc++;
         });
       }
-      st.innerHTML = '<div class="upload-status ok">Loaded ' + pc + ' new promos and ' + mc + ' messaging entries.</div>';
+      st.innerHTML='<div class="upload-status ok">Loaded '+pc+' new promos and '+mc+' messaging entries.</div>';
       render();
-    } catch(err) {
-      st.innerHTML = '<div class="upload-status err">Error reading file: ' + err.message + '</div>';
-    }
+    }catch(err){st.innerHTML='<div class="upload-status err">Error reading file: '+err.message+'</div>'}
   };
-  reader.readAsArrayBuffer(file);
-  ev.target.value = '';
+  reader.readAsArrayBuffer(file);ev.target.value='';
 }
-
-// ── Promo manager ─────────────────────────────────────────────────────────────
-function openPromoMgr()  { renderPromoList(); document.getElementById('promo-overlay').classList.add('open'); }
-function closePromoMgr() { document.getElementById('promo-overlay').classList.remove('open'); }
-
-function renderPromoList() {
-  document.getElementById('promo-list').innerHTML = promos.map(p =>
-    '<div class="promo-chip">'
-    + '<div style="width:9px;height:9px;border-radius:3px;background:' + PC[p.ci%PC.length] + ';flex-shrink:0"></div>'
-    + '<span class="name">' + esc(p.name) + '</span>'
-    + '<span class="dates">' + p.start + ' – ' + p.end + '</span>'
-    + '<button onclick="delPromo(' + p.id + ')" title="Delete">&times;</button>'
-    + '</div>'
-  ).join('');
+function openPromoMgr(){renderPromoList();document.getElementById('promo-overlay').classList.add('open')}
+function closePromoMgr(){document.getElementById('promo-overlay').classList.remove('open')}
+function renderPromoList(){
+  document.getElementById('promo-list').innerHTML=promos.map(p=>'<div class="promo-chip"><div style="width:9px;height:9px;border-radius:3px;background:'+PC[p.ci%PC.length]+';flex-shrink:0"></div><span class="name">'+esc(p.name)+'</span><span class="dates">'+p.start+' \u2013 '+p.end+'</span><button onclick="delPromo('+p.id+')" title="Delete">&times;</button></div>').join('');
 }
-function delPromo(id) {
-  if (!confirm('Delete this promotion and all its messaging?')) return;
-  promos = promos.filter(p => p.id !== id);
-  renderPromoList(); render();
+function delPromo(id){if(!confirm('Delete this promotion and all its messaging?'))return;promos=promos.filter(p=>p.id!==id);renderPromoList();render()}
+function addPromo(){
+  const name=document.getElementById('np-name').value.trim(),start=document.getElementById('np-start').value,end=document.getElementById('np-end').value;
+  if(!name||!start||!end){alert('Please fill in name, start date, and end date.');return}
+  promos.push({id:nextId++,name,start,end,ci:promos.length%PC.length});
+  document.getElementById('np-name').value='';document.getElementById('np-start').value='';document.getElementById('np-end').value='';
+  renderPromoList();render();
 }
-function addPromo() {
-  const name  = document.getElementById('np-name').value.trim();
-  const start = document.getElementById('np-start').value;
-  const end   = document.getElementById('np-end').value;
-  if (!name || !start || !end) { alert('Please fill in name, start date, and end date.'); return; }
-  promos.push({ id: nextId++, name, start, end, ci: promos.length % PC.length });
-  document.getElementById('np-name').value  = '';
-  document.getElementById('np-start').value = '';
-  document.getElementById('np-end').value   = '';
-  renderPromoList(); render();
-}
-
-// ── Init ──────────────────────────────────────────────────────────────────────
 render();
 </script>
 </body>
