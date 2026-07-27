@@ -191,6 +191,8 @@ let promos=[
   {id:11,name:"Upholstery & Laundry Event",start:"2026-08-20",end:"2026-08-27",ci:2},
   {id:12,name:"Labor Day Event",start:"2026-08-28",end:"2026-09-09",ci:3},
   {id:13,name:"Major Doorbusters",start:"2026-09-10",end:"2026-09-17",ci:4},
+  {id:14,name:"Get Fall Ready",start:"2026-09-18",end:"2026-09-30",ci:5},
+  {id:15,name:"Clear the Summer Clearance",start:"2026-09-18",end:"2026-10-16",ci:6},
 ];
 let nextId = 14;
 const store = {};
@@ -448,6 +450,33 @@ const RAW=[
   ["Limited Time Deal 4","Major Doorbusters","P19",0,"Up to 30% Off Select Living Room Furniture: G0005NB - $99.98/mo WAS $149.98"],
   ["Limited Time Deal 4","Major Doorbusters","P19",0,"Up to 30% Off Select Living Room Furniture: G0003XU - $109.99/mo WAS $149.99"],
   ["Limited Time Deal 4","Major Doorbusters","National",0,"Limited Time Savings on Top Living Room Furniture"],
+  ["Featured Deal Tile 1","Major Doorbusters","P19",0,"Major Doorbusters: Up to $1,200 Off Select Products + 6 Months Same As Cash"],
+  ["Featured Deal Tile 1","Major Doorbusters","National",0,"Major Doorbusters: Up to $300 Off Select Products + 6 Months Same As Cash"],
+  ["Featured Deal Tile 2","Major Doorbusters","All Tiers",0,"Generic"],
+  ["Ribbon in Grid","Major Doorbusters","P19",0,"Major Doorbusters: Up to $1,200 Off Select Products + 6 Months Same As Cash"],
+  ["Ribbon in Grid","Major Doorbusters","National",0,"Major Doorbusters: Up to $300 Off Select Products + 6 Months Same As Cash"],
+  ["Sale Page Visual Nav","Major Doorbusters","P19",0,"Major Doorbusters: Up to $1,200 Off Select Products + 6 Months Same As Cash"],
+  ["Sale Page Visual Nav","Major Doorbusters","National",0,"Major Doorbusters: Up to $300 Off Select Products + 6 Months Same As Cash"],
+  ["Location Page Tile","Major Doorbusters","All Tiers",0,"Major Doorbusters: Up to $300 Off Select Products + 6 Months Same As Cash"],
+  ["Google Posting","Major Doorbusters","P19",0,"Major Doorbusters: Up to $1,200 Off Select Products + 6 Months Same As Cash"],
+  ["Hero","Get Fall Ready","P19",0,"Get Fall Ready: Up to $900 Off Select Products + $0.01 PAYG"],
+  ["Hero","Get Fall Ready","National",0,"Get Fall Ready: Up to $300 Off Select Products + $0.01 PAYG"],
+  ["Limited Time Deal 1","Get Fall Ready","P19",0,"Up to 25% Off Select Mattresses"],
+  ["Limited Time Deal 1","Get Fall Ready","National",0,"Limited Time Savings on Top Mattress Brands"],
+  ["Limited Time Deal 2","Get Fall Ready","P19",0,"Save up to $40/Month on Washers & Dryers"],
+  ["Limited Time Deal 2","Get Fall Ready","National",0,"Huge Monthly Savings on Top Washers & Dryers"],
+  ["Limited Time Deal 3","Get Fall Ready","P19",0,"20% Off Our Most Popular TVs"],
+  ["Limited Time Deal 3","Get Fall Ready","National",0,"TVs for Less: Top Models on Sale Now"],
+  ["Limited Time Deal 4","Clear the Summer Clearance","All Tiers",0,"Clear the Summer Clearance (Pre-Leased Event) - In Store Only"],
+  ["Featured Deal Tile 1","Get Fall Ready","P19",0,"Get Fall Ready: Up to $900 Off Select Products + $0.01 PAYG"],
+  ["Featured Deal Tile 1","Get Fall Ready","National",0,"Get Fall Ready: Up to $300 Off Select Products + $0.01 PAYG"],
+  ["Featured Deal Tile 2","Get Fall Ready","All Tiers",0,"Generic"],
+  ["Ribbon in Grid","Get Fall Ready","P19",0,"Get Fall Ready: Up to $900 Off Select Products + $0.01 PAYG"],
+  ["Ribbon in Grid","Get Fall Ready","National",0,"Get Fall Ready: Up to $300 Off Select Products + $0.01 PAYG"],
+  ["Sale Page Visual Nav","Get Fall Ready","P19",0,"Get Fall Ready: Up to $900 Off Select Products + $0.01 PAYG"],
+  ["Sale Page Visual Nav","Get Fall Ready","National",0,"Get Fall Ready: Up to $300 Off Select Products + $0.01 PAYG"],
+  ["Location Page Tile","Get Fall Ready","All Tiers",0,"Get Fall Ready: Up to $300 Off Select Products + $0.01 PAYG"],
+  ["Google Posting","Get Fall Ready","All Tiers",0,"Get Fall Ready: Up to $300 Off Select Products + $0.01 PAYG"],
 ];
 RAW.forEach(([slot,promo,tier,pri,copy])=>{
   if(!store[promo])store[promo]={};
