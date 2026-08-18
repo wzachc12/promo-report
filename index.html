@@ -168,6 +168,7 @@ tbody tr:hover td{background:var(--surface2)}
     <div class="tab" onclick="showTab('sku')" id="tab-sku">Product Performance</div>
     <div class="tab" onclick="showTab('catsum')" id="tab-catsum">Category Insights</div>
     <div class="tab" onclick="showTab('track')" id="tab-track">SKU Lookup</div>
+    <div class="tab" onclick="showTab('lift')" id="tab-lift">Category Lift</div>
     <div class="tab" onclick="showTab('formulas')" id="tab-formulas">About This Report</div>
   </div>
   <div class="panel">
@@ -179,6 +180,7 @@ tbody tr:hover td{background:var(--surface2)}
     <div id="view-catsum" style="display:none"></div>
     <div id="view-elasticity" style="display:none"></div>
     <div id="view-skurank" style="display:none"></div>
+    <div id="view-lift" style="display:none"></div>
     <div id="view-formulas" style="display:none"></div>
   </div>
   <p class="data-note" id="data-note"></p>
@@ -193,6 +195,9 @@ const ASSETS_DATA={"promos":["Jan 10 - 13: $0.01 PAYG","Jan 16 - 20: TV Event + 
 
 const PROMO_CROSSWALK={"$0.01 PAYG (Dec 27 - Jan 2)":0,"$0.01 PAYG (Jan 3 - 7)":17,"$0.01 PAYG (Jan 10 - 13)":0,"TV Event + $0.01 PAYG (Jan 16 - 20)":1,"Up to 35% (P19)/20% (National) Off Select Products (Jan 24 - 29)":2,"President's Day Super Sale (Jan 31 - Feb 17)":3,"Up to 15% Off Select Products (Feb 20 - 28)":4,"70th Anniversary Event (Mar 1 - 12)":5,"TV Event (Mar 13 - 20)":6,"70th Anniversary Event (Mar 21 - 23)":7,"March EOM Product Deals (Mar 24 - 31)":8,"$0.01 PAYG (Apr 1 - 6)":9,"Mower Event (Apr 10 - 17)":10,"$0.01 PAYG (Apr 18 - 21)":11,"April EOM Product Deals (Apr 23 - 30)":12,"$0.01 PAYG (May 1 - 6)":9,"Living Room Event (May 8 - 13)":14,"$0.01 PAYG (May 16 - 19)":15,"Memorial Day Event (May 23 - June 2)":16,"$0.01 PAYG All Month Long (June 3 - 11)":17,"Refrigeration and Computer Event (June 12 - 17)":18,"Up to 50% Off Pre-Leased (June 18 - 25)":19,"Black Friday In July (June 26 - July 31)":20,"$0.01 PAYG All Month Long (Aug 1 - 12)":21,"Electronics Event (Aug 13 - 20)":6,"$0.01 PAYG All Month Long (Aug 21)":11,"Labor Day Event (Aug 22 - Sep 2)":24,"$0.01 PAYG All Month Long (Sep 3 - 8)":25,"Fall Furniture Event (Sep 9 - 18)":26,"$0.01 PAYG All Month Long (Sep 19 - 25)":27,"September EOM Product Deals (Sep 26 - 30)":28,"Prime Day Event (Oct 1 - 12)":29,"Pre-Black Friday Sale (Oct 13 - 30)":30,"Black Friday All Month Long (Oct 31 - Nov 23)":31,"Black Friday Week (Nov 24 - 30)":32,"Cyber Monday (Dec 1 - 4)":33,"Holiday Event (Dec 5 - 31)":34,"Up to 40% / 30% Off Select Products (Jan 1 \u2013 14)":35,"TV Event (Jan 15 \u2013 25)":36,"Hot Deals (Jan 26 \u2013 31)":20,"Living Room & Laundry Event (Feb 2 \u2013 9)":38,"President's Day Event (Feb 12 \u2013 17)":18,"Pre-Tax Event (Feb 18 \u2013 28)":40,"Lucky Deals Under $10 Per Week (Mar. 2 \u2013 11)":41,"Mid-Month Electronics Event (Mar. 12 \u2013 19)":42,"Refrigerator & Dining Event (Mar. 24 \u2013 31)":8,"Electronics Event + Budget Booster Deals (Apr. 1 \u2013 5)":44,"Spring Hot Deals + Lawn Mowers (Apr. 8 - 15)":45,"Extended Spring Hot Deals + No Payments Till May (Apr. 16 - 22)":46,"EOM Flash Sale (Apr. 23 - 30)":12,"May BOM Under $70 (May 1 - 5)":48,"May BOM Under $70 + May Mother's Day Living Room Event (May 6 - 12)":49,"Memorial Day Early Access + Under $70 (May 13 - 20)":6,"Memorial Day Event (May 21 - June 1)":51,"Early Summer Kickoff (June 2 - 10)":52,"No Payments until July 1st (June 11 - 17)":53,"Weekend Flash Sale (June 18 - 21)":11,"Hot Summer Savings (June 22 - 30)":55,"Black Friday All Month Long (July 1 - 2)":56,"4th of July Weekend Flash Sale (July 3 - 6)":57,"Black Friday All Month Long (July 7 - 15)":58,"Sizzling Summer Savings (July 16 - 24)":59,"Last Chance: Black Friday All Month Long (July 25 - 31)":60,"Select Products Sale (Aug 1 - 10)":61,"$0.01 PAYG + No Payments Until Sept 1 (Aug 11 - 19)":62,"Upholstery & Laundry Blowout (Aug 20 - 27)":63,"Labor Day Event (Aug 28 - Sep 9)":64,"Major Doorbuster Deals (Sep 10 - 17)":65,"Get Fall Ready (Sep 18 - 30)":66};
 const TODAY=new Date(2026,7,17);// August 17 2026
+const LIFT_DATA={"baseline":{"Appliances":{"ao":33.94,"ffr":25.06,"orders":2782,"apps":8196,"dels":2054},"Electronics":{"ao":21.44,"ffr":13.23,"orders":1661,"apps":7746,"dels":1025},"Furniture":{"ao":28.61,"ffr":18.69,"orders":4622,"apps":16158,"dels":3020},"Tools & Equipment":{"ao":16.76,"ffr":12.17,"orders":157,"apps":937,"dels":114}},"categories":["Appliances","Electronics","Furniture","Tools & Equipment"],"promos":[{"name":"Up to 40% / 30% Off Select Products (Jan 1 – 14)","cats":{"Appliances":{"on":{"apps":6664,"orders":2454,"dels":1777,"ao":36.82,"ffr":26.67},"off":{"apps":6694,"orders":2197,"dels":1610,"ao":32.82,"ffr":24.05}},"Electronics":{"on":{"apps":6215,"orders":1538,"dels":948,"ao":24.75,"ffr":15.25},"off":{"apps":7272,"orders":1547,"dels":970,"ao":21.27,"ffr":13.34}},"Furniture":{"on":{"apps":4750,"orders":1602,"dels":1069,"ao":33.73,"ffr":22.51},"off":{"apps":21589,"orders":6264,"dels":3995,"ao":29.01,"ffr":18.5}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":175,"orders":14,"dels":13,"ao":8.0,"ffr":7.43}}}},{"name":"TV Event (Jan 15 – 25)","cats":{"Appliances":{"on":{"apps":4617,"orders":1583,"dels":1169,"ao":34.29,"ffr":25.32},"off":{"apps":4801,"orders":1557,"dels":1141,"ao":32.43,"ffr":23.77}},"Electronics":{"on":{"apps":6241,"orders":1638,"dels":1031,"ao":26.25,"ffr":16.52},"off":{"apps":5594,"orders":1167,"dels":741,"ao":20.86,"ffr":13.25}},"Furniture":{"on":{"apps":3115,"orders":1077,"dels":678,"ao":34.57,"ffr":21.77},"off":{"apps":15125,"orders":4422,"dels":2808,"ao":29.24,"ffr":18.57}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":971,"orders":112,"dels":72,"ao":11.53,"ffr":7.42}}}},{"name":"Hot Deals (Jan 26 – 31)","cats":{"Appliances":{"on":{"apps":3266,"orders":1118,"dels":762,"ao":34.23,"ffr":23.33},"off":{"apps":2397,"orders":764,"dels":511,"ao":31.87,"ffr":21.32}},"Electronics":{"on":{"apps":2586,"orders":604,"dels":402,"ao":23.36,"ffr":15.55},"off":{"apps":4243,"orders":1019,"dels":633,"ao":24.02,"ffr":14.92}},"Furniture":{"on":{"apps":2339,"orders":768,"dels":509,"ao":32.83,"ffr":21.76},"off":{"apps":8785,"orders":2439,"dels":1558,"ao":27.76,"ffr":17.73}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":274,"orders":62,"dels":47,"ao":22.63,"ffr":17.15}}}},{"name":"Living Room & Laundry Event (Feb 2 – 9)","cats":{"Appliances":{"on":{"apps":7244,"orders":2841,"dels":2037,"ao":39.22,"ffr":28.12},"off":{"apps":2745,"orders":921,"dels":657,"ao":33.55,"ffr":23.93}},"Electronics":{"on":{"apps":2836,"orders":703,"dels":426,"ao":24.79,"ffr":15.02},"off":{"apps":4805,"orders":961,"dels":571,"ao":20.0,"ffr":11.88}},"Furniture":{"on":{"apps":3754,"orders":1079,"dels":692,"ao":28.74,"ffr":18.43},"off":{"apps":11664,"orders":3446,"dels":2209,"ao":29.54,"ffr":18.94}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":159,"orders":22,"dels":18,"ao":13.84,"ffr":11.32}}}},{"name":"President’s Day Event (Feb 12 – 17)","cats":{"Appliances":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":4656,"orders":1666,"dels":1199,"ao":35.78,"ffr":25.75}},"Electronics":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":5048,"orders":1124,"dels":689,"ao":22.27,"ffr":13.65}},"Furniture":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":10185,"orders":3238,"dels":2241,"ao":31.79,"ffr":22.0}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":129,"orders":12,"dels":10,"ao":9.3,"ffr":7.75}}}},{"name":"Pre-Tax Event (Feb 18 – 28)","cats":{"Appliances":{"on":{"apps":8258,"orders":3102,"dels":2281,"ao":37.56,"ffr":27.62},"off":{"apps":3772,"orders":1275,"dels":946,"ao":33.8,"ffr":25.08}},"Electronics":{"on":{"apps":4788,"orders":1250,"dels":832,"ao":26.11,"ffr":17.38},"off":{"apps":6559,"orders":1494,"dels":953,"ao":22.78,"ffr":14.53}},"Furniture":{"on":{"apps":3629,"orders":1185,"dels":797,"ao":32.65,"ffr":21.96},"off":{"apps":19457,"orders":5669,"dels":3783,"ao":29.14,"ffr":19.44}},"Tools & Equipment":{"on":{"apps":372,"orders":71,"dels":50,"ao":19.09,"ffr":13.44},"off":{"apps":168,"orders":36,"dels":24,"ao":21.43,"ffr":14.29}}}},{"name":"Lucky Deals Under $10 Per Week (Mar. 2 – 11)","cats":{"Appliances":{"on":{"apps":5500,"orders":2087,"dels":1516,"ao":37.95,"ffr":27.56},"off":{"apps":6518,"orders":2297,"dels":1577,"ao":35.24,"ffr":24.19}},"Electronics":{"on":{"apps":3882,"orders":1295,"dels":761,"ao":33.36,"ffr":19.6},"off":{"apps":6679,"orders":1382,"dels":863,"ao":20.69,"ffr":12.92}},"Furniture":{"on":{"apps":8906,"orders":2654,"dels":1739,"ao":29.8,"ffr":19.53},"off":{"apps":15920,"orders":4789,"dels":3058,"ao":30.08,"ffr":19.21}},"Tools & Equipment":{"on":{"apps":230,"orders":46,"dels":32,"ao":20.0,"ffr":13.91},"off":{"apps":433,"orders":72,"dels":55,"ao":16.63,"ffr":12.7}}}},{"name":"Mid-Month Electronics Event (Mar. 12 – 19)","cats":{"Appliances":{"on":{"apps":2580,"orders":934,"dels":697,"ao":36.2,"ffr":27.02},"off":{"apps":4593,"orders":1661,"dels":1154,"ao":36.16,"ffr":25.13}},"Electronics":{"on":{"apps":3173,"orders":1058,"dels":609,"ao":33.34,"ffr":19.19},"off":{"apps":4631,"orders":1010,"dels":613,"ao":21.81,"ffr":13.24}},"Furniture":{"on":{"apps":1850,"orders":584,"dels":368,"ao":31.57,"ffr":19.89},"off":{"apps":13542,"orders":4006,"dels":2629,"ao":29.58,"ffr":19.41}},"Tools & Equipment":{"on":{"apps":288,"orders":51,"dels":36,"ao":17.71,"ffr":12.5},"off":{"apps":588,"orders":84,"dels":68,"ao":14.29,"ffr":11.56}}}},{"name":"Refrigerator & Dining Event (Mar. 24 – 31)","cats":{"Appliances":{"on":{"apps":3422,"orders":1269,"dels":904,"ao":37.08,"ffr":26.42},"off":{"apps":3798,"orders":1340,"dels":959,"ao":35.28,"ffr":25.25}},"Electronics":{"on":{"apps":786,"orders":247,"dels":132,"ao":31.42,"ffr":16.79},"off":{"apps":5349,"orders":1273,"dels":721,"ao":23.8,"ffr":13.48}},"Furniture":{"on":{"apps":2041,"orders":661,"dels":457,"ao":32.39,"ffr":22.39},"off":{"apps":12160,"orders":3581,"dels":2211,"ao":29.45,"ffr":18.18}},"Tools & Equipment":{"on":{"apps":317,"orders":68,"dels":50,"ao":21.45,"ffr":15.77},"off":{"apps":616,"orders":93,"dels":71,"ao":15.1,"ffr":11.53}}}},{"name":"Electronics Event + Budget Booster Deals (Apr. 1 – 5)","cats":{"Appliances":{"on":{"apps":979,"orders":350,"dels":265,"ao":35.75,"ffr":27.07},"off":{"apps":2778,"orders":916,"dels":663,"ao":32.97,"ffr":23.87}},"Electronics":{"on":{"apps":1668,"orders":443,"dels":259,"ao":26.56,"ffr":15.53},"off":{"apps":2941,"orders":666,"dels":380,"ao":22.65,"ffr":12.92}},"Furniture":{"on":{"apps":875,"orders":255,"dels":173,"ao":29.14,"ffr":19.77},"off":{"apps":7199,"orders":2083,"dels":1281,"ao":28.93,"ffr":17.79}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":595,"orders":104,"dels":71,"ao":17.48,"ffr":11.93}}}},{"name":"Spring Hot Deals + Lawn Mowers (Apr. 8 - 15)","cats":{"Appliances":{"on":{"apps":3587,"orders":1298,"dels":1006,"ao":36.19,"ffr":28.05},"off":{"apps":3166,"orders":1040,"dels":740,"ao":32.85,"ffr":23.37}},"Electronics":{"on":{"apps":1761,"orders":512,"dels":290,"ao":29.07,"ffr":16.47},"off":{"apps":5030,"orders":1033,"dels":672,"ao":20.54,"ffr":13.36}},"Furniture":{"on":{"apps":2443,"orders":773,"dels":535,"ao":31.64,"ffr":21.9},"off":{"apps":11616,"orders":3192,"dels":2123,"ao":27.48,"ffr":18.28}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":2604,"orders":502,"dels":403,"ao":19.28,"ffr":15.48}}}},{"name":"Extended Spring Hot Deals + No Payments Till May (Apr. 16 - 22)","cats":{"Appliances":{"on":{"apps":1954,"orders":666,"dels":507,"ao":34.08,"ffr":25.95},"off":{"apps":4872,"orders":1582,"dels":1169,"ao":32.47,"ffr":23.99}},"Electronics":{"on":{"apps":1095,"orders":268,"dels":161,"ao":24.47,"ffr":14.7},"off":{"apps":5388,"orders":1184,"dels":727,"ao":21.97,"ffr":13.49}},"Furniture":{"on":{"apps":1441,"orders":458,"dels":317,"ao":31.78,"ffr":22.0},"off":{"apps":11471,"orders":3299,"dels":2071,"ao":28.76,"ffr":18.05}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":1065,"orders":155,"dels":120,"ao":14.55,"ffr":11.27}}}},{"name":"EOM Flash Sale (Apr. 23 - 30)","cats":{"Appliances":{"on":{"apps":2008,"orders":710,"dels":524,"ao":35.36,"ffr":26.1},"off":{"apps":4386,"orders":1493,"dels":1077,"ao":34.04,"ffr":24.56}},"Electronics":{"on":{"apps":3202,"orders":718,"dels":461,"ao":22.42,"ffr":14.4},"off":{"apps":3691,"orders":845,"dels":518,"ao":22.89,"ffr":14.03}},"Furniture":{"on":{"apps":2948,"orders":923,"dels":683,"ao":31.31,"ffr":23.17},"off":{"apps":10279,"orders":3001,"dels":1916,"ao":29.2,"ffr":18.64}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":774,"orders":114,"dels":89,"ao":14.73,"ffr":11.5}}}},{"name":"May BOM Under $70 (May 1 - 5)","cats":{"Appliances":{"on":{"apps":1406,"orders":521,"dels":388,"ao":37.06,"ffr":27.6},"off":{"apps":3871,"orders":1410,"dels":1029,"ao":36.42,"ffr":26.58}},"Electronics":{"on":{"apps":389,"orders":54,"dels":33,"ao":13.88,"ffr":8.48},"off":{"apps":3903,"orders":942,"dels":539,"ao":24.14,"ffr":13.81}},"Furniture":{"on":{"apps":902,"orders":321,"dels":222,"ao":35.59,"ffr":24.61},"off":{"apps":7639,"orders":2301,"dels":1436,"ao":30.12,"ffr":18.8}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":605,"orders":103,"dels":84,"ao":17.02,"ffr":13.88}}}},{"name":"Memorial Day Early Access + Under $70 (May 13 - 20)","cats":{"Appliances":{"on":{"apps":2299,"orders":759,"dels":571,"ao":33.01,"ffr":24.84},"off":{"apps":6397,"orders":2183,"dels":1576,"ao":34.13,"ffr":24.64}},"Electronics":{"on":{"apps":474,"orders":61,"dels":33,"ao":12.87,"ffr":6.96},"off":{"apps":6959,"orders":1398,"dels":869,"ao":20.09,"ffr":12.49}},"Furniture":{"on":{"apps":1107,"orders":381,"dels":297,"ao":34.42,"ffr":26.83},"off":{"apps":14095,"orders":3872,"dels":2554,"ao":27.47,"ffr":18.12}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":809,"orders":128,"dels":102,"ao":15.82,"ffr":12.61}}}},{"name":"Memorial Day Event (May 21 - June 1)","cats":{"Appliances":{"on":{"apps":4568,"orders":1522,"dels":1129,"ao":33.32,"ffr":24.72},"off":{"apps":8295,"orders":2750,"dels":1927,"ao":33.15,"ffr":23.23}},"Electronics":{"on":{"apps":1763,"orders":433,"dels":258,"ao":24.56,"ffr":14.63},"off":{"apps":9248,"orders":1857,"dels":1098,"ao":20.08,"ffr":11.87}},"Furniture":{"on":{"apps":3847,"orders":1214,"dels":837,"ao":31.56,"ffr":21.76},"off":{"apps":17737,"orders":4861,"dels":3057,"ao":27.41,"ffr":17.24}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":1988,"orders":414,"dels":346,"ao":20.82,"ffr":17.4}}}},{"name":"Early Summer Kickoff (June 2 - 10)","cats":{"Appliances":{"on":{"apps":6240,"orders":2108,"dels":1503,"ao":33.78,"ffr":24.09},"off":{"apps":3289,"orders":1009,"dels":758,"ao":30.68,"ffr":23.05}},"Electronics":{"on":{"apps":3670,"orders":784,"dels":498,"ao":21.36,"ffr":13.57},"off":{"apps":4767,"orders":1042,"dels":585,"ao":21.86,"ffr":12.27}},"Furniture":{"on":{"apps":3754,"orders":1136,"dels":748,"ao":30.26,"ffr":19.93},"off":{"apps":11312,"orders":3089,"dels":1987,"ao":27.31,"ffr":17.57}},"Tools & Equipment":{"on":{"apps":570,"orders":113,"dels":92,"ao":19.82,"ffr":16.14},"off":{"apps":1417,"orders":257,"dels":199,"ao":18.14,"ffr":14.04}}}},{"name":"No Payments until July 1st (June 11 - 17)","cats":{"Appliances":{"on":{"apps":4708,"orders":1658,"dels":1165,"ao":35.22,"ffr":24.75},"off":{"apps":3571,"orders":1052,"dels":779,"ao":29.46,"ffr":21.81}},"Electronics":{"on":{"apps":1387,"orders":365,"dels":216,"ao":26.32,"ffr":15.57},"off":{"apps":6739,"orders":1231,"dels":698,"ao":18.27,"ffr":10.36}},"Furniture":{"on":{"apps":2843,"orders":843,"dels":565,"ao":29.65,"ffr":19.87},"off":{"apps":11435,"orders":3266,"dels":2099,"ao":28.56,"ffr":18.36}},"Tools & Equipment":{"on":{"apps":563,"orders":117,"dels":93,"ao":20.78,"ffr":16.52},"off":{"apps":1202,"orders":209,"dels":168,"ao":17.39,"ffr":13.98}}}},{"name":"Weekend Flash Sale (June 18 - 21)","cats":{"Appliances":{"on":{"apps":2595,"orders":925,"dels":671,"ao":35.65,"ffr":25.86},"off":{"apps":1175,"orders":389,"dels":295,"ao":33.11,"ffr":25.11}},"Electronics":{"on":{"apps":726,"orders":211,"dels":118,"ao":29.06,"ffr":16.25},"off":{"apps":3490,"orders":696,"dels":377,"ao":19.94,"ffr":10.8}},"Furniture":{"on":{"apps":2019,"orders":622,"dels":446,"ao":30.81,"ffr":22.09},"off":{"apps":5193,"orders":1424,"dels":947,"ao":27.42,"ffr":18.24}},"Tools & Equipment":{"on":{"apps":261,"orders":52,"dels":38,"ao":19.92,"ffr":14.56},"off":{"apps":381,"orders":76,"dels":68,"ao":19.95,"ffr":17.85}}}},{"name":"Hot Summer Savings (June 22 - 30)","cats":{"Appliances":{"on":{"apps":5936,"orders":2219,"dels":1612,"ao":37.38,"ffr":27.16},"off":{"apps":3805,"orders":1195,"dels":895,"ao":31.41,"ffr":23.52}},"Electronics":{"on":{"apps":2811,"orders":783,"dels":478,"ao":27.85,"ffr":17.0},"off":{"apps":6621,"orders":1214,"dels":682,"ao":18.34,"ffr":10.3}},"Furniture":{"on":{"apps":3783,"orders":1164,"dels":838,"ao":30.77,"ffr":22.15},"off":{"apps":11623,"orders":3345,"dels":2184,"ao":28.78,"ffr":18.79}},"Tools & Equipment":{"on":{"apps":584,"orders":124,"dels":100,"ao":21.23,"ffr":17.12},"off":{"apps":939,"orders":144,"dels":111,"ao":15.34,"ffr":11.82}}}},{"name":"Black Friday All Month Long (July 1 - 2)","cats":{"Appliances":{"on":{"apps":1453,"orders":445,"dels":336,"ao":30.63,"ffr":23.12},"off":{"apps":1404,"orders":467,"dels":329,"ao":33.26,"ffr":23.43}},"Electronics":{"on":{"apps":945,"orders":254,"dels":148,"ao":26.88,"ffr":15.66},"off":{"apps":1354,"orders":351,"dels":171,"ao":25.92,"ffr":12.63}},"Furniture":{"on":{"apps":887,"orders":285,"dels":190,"ao":32.13,"ffr":21.42},"off":{"apps":2857,"orders":874,"dels":572,"ao":30.59,"ffr":20.02}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":208,"orders":52,"dels":42,"ao":25.0,"ffr":20.19}}}},{"name":"4th of July Weekend Flash Sale (July 3 - 6)","cats":{"Appliances":{"on":{"apps":2854,"orders":1070,"dels":769,"ao":37.49,"ffr":26.94},"off":{"apps":1753,"orders":650,"dels":465,"ao":37.08,"ffr":26.53}},"Electronics":{"on":{"apps":1554,"orders":396,"dels":234,"ao":25.48,"ffr":15.06},"off":{"apps":1974,"orders":415,"dels":220,"ao":21.02,"ffr":11.14}},"Furniture":{"on":{"apps":2164,"orders":721,"dels":505,"ao":33.32,"ffr":23.34},"off":{"apps":4308,"orders":1357,"dels":876,"ao":31.5,"ffr":20.33}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":265,"orders":42,"dels":37,"ao":15.85,"ffr":13.96}}}},{"name":"Black Friday All Month Long (July 7 - 15)","cats":{"Appliances":{"on":{"apps":5226,"orders":1803,"dels":1308,"ao":34.5,"ffr":25.03},"off":{"apps":5355,"orders":2018,"dels":1428,"ao":37.68,"ffr":26.67}},"Electronics":{"on":{"apps":3873,"orders":913,"dels":524,"ao":23.57,"ffr":13.53},"off":{"apps":5001,"orders":1072,"dels":521,"ao":21.44,"ffr":10.42}},"Furniture":{"on":{"apps":3788,"orders":1206,"dels":773,"ao":31.84,"ffr":20.41},"off":{"apps":12729,"orders":3665,"dels":2265,"ao":28.79,"ffr":17.79}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":678,"orders":97,"dels":81,"ao":14.31,"ffr":11.95}}}},{"name":"Sizzling Summer Savings (July 16 - 24)","cats":{"Appliances":{"on":{"apps":5190,"orders":1804,"dels":1310,"ao":34.76,"ffr":25.24},"off":{"apps":4728,"orders":1827,"dels":1308,"ao":38.64,"ffr":27.66}},"Electronics":{"on":{"apps":4011,"orders":986,"dels":584,"ao":24.58,"ffr":14.56},"off":{"apps":4312,"orders":897,"dels":479,"ao":20.8,"ffr":11.11}},"Furniture":{"on":{"apps":4209,"orders":1395,"dels":998,"ao":33.14,"ffr":23.71},"off":{"apps":11607,"orders":3266,"dels":2063,"ao":28.14,"ffr":17.77}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":954,"orders":168,"dels":132,"ao":17.61,"ffr":13.84}}}},{"name":"Last Chance: Black Friday All Month Long (July 25 - 31)","cats":{"Appliances":{"on":{"apps":3856,"orders":1312,"dels":962,"ao":34.02,"ffr":24.95},"off":{"apps":4029,"orders":1509,"dels":1117,"ao":37.45,"ffr":27.72}},"Electronics":{"on":{"apps":2808,"orders":631,"dels":387,"ao":22.47,"ffr":13.78},"off":{"apps":3932,"orders":791,"dels":469,"ao":20.12,"ffr":11.93}},"Furniture":{"on":{"apps":2969,"orders":959,"dels":663,"ao":32.3,"ffr":22.33},"off":{"apps":9700,"orders":2648,"dels":1659,"ao":27.3,"ffr":17.1}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":1023,"orders":198,"dels":164,"ao":19.35,"ffr":16.03}}}},{"name":"Select Products Sale (Aug 1 - 10)","cats":{"Appliances":{"on":{"apps":5108,"orders":1898,"dels":1315,"ao":37.16,"ffr":25.74},"off":{"apps":6044,"orders":2238,"dels":1527,"ao":37.03,"ffr":25.26}},"Electronics":{"on":{"apps":1887,"orders":524,"dels":279,"ao":27.77,"ffr":14.79},"off":{"apps":7821,"orders":1625,"dels":842,"ao":20.78,"ffr":10.77}},"Furniture":{"on":{"apps":4245,"orders":1310,"dels":779,"ao":30.86,"ffr":18.35},"off":{"apps":14530,"orders":4270,"dels":2281,"ao":29.39,"ffr":15.7}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":1242,"orders":199,"dels":145,"ao":16.02,"ffr":11.67}}}},{"name":"$0.01 PAYG + No Payments Until Sept 1 (Aug 11 - 19)","cats":{"Appliances":{"on":{"apps":3177,"orders":1151,"dels":271,"ao":36.23,"ffr":8.53},"off":{"apps":4455,"orders":1603,"dels":448,"ao":35.98,"ffr":10.06}},"Electronics":{"on":{"apps":901,"orders":206,"dels":51,"ao":22.86,"ffr":5.66},"off":{"apps":6047,"orders":1238,"dels":284,"ao":20.47,"ffr":4.7}},"Furniture":{"on":{"apps":1738,"orders":448,"dels":99,"ao":25.78,"ffr":5.7},"off":{"apps":11555,"orders":3182,"dels":436,"ao":27.54,"ffr":3.77}},"Tools & Equipment":{"on":{"apps":0,"orders":0,"dels":0,"ao":null,"ffr":null},"off":{"apps":641,"orders":100,"dels":22,"ao":15.6,"ffr":3.43}}}}]};
+const LIFT_V3={"categories":["Appliances","Electronics","Furniture","Tools & Equipment"],"bars":{"Appliances":{"ytd_ao":35.14,"on_ao":35.92,"off_ao":34.36,"on_apps":104695,"off_apps":108691,"on_orders":37607,"off_orders":37343,"periods":26},"Electronics":{"ytd_ao":22.63,"on_ao":25.79,"off_ao":21.1,"on_apps":65432,"off_apps":134350,"on_orders":16875,"off_orders":28350,"periods":26},"Furniture":{"ytd_ao":29.33,"on_ao":31.47,"off_ao":28.71,"on_apps":76346,"off_apps":305127,"on_orders":24024,"off_orders":87611,"periods":26},"Tools & Equipment":{"ytd_ao":17.48,"on_ao":20.16,"off_ao":16.9,"on_apps":3185,"off_apps":5744,"on_orders":642,"off_orders":971,"periods":8}}};
+const LIFT_SERIES={"series":{"Appliances":[{"promo":"Up to 40% / 30% Off Select Products (Jan 1 – 14)","ao":34.81808653990118,"lift":0.878086539901183,"in_promo":true},{"promo":"TV Event (Jan 15 – 25)","ao":33.340411977065195,"lift":-0.5995880229348032,"in_promo":true},{"promo":"Hot Deals (Jan 26 – 31)","ao":33.23326858555536,"lift":-0.7067314144446399,"in_promo":true},{"promo":"Living Room & Laundry Event (Feb 2 – 9)","ao":37.66142757032736,"lift":3.7214275703273643,"in_promo":true},{"promo":"President’s Day Event (Feb 12 – 17)","ao":35.781786941580755,"lift":1.8417869415807573,"in_promo":false},{"promo":"Pre-Tax Event (Feb 18 – 28)","ao":36.38403990024938,"lift":2.444039900249379,"in_promo":true},{"promo":"Lucky Deals Under $10 Per Week (Mar. 2 – 11)","ao":36.478615410218005,"lift":2.538615410218007,"in_promo":true},{"promo":"Mid-Month Electronics Event (Mar. 12 – 19)","ao":36.17733166039314,"lift":2.2373316603931457,"in_promo":true},{"promo":"Refrigerator & Dining Event (Mar. 24 – 31)","ao":36.13573407202216,"lift":2.1957340720221623,"in_promo":true},{"promo":"Electronics Event + Budget Booster Deals (Apr. 1 – 5)","ao":33.69709874900187,"lift":-0.24290125099813054,"in_promo":true},{"promo":"Spring Hot Deals + Lawn Mowers (Apr. 8 - 15)","ao":34.62164963719828,"lift":0.6816496371982836,"in_promo":true},{"promo":"Extended Spring Hot Deals + No Payments Till May (Apr. 16 - 22)","ao":32.932903603867565,"lift":-1.0070963961324324,"in_promo":true},{"promo":"EOM Flash Sale (Apr. 23 - 30)","ao":34.45417578980294,"lift":0.5141757898029411,"in_promo":true},{"promo":"May BOM Under $70 (May 1 - 5)","ao":36.59276103846883,"lift":2.6527610384688316,"in_promo":true},{"promo":"Memorial Day Early Access + Under $70 (May 13 - 20)","ao":33.83164673413063,"lift":-0.10835326586936844,"in_promo":true},{"promo":"Memorial Day Event (May 21 - June 1)","ao":33.21153696649304,"lift":-0.7284630335069551,"in_promo":true},{"promo":"Early Summer Kickoff (June 2 - 10)","ao":32.71067268338756,"lift":-1.2293273166124408,"in_promo":true},{"promo":"No Payments until July 1st (June 11 - 17)","ao":32.7334219108588,"lift":-1.2065780891411961,"in_promo":true},{"promo":"Weekend Flash Sale (June 18 - 21)","ao":34.85411140583554,"lift":0.9141114058355413,"in_promo":true},{"promo":"Hot Summer Savings (June 22 - 30)","ao":35.04773637203573,"lift":1.1077363720357312,"in_promo":true},{"promo":"Black Friday All Month Long (July 1 - 2)","ao":31.921596079803987,"lift":-2.018403920196011,"in_promo":true},{"promo":"4th of July Weekend Flash Sale (July 3 - 6)","ao":37.33449099196874,"lift":3.3944909919687447,"in_promo":true},{"promo":"Black Friday All Month Long (July 7 - 15)","ao":36.111898686324544,"lift":2.171898686324546,"in_promo":true},{"promo":"Sizzling Summer Savings (July 16 - 24)","ao":36.610203670094776,"lift":2.6702036700947787,"in_promo":true},{"promo":"Last Chance: Black Friday All Month Long (July 25 - 31)","ao":35.77679137603044,"lift":1.8367913760304404,"in_promo":true},{"promo":"Select Products Sale (Aug 1 - 10)","ao":37.08751793400287,"lift":3.1475179340028703,"in_promo":true},{"promo":"$0.01 PAYG + No Payments Until Sept 1 (Aug 11 - 19)","ao":36.08490566037736,"lift":2.1449056603773613,"in_promo":true}],"Electronics":[{"promo":"Up to 40% / 30% Off Select Products (Jan 1 – 14)","ao":22.87387854971454,"lift":1.4338785497145388,"in_promo":true},{"promo":"TV Event (Jan 15 – 25)","ao":23.70088719898606,"lift":2.260887198986058,"in_promo":true},{"promo":"Hot Deals (Jan 26 – 31)","ao":23.766290818567875,"lift":2.3262908185678732,"in_promo":true},{"promo":"Living Room & Laundry Event (Feb 2 – 9)","ao":21.77725428608821,"lift":0.33725428608820707,"in_promo":true},{"promo":"President’s Day Event (Feb 12 – 17)","ao":22.266244057052297,"lift":0.8262440570522962,"in_promo":false},{"promo":"Pre-Tax Event (Feb 18 – 28)","ao":24.18260333127699,"lift":2.742603331276989,"in_promo":true},{"promo":"Lucky Deals Under $10 Per Week (Mar. 2 – 11)","ao":25.34797841113531,"lift":3.907978411135307,"in_promo":true},{"promo":"Mid-Month Electronics Event (Mar. 12 – 19)","ao":26.499231163505893,"lift":5.059231163505892,"in_promo":true},{"promo":"Refrigerator & Dining Event (Mar. 24 – 31)","ao":24.775876120619397,"lift":3.335876120619396,"in_promo":true},{"promo":"Electronics Event + Budget Booster Deals (Apr. 1 – 5)","ao":24.06161857235843,"lift":2.621618572358429,"in_promo":true},{"promo":"Spring Hot Deals + Lawn Mowers (Apr. 8 - 15)","ao":22.750699455161243,"lift":1.3106994551612416,"in_promo":true},{"promo":"Extended Spring Hot Deals + No Payments Till May (Apr. 16 - 22)","ao":22.397038408144375,"lift":0.9570384081443741,"in_promo":true},{"promo":"EOM Flash Sale (Apr. 23 - 30)","ao":22.675177716524008,"lift":1.2351777165240065,"in_promo":true},{"promo":"May BOM Under $70 (May 1 - 5)","ao":23.20596458527493,"lift":1.7659645852749293,"in_promo":true},{"promo":"Memorial Day Early Access + Under $70 (May 13 - 20)","ao":19.6286829005785,"lift":-1.811317099421501,"in_promo":true},{"promo":"Memorial Day Event (May 21 - June 1)","ao":20.79738443374807,"lift":-0.64261556625193,"in_promo":true},{"promo":"Early Summer Kickoff (June 2 - 10)","ao":21.642764015645373,"lift":0.2027640156453714,"in_promo":true},{"promo":"No Payments until July 1st (June 11 - 17)","ao":19.640659611124782,"lift":-1.799340388875219,"in_promo":true},{"promo":"Weekend Flash Sale (June 18 - 21)","ao":21.513282732447816,"lift":0.07328273244781514,"in_promo":true},{"promo":"Hot Summer Savings (June 22 - 30)","ao":21.172603901611538,"lift":-0.26739609838846334,"in_promo":true},{"promo":"Black Friday All Month Long (July 1 - 2)","ao":26.31578947368421,"lift":4.875789473684208,"in_promo":true},{"promo":"4th of July Weekend Flash Sale (July 3 - 6)","ao":22.9875283446712,"lift":1.5475283446711998,"in_promo":true},{"promo":"Black Friday All Month Long (July 7 - 15)","ao":22.368717601983324,"lift":0.9287176019833225,"in_promo":true},{"promo":"Sizzling Summer Savings (July 16 - 24)","ao":22.624053826745165,"lift":1.1840538267451635,"in_promo":true},{"promo":"Last Chance: Black Friday All Month Long (July 25 - 31)","ao":21.097922848664687,"lift":-0.3420771513353138,"in_promo":true},{"promo":"Select Products Sale (Aug 1 - 10)","ao":22.136382365059745,"lift":0.696382365059744,"in_promo":true},{"promo":"$0.01 PAYG + No Payments Until Sept 1 (Aug 11 - 19)","ao":20.782959124928038,"lift":-0.6570408750719636,"in_promo":true}],"Furniture":[{"promo":"Up to 40% / 30% Off Select Products (Jan 1 – 14)","ao":29.86445954667983,"lift":1.2544595466798292,"in_promo":true},{"promo":"TV Event (Jan 15 – 25)","ao":30.148026315789473,"lift":1.5380263157894731,"in_promo":true},{"promo":"Hot Deals (Jan 26 – 31)","ao":28.82955771305286,"lift":0.2195577130528612,"in_promo":true},{"promo":"Living Room & Laundry Event (Feb 2 – 9)","ao":29.34881307562589,"lift":0.7388130756258917,"in_promo":true},{"promo":"President’s Day Event (Feb 12 – 17)","ao":31.791850760922923,"lift":3.1818507609229236,"in_promo":false},{"promo":"Pre-Tax Event (Feb 18 – 28)","ao":29.68898899766092,"lift":1.0789889976609217,"in_promo":true},{"promo":"Lucky Deals Under $10 Per Week (Mar. 2 – 11)","ao":29.980665431402564,"lift":1.3706654314025641,"in_promo":true},{"promo":"Mid-Month Electronics Event (Mar. 12 – 19)","ao":29.82068607068607,"lift":1.2106860706860694,"in_promo":true},{"promo":"Refrigerator & Dining Event (Mar. 24 – 31)","ao":29.871135835504543,"lift":1.2611358355045432,"in_promo":true},{"promo":"Electronics Event + Budget Booster Deals (Apr. 1 – 5)","ao":28.957146395838496,"lift":0.3471463958384966,"in_promo":true},{"promo":"Spring Hot Deals + Lawn Mowers (Apr. 8 - 15)","ao":28.202574863077036,"lift":-0.40742513692296356,"in_promo":true},{"promo":"Extended Spring Hot Deals + No Payments Till May (Apr. 16 - 22)","ao":29.096964064436182,"lift":0.486964064436183,"in_promo":true},{"promo":"EOM Flash Sale (Apr. 23 - 30)","ao":29.66659106373327,"lift":1.056591063733272,"in_promo":true},{"promo":"May BOM Under $70 (May 1 - 5)","ao":30.698981383912894,"lift":2.088981383912895,"in_promo":true},{"promo":"Memorial Day Early Access + Under $70 (May 13 - 20)","ao":27.976582028680436,"lift":-0.6334179713195631,"in_promo":true},{"promo":"Memorial Day Event (May 21 - June 1)","ao":28.145848776871755,"lift":-0.4641512231282441,"in_promo":true},{"promo":"Early Summer Kickoff (June 2 - 10)","ao":28.043276251161558,"lift":-0.5667237488384416,"in_promo":true},{"promo":"No Payments until July 1st (June 11 - 17)","ao":28.778540411822384,"lift":0.16854041182238433,"in_promo":true},{"promo":"Weekend Flash Sale (June 18 - 21)","ao":28.369384359401,"lift":-0.24061564059899965,"in_promo":true},{"promo":"Hot Summer Savings (June 22 - 30)","ao":29.267817733350643,"lift":0.6578177333506439,"in_promo":true},{"promo":"Black Friday All Month Long (July 1 - 2)","ao":30.956196581196583,"lift":2.3461965811965833,"in_promo":true},{"promo":"4th of July Weekend Flash Sale (July 3 - 6)","ao":32.10754017305315,"lift":3.497540173053153,"in_promo":true},{"promo":"Black Friday All Month Long (July 7 - 15)","ao":29.490827632136586,"lift":0.8808276321365867,"in_promo":true},{"promo":"Sizzling Summer Savings (July 16 - 24)","ao":29.47015680323723,"lift":0.8601568032372313,"in_promo":true},{"promo":"Last Chance: Black Friday All Month Long (July 25 - 31)","ao":28.471071118478175,"lift":-0.13892888152182437,"in_promo":true},{"promo":"Select Products Sale (Aug 1 - 10)","ao":29.720372836218374,"lift":1.1103728362183745,"in_promo":true},{"promo":"$0.01 PAYG + No Payments Until Sept 1 (Aug 11 - 19)","ao":27.30760550665764,"lift":-1.3023944933423586,"in_promo":true}],"Tools & Equipment":[{"promo":"Up to 40% / 30% Off Select Products (Jan 1 – 14)","ao":8.0,"lift":-8.760000000000002,"in_promo":false},{"promo":"TV Event (Jan 15 – 25)","ao":11.53450051493306,"lift":-5.225499485066942,"in_promo":false},{"promo":"Hot Deals (Jan 26 – 31)","ao":22.62773722627737,"lift":5.86773722627737,"in_promo":false},{"promo":"Living Room & Laundry Event (Feb 2 – 9)","ao":13.836477987421384,"lift":-2.9235220125786174,"in_promo":false},{"promo":"President’s Day Event (Feb 12 – 17)","ao":9.30232558139535,"lift":-7.457674418604652,"in_promo":false},{"promo":"Pre-Tax Event (Feb 18 – 28)","ao":19.814814814814817,"lift":3.054814814814815,"in_promo":true},{"promo":"Lucky Deals Under $10 Per Week (Mar. 2 – 11)","ao":17.79788838612368,"lift":1.0378883861236794,"in_promo":true},{"promo":"Mid-Month Electronics Event (Mar. 12 – 19)","ao":15.41095890410959,"lift":-1.3490410958904118,"in_promo":true},{"promo":"Refrigerator & Dining Event (Mar. 24 – 31)","ao":17.256162915326904,"lift":0.49616291532690227,"in_promo":true},{"promo":"Electronics Event + Budget Booster Deals (Apr. 1 – 5)","ao":17.478991596638654,"lift":0.7189915966386522,"in_promo":false},{"promo":"Spring Hot Deals + Lawn Mowers (Apr. 8 - 15)","ao":19.278033794162827,"lift":2.5180337941628252,"in_promo":false},{"promo":"Extended Spring Hot Deals + No Payments Till May (Apr. 16 - 22)","ao":14.553990610328638,"lift":-2.2060093896713635,"in_promo":false},{"promo":"EOM Flash Sale (Apr. 23 - 30)","ao":14.728682170542637,"lift":-2.0313178294573646,"in_promo":false},{"promo":"May BOM Under $70 (May 1 - 5)","ao":17.024793388429753,"lift":0.26479338842975153,"in_promo":false},{"promo":"Memorial Day Early Access + Under $70 (May 13 - 20)","ao":15.822002472187885,"lift":-0.9379975278121169,"in_promo":false},{"promo":"Memorial Day Event (May 21 - June 1)","ao":20.824949698189137,"lift":4.064949698189135,"in_promo":false},{"promo":"Early Summer Kickoff (June 2 - 10)","ao":18.621036738802214,"lift":1.8610367388022127,"in_promo":true},{"promo":"No Payments until July 1st (June 11 - 17)","ao":18.47025495750708,"lift":1.710254957507079,"in_promo":true},{"promo":"Weekend Flash Sale (June 18 - 21)","ao":19.937694704049843,"lift":3.1776947040498413,"in_promo":true},{"promo":"Hot Summer Savings (June 22 - 30)","ao":17.596848325673015,"lift":0.8368483256730137,"in_promo":true},{"promo":"Black Friday All Month Long (July 1 - 2)","ao":25.0,"lift":8.239999999999998,"in_promo":false},{"promo":"4th of July Weekend Flash Sale (July 3 - 6)","ao":15.849056603773585,"lift":-0.9109433962264166,"in_promo":false},{"promo":"Black Friday All Month Long (July 7 - 15)","ao":14.306784660766962,"lift":-2.45321533923304,"in_promo":false},{"promo":"Sizzling Summer Savings (July 16 - 24)","ao":17.61006289308176,"lift":0.8500628930817591,"in_promo":false},{"promo":"Last Chance: Black Friday All Month Long (July 25 - 31)","ao":19.35483870967742,"lift":2.5948387096774184,"in_promo":false},{"promo":"Select Products Sale (Aug 1 - 10)","ao":16.022544283413847,"lift":-0.7374557165861546,"in_promo":false},{"promo":"$0.01 PAYG + No Payments Until Sept 1 (Aug 11 - 19)","ao":15.600624024960998,"lift":-1.1593759750390031,"in_promo":false}]},"baseline":{"Appliances":33.94,"Electronics":21.44,"Furniture":28.61,"Tools & Equipment":16.76},"categories":["Appliances","Electronics","Furniture","Tools & Equipment"]};
 const MATURITY_DAYS=14;// Promotions started less than this many days ago are excluded from reporting
 
 function isMature(endStr){
@@ -316,7 +321,7 @@ function applyFilters(){
 
 function showTab(t){
   activeTab=t;
-  ["exec","assets","promo","sku","track","catsum","elasticity","skurank","formulas"].forEach(id=>{
+  ["exec","assets","promo","sku","track","catsum","elasticity","skurank","lift","formulas"].forEach(id=>{
     document.getElementById("view-"+id).style.display=id===t?"block":"none";
     const tabEl=document.getElementById("tab-"+id);
     if(tabEl) tabEl.className="tab"+(id===t?" active":"");
@@ -543,6 +548,7 @@ function renderActiveTab(){
   else if(activeTab==="catsum"){ renderCatSum(); renderElasticityInline(); }
   else if(activeTab==="elasticity") renderElasticity();
   else if(activeTab==="skurank") renderSKURank();
+  else if(activeTab==="lift") renderLift();
   else if(activeTab==="formulas") renderFormulas();
 }
 // Render SKU Efficiency as a sub-section of Product Performance
@@ -1716,6 +1722,304 @@ function sortArrow(tab, colKey) {
 
 
 init();
+
+function renderLift(){
+  const el=document.getElementById('view-lift');
+  if(!el) return;
+  const cats=LIFT_V3.categories;
+  const bars=LIFT_V3.bars;
+  const palette={'Appliances':'#2a5caa','Electronics':'#c0392b','Furniture':'#1a7a52','Tools & Equipment':'#8a5c00'};
+  const fmt=v=>v==null?'—':v.toFixed(1)+'%';
+  const fmtN=v=>v==null?'—':v.toLocaleString();
+
+  // Header
+  let html='<div style="padding:1.5rem 1rem 0">'
+    +'<div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:4px">Category Lift Analysis</div>'
+    +'<p style="font-size:14px;line-height:1.6;color:var(--text);max-width:720px;margin-bottom:1.5rem">'
+    +'During promo periods where a category has SKUs on promotion, how does A\u2192O compare between the promoted SKUs and the non-promoted SKUs in the same category? The YTD line shows the full-year category average across all periods.'
+    +'</p>';
+
+  // Bar chart
+  const W=700,H=260,PAD={top:30,right:24,bottom:60,left:52};
+  const plotW=W-PAD.left-PAD.right;
+  const plotH=H-PAD.top-PAD.bottom;
+  const allVals=cats.flatMap(c=>[bars[c].on_ao,bars[c].off_ao,bars[c].ytd_ao].filter(v=>v!=null));
+  const yMin=Math.floor(Math.min(...allVals)-2);
+  const yMax=Math.ceil(Math.max(...allVals)+2);
+  const yRange=yMax-yMin;
+  const y=v=>PAD.top+plotH*(1-(v-yMin)/yRange);
+  const barW=plotW/(cats.length*3+cats.length-1);
+  const groupW=barW*3;
+  const gapW=barW;
+
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;font-family:var(--font-sans)">`;
+
+  // Y grid + labels
+  const ticks=5;
+  for(let i=0;i<=ticks;i++){
+    const val=yMin+Math.round(yRange/ticks*i);
+    const yp=y(val);
+    svg+=`<line x1="${PAD.left}" y1="${yp}" x2="${W-PAD.right}" y2="${yp}" stroke="var(--border)" stroke-width="1"/>`;
+    svg+=`<text x="${PAD.left-6}" y="${yp+4}" text-anchor="end" font-size="10" fill="var(--text2)">${val}%</text>`;
+  }
+
+  cats.forEach((cat,ci)=>{
+    const d=bars[cat];
+    const col=palette[cat]||'#555';
+    const gx=PAD.left+ci*(groupW+gapW);
+
+    // Off-promo bar (lighter)
+    const offY=y(d.off_ao); const offH=y(yMin)-offY;
+    svg+=`<rect x="${gx}" y="${offY}" width="${barW}" height="${offH}" fill="${col}" opacity="0.3" rx="2">
+      <title>${cat} — Off-promo SKUs\nA→O: ${d.off_ao.toFixed(1)}%\n${fmtN(d.off_orders)} orders / ${fmtN(d.off_apps)} apps</title></rect>`;
+
+    // On-promo bar (full color)
+    const onY=y(d.on_ao); const onH=y(yMin)-onY;
+    svg+=`<rect x="${gx+barW+2}" y="${onY}" width="${barW}" height="${onH}" fill="${col}" opacity="0.9" rx="2">
+      <title>${cat} — On-promo SKUs\nA→O: ${d.on_ao.toFixed(1)}%\n${fmtN(d.on_orders)} orders / ${fmtN(d.on_apps)} apps</title></rect>`;
+
+    // Value labels
+    svg+=`<text x="${gx+barW/2}" y="${offY-4}" text-anchor="middle" font-size="10" fill="var(--text2)">${d.off_ao.toFixed(1)}%</text>`;
+    svg+=`<text x="${gx+barW+2+barW/2}" y="${onY-4}" text-anchor="middle" font-size="10" fill="${col}" font-weight="600">${d.on_ao.toFixed(1)}%</text>`;
+
+    // YTD reference line across the group
+    const ytdY=y(d.ytd_ao);
+    svg+=`<line x1="${gx-2}" y1="${ytdY}" x2="${gx+groupW+2}" y2="${ytdY}" stroke="${col}" stroke-width="1.5" stroke-dasharray="3 2"/>`;
+
+    // Lift label
+    const lift=d.on_ao-d.off_ao;
+    svg+=`<text x="${gx+barW+2+barW/2}" y="${onY-16}" text-anchor="middle" font-size="9" font-weight="600" fill="#1a7a52">+${lift.toFixed(1)}pp</text>`;
+
+    // X label
+    const shortCat=cat==='Tools & Equipment'?'Tools':cat;
+    svg+=`<text x="${gx+groupW/2}" y="${H-PAD.bottom+16}" text-anchor="middle" font-size="11" fill="var(--text)">${shortCat}</text>`;
+  });
+
+  // Legend
+  const lItems=[
+    {col:'#888',opacity:'0.3',label:'Off-promo SKUs'},
+    {col:'#555',opacity:'0.9',label:'On-promo SKUs'},
+  ];
+  let lx=PAD.left;
+  lItems.forEach(item=>{
+    svg+=`<rect x="${lx}" y="${H-18}" width="12" height="10" fill="${item.col}" opacity="${item.opacity}" rx="2"/>`;
+    svg+=`<text x="${lx+16}" y="${H-9}" font-size="10" fill="var(--text2)">${item.label}</text>`;
+    lx+=120;
+  });
+  svg+=`<line x1="${lx}" y1="${H-13}" x2="${lx+18}" y2="${H-13}" stroke="#555" stroke-width="1.5" stroke-dasharray="3 2"/>`;
+  svg+=`<text x="${lx+22}" y="${H-9}" font-size="10" fill="var(--text2)">YTD avg</text>`;
+
+  svg+='</svg>';
+  html+=svg;
+
+  // Summary table
+  html+='<div style="overflow-x:auto;margin-top:1.5rem"><table style="width:100%;max-width:700px;border-collapse:collapse;font-size:13px">';
+  html+='<thead><tr style="background:var(--surface2)">'
+    +'<th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border)">Category</th>'
+    +'<th style="padding:8px 12px;text-align:right;border-bottom:2px solid var(--border)">YTD A→O</th>'
+    +'<th style="padding:8px 12px;text-align:right;border-bottom:2px solid var(--border)">On-promo SKUs</th>'
+    +'<th style="padding:8px 12px;text-align:right;border-bottom:2px solid var(--border)">Off-promo SKUs</th>'
+    +'<th style="padding:8px 12px;text-align:right;border-bottom:2px solid var(--border)">Lift (on − off)</th>'
+    +'<th style="padding:8px 12px;text-align:right;border-bottom:2px solid var(--border)">Periods</th>'
+    +'</tr></thead><tbody>';
+
+  cats.forEach((cat,ci)=>{
+    const d=bars[cat];
+    const col=palette[cat]||'#555';
+    const lift=d.on_ao-d.off_ao;
+    const bg=ci%2===0?'':'background:var(--surface2)';
+    html+=`<tr style="${bg}">
+      <td style="padding:8px 12px;font-weight:600;color:${col}">${cat}</td>
+      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${fmt(d.ytd_ao)}</td>
+      <td style="padding:8px 12px;text-align:right;font-weight:600">${fmt(d.on_ao)}</td>
+      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${fmt(d.off_ao)}</td>
+      <td style="padding:8px 12px;text-align:right;font-weight:600;color:#1a7a52">+${lift.toFixed(1)}pp</td>
+      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${d.periods}</td>
+    </tr>`;
+  });
+
+  html+='</tbody></table></div></div>';
+  el.innerHTML=html;
+}
+
+function renderLiftSummary(){
+  const el=document.getElementById('lift-summary-strip');
+  if(!el) return;
+  const cats=LIFT_SERIES.categories;
+  const base=LIFT_SERIES.baseline;
+  const series=LIFT_SERIES.series;
+  const palette={'Appliances':'#2a5caa','Electronics':'#c0392b','Furniture':'#1a7a52','Tools & Equipment':'#8a5c00'};
+  let html='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:1rem">';
+  cats.forEach(cat=>{
+    const pts=series[cat];
+    const avg=pts.reduce((s,p)=>s+p.ao,0)/pts.length;
+    const bao=base[cat];
+    const lift=avg-bao;
+    const pctAbove=Math.round(pts.filter(p=>p.ao>bao).length/pts.length*100);
+    const col=palette[cat]||'#555';
+    const liftCol=lift>1?'#1a7a52':lift<-1?'#c0392b':'var(--text2)';
+    html+=`<div style="background:var(--surface2);border-radius:var(--radius-sm);padding:10px 16px;border-left:3px solid ${col};min-width:160px">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:${col};margin-bottom:4px">${cat}</div>
+      <div style="font-size:22px;font-weight:700;color:${liftCol}">${lift>=0?'+':''}${lift.toFixed(1)}pp</div>
+      <div style="font-size:11px;color:var(--text2)">avg lift vs baseline</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">${pctAbove}% of periods above baseline</div>
+    </div>`;
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function renderLiftYTD(){
+  const el=document.getElementById('lift-ytd-chart');
+  if(!el) return;
+  const cats=LIFT_SERIES.categories;
+  const base=LIFT_SERIES.baseline;
+  const series=LIFT_SERIES.series;
+  const palette={'Appliances':'#2a5caa','Electronics':'#c0392b','Furniture':'#1a7a52','Tools & Equipment':'#8a5c00'};
+  const W=el.offsetWidth||700,H=220,PAD={top:24,right:16,bottom:48,left:52};
+  const plotW=W-PAD.left-PAD.right;
+  const allAos=cats.flatMap(c=>series[c].map(s=>s.ao));
+  const yMin=Math.floor(Math.min(...allAos)-1),yMax=Math.ceil(Math.max(...allAos)+1);
+  const yRange=yMax-yMin;
+  const y=v=>PAD.top+H*(1-(v-yMin)/yRange);
+  const nPromos=series[cats[0]].length;
+  const x=i=>PAD.left+i/(nPromos-1)*plotW;
+  let svg=`<svg viewBox="0 0 ${W} ${H+PAD.top+PAD.bottom}" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:var(--font-sans)">`;
+  // Grid lines
+  const ticks=[yMin,yMin+Math.round(yRange/4),yMin+Math.round(yRange/2),yMin+Math.round(yRange*3/4),yMax];
+  ticks.forEach(t=>{
+    const yp=y(t);
+    svg+=`<line x1="${PAD.left}" y1="${yp}" x2="${W-PAD.right}" y2="${yp}" stroke="var(--border)" stroke-width="1"/>`;
+    svg+=`<text x="${PAD.left-6}" y="${yp+4}" text-anchor="end" font-size="10" fill="var(--text2)">${t.toFixed(0)}%</text>`;
+  });
+  // Baseline per category
+  cats.forEach(cat=>{
+    const col=palette[cat];
+    const bao=base[cat];
+    const yb=y(bao);
+    svg+=`<line x1="${PAD.left}" y1="${yb}" x2="${W-PAD.right}" y2="${yb}" stroke="${col}" stroke-width="1" stroke-dasharray="4 3" opacity="0.4"/>`;
+  });
+  // Lines per category
+  cats.forEach(cat=>{
+    const col=palette[cat];
+    const pts=series[cat];
+    let d='M';
+    pts.forEach((s,i)=>{ d+=(i?'L':'')+`${x(i).toFixed(1)},${y(s.ao).toFixed(1)} `; });
+    svg+=`<path d="${d}" fill="none" stroke="${col}" stroke-width="2" opacity="0.7"/>`;
+  });
+  // Dots per category
+  cats.forEach(cat=>{
+    const col=palette[cat];
+    const pts=series[cat];
+    pts.forEach((s,i)=>{
+      const abv=s.ao>base[cat];
+      svg+=`<circle cx="${x(i).toFixed(1)}" cy="${y(s.ao).toFixed(1)}" r="4" fill="${col}" opacity="${abv?'0.9':'0.4'}" stroke="${abv?col:'#888'}" stroke-width="1">`;
+      svg+=`<title>${s.promo}\n${cat}: ${s.ao.toFixed(1)}% (${s.lift>=0?'+':''}${s.lift.toFixed(1)}pp vs baseline)</title></circle>`;
+    });
+  });
+  // X axis promo labels (every 4th)
+  series[cats[0]].forEach((s,i)=>{
+    if(i%4===0||i===nPromos-1){
+      const short=s.promo.replace(/\s*\(.*?\)/,'').slice(0,18);
+      svg+=`<text x="${x(i).toFixed(1)}" y="${H+PAD.top+14}" text-anchor="middle" font-size="9" fill="var(--text2)" transform="rotate(-30,${x(i).toFixed(1)},${H+PAD.top+14})">${short}</text>`;
+    }
+  });
+  // Legend
+  let lx=PAD.left;
+  cats.forEach(cat=>{
+    const col=palette[cat];
+    svg+=`<circle cx="${lx+5}" cy="12" r="4" fill="${col}"/><text x="${lx+13}" y="16" font-size="10" fill="var(--text)">${cat}</text>`;
+    lx+=cat.length*6.5+20;
+  });
+  svg+=`<text x="${W/2}" y="${H+PAD.top+PAD.bottom-4}" text-anchor="middle" font-size="10" fill="var(--text2)">Promo periods (Jan – Aug 2026)</text>`;
+  svg+='</svg>';
+  el.innerHTML='<div style="margin-bottom:0.5rem"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:6px">Category-wide A→O by Promo Period vs. Baseline</div><div style="font-size:12px;color:var(--text2);margin-bottom:8px">Each dot = total category A→O (all SKUs) during that promo window. Dashed line = off-promo baseline. Solid dots = above baseline.</div>'+svg+'</div>';
+}
+
+function renderLiftDetail(){
+  const sel=document.getElementById('lift-promo-sel');
+  const detailEl=document.getElementById('lift-detail');
+  if(!sel||!detailEl) return;
+  const idx=parseInt(sel.value);
+  if(isNaN(idx)){detailEl.innerHTML='';return;}
+  const p=LIFT_DATA.promos[idx];
+  const cats=LIFT_DATA.categories;
+  const base=LIFT_DATA.baseline;
+  const palette={'Appliances':'#2a5caa','Electronics':'#c0392b','Furniture':'#1a7a52','Tools & Equipment':'#8a5c00'};
+  const fmt1=v=>v==null?'—':v.toFixed(1)+'%';
+  const fmtN=v=>v==null?'—':v.toLocaleString();
+  const liftColor=v=>v==null?'':v>2?'color:#1a7a52;font-weight:600':v<-2?'color:#c0392b;font-weight:600':'color:var(--text2)';
+  const liftStr=v=>v==null?'—':(v>0?'+':'')+v.toFixed(1)+'pp';
+
+  let html='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">';
+  html+='<thead><tr style="background:var(--surface2)">'
+    +'<th style="padding:8px 12px;text-align:left;font-weight:600;border-bottom:2px solid var(--border)">Category</th>'
+    +'<th style="padding:8px 12px;text-align:center;font-weight:600;border-bottom:2px solid var(--border)" colspan="3">On-Promo SKUs</th>'
+    +'<th style="padding:8px 12px;text-align:center;font-weight:600;border-bottom:2px solid var(--border)" colspan="3">Off-Promo SKUs (same window)</th>'
+    +'<th style="padding:8px 12px;text-align:center;font-weight:600;border-bottom:2px solid var(--border)">Lift<br><span style="font-weight:400;font-size:11px">(on \u2212 off)</span></th>'
+    +'<th style="padding:8px 12px;text-align:center;font-weight:600;border-bottom:2px solid var(--border)">vs Baseline</th>'
+    +'</tr>'
+    +'<tr style="background:var(--surface2)">'
+    +'<th style="padding:4px 12px;border-bottom:1px solid var(--border)"></th>'
+    +'<th style="padding:4px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--text2);font-weight:400">Apps</th>'
+    +'<th style="padding:4px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--text2);font-weight:400">Orders</th>'
+    +'<th style="padding:4px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--text2);font-weight:400">A\u2192O</th>'
+    +'<th style="padding:4px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--text2);font-weight:400">Apps</th>'
+    +'<th style="padding:4px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--text2);font-weight:400">Orders</th>'
+    +'<th style="padding:4px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--text2);font-weight:400">A\u2192O</th>'
+    +'<th style="padding:4px 8px;text-align:center;border-bottom:1px solid var(--border);color:var(--text2);font-weight:400">A\u2192O diff</th>'
+    +'<th style="padding:4px 8px;text-align:center;border-bottom:1px solid var(--border);color:var(--text2);font-weight:400">Off vs Base</th>'
+    +'</tr></thead><tbody>';
+
+  cats.forEach((cat,ci)=>{
+    const d=p.cats[cat];
+    const b=base[cat];
+    if(!d){
+      html+=`<tr><td style="padding:8px 12px;color:var(--text2)">${cat}</td><td colspan="8" style="padding:8px 12px;color:var(--text2);text-align:center">No data for this promotion</td></tr>`;
+      return;
+    }
+    const onAO = d.on.ao;
+    const offAO = d.off.ao;
+    const baseAO = b?b.ao:null;
+    const liftVal = (onAO!=null&&offAO!=null)?(onAO-offAO):null;
+    const offVsBase = (offAO!=null&&baseAO!=null)?(offAO-baseAO):null;
+    const hasOnPromo = d.on.apps > 0;
+    const col=palette[cat]||'#555';
+    const bg=ci%2===0?'':'background:var(--surface2)';
+
+    html+=`<tr style="${bg}">
+      <td style="padding:8px 12px;font-weight:600;color:${col};white-space:nowrap">${cat}</td>
+      <td style="padding:8px 8px;text-align:right;color:var(--text2)">${hasOnPromo?fmtN(d.on.apps):'—'}</td>
+      <td style="padding:8px 8px;text-align:right;color:var(--text2)">${hasOnPromo?fmtN(d.on.orders):'—'}</td>
+      <td style="padding:8px 8px;text-align:right;font-weight:600">${hasOnPromo?fmt1(onAO):'—'}</td>
+      <td style="padding:8px 8px;text-align:right;color:var(--text2)">${fmtN(d.off.apps)}</td>
+      <td style="padding:8px 8px;text-align:right;color:var(--text2)">${fmtN(d.off.orders)}</td>
+      <td style="padding:8px 8px;text-align:right;font-weight:600">${fmt1(offAO)}</td>
+      <td style="padding:8px 8px;text-align:center;${liftVal!=null?liftColor(liftVal):''}">${liftStr(liftVal)}</td>
+      <td style="padding:8px 8px;text-align:center;${offVsBase!=null?liftColor(offVsBase):''}">${liftStr(offVsBase)}</td>
+    </tr>`;
+  });
+
+  html+='</tbody></table></div>';
+
+  // Summary callout
+  const hasCatsWithBothSides = cats.filter(c=>{
+    const d=p.cats[c];
+    return d&&d.on.apps>0&&d.off.apps>0;
+  });
+  if(hasCatsWithBothSides.length>0){
+    const avgLift = hasCatsWithBothSides.reduce((s,c)=>{
+      const d=p.cats[c];
+      return s+(d.on.ao-d.off.ao);
+    },0)/hasCatsWithBothSides.length;
+    const liftDir = avgLift>1?'higher':'lower';
+    html+=`<div style="margin-top:1rem;padding:12px 16px;background:var(--surface2);border-radius:var(--radius-sm);font-size:13px;color:var(--text2)">
+      <strong style="color:var(--text)">Summary:</strong> Across ${hasCatsWithBothSides.length} categories with on-promo SKUs, A\u2192O for promoted products averaged <strong style="color:var(--text)">${avgLift>0?'+':''}${avgLift.toFixed(1)}pp ${liftDir}</strong> than non-promoted products in the same window.
+    </div>`;
+  }
+  detailEl.innerHTML=html;
+}
+
 </script>
 </body>
 </html>
