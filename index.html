@@ -435,7 +435,8 @@ function renderFormulas(){
         ["Net Orders","Gross Orders remaining after cancellations"],
         ["Gross / Net Cancel Rate","Gross / Net Cancelled Orders ÷ Approved Orders — matches the source export's own formula"],
         ["Per-promotion-day averages","Count ÷ days elapsed so far for a still-live promotion, or ÷ the full scheduled Number of Promo Days once it's ended — so a promo that's only partway through isn't penalized for not having run its full course yet"],
-        ["Primary bottleneck","The stage-to-stage conversion rate furthest below its own YTD-average benchmark, in percentage points. The Net Orders → Deliveries step is excluded from this check while a promotion is still live or under 14 days past its end date, since that step is mechanically depressed by delivery lead time rather than a behavioral problem"],
+        ["Δ vs Prior / Δ vs YTD","Percent change for the five volume rows (Applications Started through Deliveries); percentage points for the two rate rows (Full-Funnel Rate, Approval Rate) — these are different units and won't numerically match each other"],
+        ["Primary bottleneck","The stage-to-stage conversion rate furthest below its own YTD-average benchmark, measured in percentage points (not percent). The Net Orders → Deliveries step is excluded from this check while a promotion is still live or under 14 days past its end date, since that step is mechanically depressed by delivery lead time rather than a behavioral problem"],
         ["Pageviews","Reference only, not a funnel stage — Pageviews run below Applications Started in every promotion here, since many applications start without a tracked view of these specific SKU pages"],
       ]
     },
@@ -2041,11 +2042,11 @@ function renderFunnel(){
   const bottleneckCallout=anchorPromoName?(hasRealBottleneck?
     `<div class="funnel-bottleneck funnel-bottleneck-warn">
       <span class="funnel-bottleneck-icon">⚠</span>
-      <div><strong>Primary bottleneck: ${bottleneck.from} → ${bottleneck.to}.</strong> Converting at ${fmtPct(bottleneck.cur)} vs. a typical ${fmtPct(bottleneck.ytd)} — ${fmtPct(Math.abs(bottleneck.gap))} below the YTD benchmark at that step, the largest gap in this promo's funnel.${lagExcludedNote}</div>
+      <div><strong>Primary bottleneck: ${bottleneck.from} → ${bottleneck.to}.</strong> Converting at ${fmtPct(bottleneck.cur)} vs. a typical ${fmtPct(bottleneck.ytd)} — ${Math.abs(bottleneck.gap).toFixed(1)} percentage points below the YTD benchmark at that step, the largest gap in this promo's funnel.${lagExcludedNote}</div>
     </div>`
     :bottleneck?`<div class="funnel-bottleneck funnel-bottleneck-ok">
       <span class="funnel-bottleneck-icon">✓</span>
-      <div>Every stage is tracking at or near its typical (YTD) rate — no single step stands out as the drag on this promo right now.${bottleneck.gap<0?` Weakest relative step: ${bottleneck.from} → ${bottleneck.to} (${fmtPct(Math.abs(bottleneck.gap))} below typical, not yet significant).`:""}${lagExcludedNote}</div>
+      <div>Every stage is tracking at or near its typical (YTD) rate — no single step stands out as the drag on this promo right now.${bottleneck.gap<0?` Weakest relative step: ${bottleneck.from} → ${bottleneck.to} (${Math.abs(bottleneck.gap).toFixed(1)} points below typical, not yet significant).`:""}${lagExcludedNote}</div>
     </div>`:""):"";
 
   function deltaCell(cur,base,isRate){
@@ -2114,7 +2115,7 @@ function renderFunnel(){
     ${bottleneckCallout}
     ${qualityCards}
     <div class="section-title" style="margin:1.5rem 0 10px">Current vs. Prior vs. YTD</div>
-    <p style="font-size:11.5px;color:var(--text3);margin-bottom:10px">Per-promotion-day averages, so promos of different lengths (or a live promo only partway through) compare fairly. Pick any promotion in the filter bar above to compare it against the one immediately before it instead. Current = ${anchorPromoName||"—"}${maturityBadge(anchorPromoName)}${curDays!=null?` · ${curDays}d elapsed of ${meta[anchorPromoName].days}d scheduled`:""}. Prior = ${precedingPromoName||"—"}${maturityBadge(precedingPromoName)}. YTD Avg = mean of each mature 2026 promotion's own per-day rate, across ${maturePromos.length} promotions (same convention as the Del/Day YTD figure elsewhere in this report). ⚠ flags the stage furthest below its YTD benchmark.</p>
+    <p style="font-size:11.5px;color:var(--text3);margin-bottom:10px">Per-promotion-day averages, so promos of different lengths (or a live promo only partway through) compare fairly. Pick any promotion in the filter bar above to compare it against the one immediately before it instead. Current = ${anchorPromoName||"—"}${maturityBadge(anchorPromoName)}${curDays!=null?` · ${curDays}d elapsed of ${meta[anchorPromoName].days}d scheduled`:""}. Prior = ${precedingPromoName||"—"}${maturityBadge(precedingPromoName)}. YTD Avg = mean of each mature 2026 promotion's own per-day rate, across ${maturePromos.length} promotions (same convention as the Del/Day YTD figure elsewhere in this report). Δ columns show percent change for the five volume rows and percentage points for the two rate rows below — they're different units, so don't expect them to match the ⚠ bottleneck callout's point gap. ⚠ flags the stage furthest below its YTD benchmark.</p>
     <div class="tbl-scroll"><table>
       <thead><tr><th class="left">Stage</th><th>Current</th><th>Δ vs Prior</th><th>Prior</th><th>Δ vs YTD</th><th>YTD Avg</th></tr></thead>
       <tbody>${cmpTableRows}${cmpRateTableRows}</tbody>
