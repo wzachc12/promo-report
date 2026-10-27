@@ -196,6 +196,7 @@ tbody tr:hover td{background:var(--surface2)}
     <div class="tab" onclick="showTab('sku')" id="tab-sku">Product Performance</div>
     <div class="tab" onclick="showTab('catsum')" id="tab-catsum">Category Insights</div>
     <div class="tab" onclick="showTab('assets')" id="tab-assets" title="Promotional Assets CTR">Assets CTR</div>
+    <div class="tab" onclick="showTab('journey')" id="tab-journey" title="Tile shopper journey">Tile Journey</div>
     <div class="tab" onclick="showTab('tools')" id="tab-tools">Tools &amp; Reference</div>
   </div>
   <div class="panel">
@@ -203,6 +204,7 @@ tbody tr:hover td{background:var(--surface2)}
     <div id="view-funnel" style="display:none"></div>
     <div id="view-calendar" style="display:none"></div>
     <div id="view-assets" style="display:none"></div>
+    <div id="view-journey" style="display:none"></div>
     <div id="view-promo" style="display:none"></div>
     <div id="view-sku" style="display:none"></div>
     <div id="view-track" style="display:none"></div>
@@ -351,7 +353,7 @@ function applyFilters(){
 
 function showTab(t){
   activeTab=t;
-  ["exec","calendar","assets","promo","sku","track","catsum","elasticity","skurank","lift","formulas","tools","funnel"].forEach(id=>{
+  ["exec","calendar","assets","journey","promo","sku","track","catsum","elasticity","skurank","lift","formulas","tools","funnel"].forEach(id=>{
     const viewEl=document.getElementById("view-"+id);
     if(viewEl) viewEl.style.display=id===t?"block":"none";
     const tabEl=document.getElementById("tab-"+id);
@@ -582,6 +584,7 @@ function renderActiveTab(){
   if(activeTab==="exec") renderExec();
   else if(activeTab==="calendar") renderCalendar();
   else if(activeTab==="assets") renderAssetsTab();
+  else if(activeTab==="journey") renderJourneyTab();
   else if(activeTab==="promo") renderPromoView();
   else if(activeTab==="sku"){ renderSKUView(); renderSKURankInline(); }
   else if(activeTab==="track") renderTrackView();
@@ -1906,6 +1909,76 @@ function sortPromoView(col){
 /* ═══════════════════════════════════════════
    TAB: FULL-FUNNEL DIAGNOSTIC
 ═══════════════════════════════════════════ */
+const TILE_JOURNEY={
+  source:"GA4 session segments: homepage > tile page. Events counted as sessions that fired the event anywhere in the session.",
+  promos:[
+   {promo:"Oct 22 - 31: Big Deals, Low Payments",range:"Oct 22 - 26, 2026 (promo in progress)",tiles:[
+    {name:"Homepage Hero",dest:"Current Deals listing",sessions:18726,appStart:1753,appDone:1608,orders:736,browsed:11405,next:[["Stay in deals listing",64],["Washer/dryer PDP",9],["58\" Roku TV PDP",7],["Homepage",5],["Sofa PDP",4],["Bed PDP",4]]},
+    {name:"Limited Time Deal 1",dest:"PS5 Slim PDP",sessions:4412,appStart:517,appDone:484,orders:179,browsed:1666,next:[["Reload / alt PDP URL",32],["Checkout",18],["Search results",17],["Homepage",11],["Consoles category",9]]},
+    {name:"Limited Time Deal 2",dest:"Washer/dryer PDP",sessions:4052,appStart:425,appDone:387,orders:228,browsed:1253,next:[["Reload / alt PDP URL",28],["Search results",22],["Washers-dryers category",21],["Checkout",15],["Homepage",10]]},
+    {name:"Limited Time Deal 3",dest:"Envy III sofa PDP",sessions:4368,appStart:492,appDone:451,orders:212,browsed:1765,next:[["Reload / alt PDP URL",20],["Search results",17],["Living room sets",10],["Sofas-loveseats",10],["Sectionals",9],["Living room",9]]},
+    {name:"Limited Time Deal 4",dest:"Shop Your Store",sessions:9558,appStart:1290,appDone:1207,orders:495,browsed:7200,next:[["Search results",21],["Stay on page",14],["Homepage",5],["Sale",4],["Clearance",4],["Leasing power",3]]}]},
+   {promo:"Oct 19 - 21: Extended Products Under $19.99/Week + EOM Deals",range:"Oct 19 - 21, 2026",tiles:[
+    {name:"Homepage Hero",dest:"Current Deals listing",sessions:15661,appStart:1816,appDone:1670,orders:698},
+    {name:"Limited Time Deal 1",dest:"Featured products: Last Chance Savings",sessions:1603,appStart:191,appDone:182,orders:75},
+    {name:"Limited Time Deal 2",dest:"Laptops / TVs deals (rotating)",sessions:2579,appStart:236,appDone:218,orders:90},
+    {name:"Limited Time Deal 3",dest:"Washers-dryers deals",sessions:2122,appStart:274,appDone:252,orders:125},
+    {name:"Limited Time Deal 4",dest:"Shop Your Store",sessions:6038,appStart:711,appDone:679,orders:270}]},
+   {promo:"Oct 14 - 18: Last Chance: Products Under $19.99/Week",range:"Oct 14 - 18, 2026",tiles:[
+    {name:"Homepage Hero",dest:"Current Deals listing",sessions:25632,appStart:2944,appDone:2662,orders:1111},
+    {name:"Limited Time Deal 1",dest:"Featured products: Fall Savings",sessions:8208,appStart:745,appDone:696,orders:329},
+    {name:"Limited Time Deal 2",dest:"Laptops / TVs deals (rotating)",sessions:4530,appStart:389,appDone:374,orders:131},
+    {name:"Limited Time Deal 3",dest:"Washers-dryers deals",sessions:3292,appStart:433,appDone:409,orders:236},
+    {name:"Limited Time Deal 4",dest:"Shop Your Store",sessions:8561,appStart:944,appDone:870,orders:366}]}
+  ]
+};
+let journeyIdx=0;
+function renderJourneyTab(){
+  const el=document.getElementById("view-journey");
+  const J=TILE_JOURNEY;
+  const P=J.promos[journeyIdx]||J.promos[0];
+  const fmt=n=>n==null?"—":n.toLocaleString();
+  const pct=(a,b,d=1)=>(a==null||!b)?"—":(100*a/b).toFixed(d)+"%";
+  const assetFor=(name,promo)=>{const a=ASSETS_DATA.assets.find(x=>x.name===name);return a&&a.data.find(x=>x.promo===promo);};
+  const rows=P.tiles.map(t=>{
+    const d=assetFor(t.name,P.promo);
+    const share=d&&d.ctr!=null?(d.ctr<1?d.ctr*100:d.ctr).toFixed(1)+"%":"—";
+    return {...t,share,art:d&&d.art_type||"—"};
+  });
+  const th='style="text-align:right;padding:8px 6px;font-weight:500;color:var(--text2);font-size:12px"';
+  const td='style="text-align:right;padding:8px 6px;font-family:\'DM Mono\',monospace"';
+  const bestRate=Math.max(...rows.map(r=>r.orders/r.sessions));
+  const table=`<div class="tbl-scroll"><table style="width:100%;border-collapse:collapse;font-size:12px">
+  <thead><tr style="border-bottom:1px solid var(--border-med)"><th style="text-align:left;padding:8px 6px;font-weight:500;color:var(--text2);font-size:12px">Tile</th>
+  <th ${th}>Click %</th><th ${th}>Sessions</th><th ${th}>Browsed</th><th ${th}>Apps</th><th ${th}>App rate</th><th ${th}>Decisions</th><th ${th}>App to decision</th><th ${th}>Orders</th><th ${th}>Order rate</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 6px;text-align:left"><b>${r.name}</b><div style="color:var(--text2);font-size:12px">${r.dest} &middot; ${r.art}</div></td>
+  <td ${td}>${r.share}</td><td ${td}>${fmt(r.sessions)}</td><td ${td}>${pct(r.browsed,r.sessions,0)}</td><td ${td}>${fmt(r.appStart)}</td><td ${td}>${pct(r.appStart,r.sessions)}</td>
+  <td ${td}>${fmt(r.appDone)}</td><td ${td}>${pct(r.appDone,r.appStart,0)}</td><td ${td}>${fmt(r.orders)}</td><td ${td}><b style="color:${r.orders/r.sessions===bestRate?"var(--green)":"inherit"}">${pct(r.orders,r.sessions)}</b></td></tr>`).join("")}
+  </tbody></table></div>`;
+  const cards=rows.map(r=>{
+    const steps=[["Sessions from tile",r.sessions,"#2a5caa"],["Applications started",r.appStart,"#1a7a52"],["Decisions submitted",r.appDone,"#8a5c00"],["Orders",r.orders,"#6b3fa0"]];
+    const bars=steps.map((s,i)=>{
+      const w=Math.max(2,100*s[1]/r.sessions);
+      const drop=i?`<span style="color:var(--red);font-size:11px"> &minus;${Math.round(100*(steps[i-1][1]-s[1])/steps[i-1][1])}% dropped</span>`:"";
+      return `<div style="margin:6px 0"><div style="font-size:12px;color:var(--text2);display:flex;justify-content:space-between"><span>${s[0]}${drop}</span><span style="font-family:'DM Mono',monospace">${fmt(s[1])}</span></div>
+      <div style="background:var(--surface2);border-radius:4px;height:14px"><div style="width:${w}%;background:${s[2]};height:14px;border-radius:4px"></div></div></div>`;
+    }).join("");
+    const nx=r.next?`<div style="margin-top:12px;font-size:12px;font-weight:500">Top next pages for the ${pct(r.browsed,r.sessions,0)} who browsed on</div>`+r.next.map(n=>`<div style="display:flex;align-items:center;gap:8px;font-size:12px;margin:3px 0"><span style="width:150px;color:var(--text2)">${n[0]}</span><div style="flex:1;background:var(--surface2);height:8px;border-radius:4px"><div style="width:${Math.min(100,n[1]*100/70)}%;background:#9aa9c4;height:8px;border-radius:4px"></div></div><span style="font-family:'DM Mono',monospace;width:34px;text-align:right">${n[1]}%</span></div>`).join(""):"";
+    return `<div class="panel" style="margin-bottom:0"><div style="font-weight:500">${r.name}</div><div style="color:var(--text2);font-size:12px;margin-bottom:8px">${r.dest}${r.browsed!=null?" &middot; "+pct(r.browsed,r.sessions,0)+" browsed on to another page":""}</div>${bars}${nx}</div>`;
+  }).join("");
+  // across-promos trend: order rate per tile
+  const names=J.promos[0].tiles.map(t=>t.name);
+  const trend=`<div class="tbl-scroll"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="border-bottom:1px solid var(--border-med)"><th style="text-align:left;padding:8px 6px;font-weight:500;color:var(--text2);font-size:12px">Order rate (orders / sessions)</th>${J.promos.slice().reverse().map(p=>`<th ${th}>${p.promo.split(":")[0]}</th>`).join("")}</tr></thead><tbody>
+  ${names.map(n=>`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 6px;text-align:left"><b>${n}</b></td>${J.promos.slice().reverse().map(p=>{const t=p.tiles.find(x=>x.name===n);return `<td ${td}>${pct(t.orders,t.sessions)}<div style="font-family:'DM Sans',sans-serif;color:var(--text3);font-size:11px">${fmt(t.orders)} orders</div><div style="font-family:'DM Sans',sans-serif;color:var(--text3);font-size:11px">${t.dest}</div></td>`;}).join("")}</tr>`).join("")}
+  </tbody></table></div>`;
+  const opts=J.promos.map((p,i)=>`<option value="${i}"${i===journeyIdx?" selected":""}>${p.promo}</option>`).join("");
+  el.innerHTML=`<div class="panel"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div style="font-size:16px;font-weight:500">Tile journey</div>
+  <select onchange="journeyIdx=+this.value;renderJourneyTab()" style="padding:6px 8px;border:1px solid var(--border-med);border-radius:6px;font-family:inherit;max-width:100%">${opts}</select></div>
+  <div style="color:var(--text2);margin:4px 0 12px">${P.range}. Sessions that went from the homepage straight to the tile destination, and how many went on to start an application, submit for a decision and place an order.</div>${table}
+  <div style="color:var(--text3);font-size:12px;margin-top:8px">${J.source} Apps = application_start. Decisions = application_complete. Orders = purchase. App rate and order rate = share of sessions. App to decision = decisions / apps started. Browsed and next pages are only pulled for the latest promo. GA4 counts will not match internal order data exactly. Rotating Laptops/TVs tiles are combined.</div></div>
+  <div class="panel"><div style="font-weight:500;margin-bottom:8px">Order rate by tile across recent promos</div>${trend}</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem">${cards}</div>`;
+}
 function renderFunnel(){
   const el=document.getElementById("view-funnel");
   if(!el) return;
