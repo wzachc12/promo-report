@@ -194,12 +194,14 @@ tbody tr:hover td{background:var(--surface2)}
   <div class="tab-bar">
     <div class="tab active" onclick="showTab('scorecard')" id="tab-scorecard">Promo vs ecommerce</div>
     <div class="tab" onclick="showTab('promos')" id="tab-promos">Promotions &amp; assets</div>
+    <div class="tab" onclick="showTab('plan')" id="tab-plan">Plan a promo</div>
     <div class="tab tab-right" onclick="showTab('tools')" id="tab-tools">Definitions</div>
   </div>
   <div id="subnav" style="display:none;gap:6px;flex-wrap:wrap;margin-bottom:1rem"></div>
   <div class="panel">
     <div id="view-summary" style="display:none"></div>
     <div id="view-scorecard"></div>
+    <div id="view-plan" style="display:none"></div>
     <div id="view-pc" style="display:none"></div>
     <div id="view-assetsum" style="display:none"></div>
     <div id="view-compare" style="display:none"></div>
@@ -423,7 +425,8 @@ function v2buildMonths(){
     V2ALL.D[idx].forEach(function(r){if(!r[7])return;var q=V2ALL.S[r[0]],x=skus[q[0]]=skus[q[0]]||{apps:0,ord:0,del:0,cat:q[2],sub:q[3],d:0};x.apps+=r[1];x.ord+=r[2];x.del+=r[5];x.d+=r[8];});
     return {w:W,i:idx,skus:skus,N:Object.keys(skus).length,pe:null,syn:true};
   };
-  [[2026,4],[2026,5],[2026,6],[2026,7],[2026,8],[2026,9],[2026,10]].forEach(function(ym){
+  var yms=[];for(var yy=2025;yy<=2026;yy++)for(var mm=0;mm<12;mm++)if(yy<2026||mm<=10)yms.push([yy,mm]);
+  yms.forEach(function(ym){
     var st=new Date(ym[0],ym[1],1),nx=new Date(ym[0],ym[1]+1,1),en=nx>V2_END?V2_END:nx,toDate=nx>V2_END;
     var p=mk(st,en,MN[ym[1]]+' '+ym[0]+(toDate?' to date':''));if(!p)return;
     if(toDate){var ps=new Date(ym[0],ym[1]-1,1),pe=new Date(ym[0],ym[1]-1,1+v2diff(st,en));p.prevSame=mk(ps,pe,MN[ym[1]-1]+' '+v2rangeLabel(ps,pe).replace(/^[A-Za-z]+ /,'').replace(' - ',' to '));}
@@ -483,7 +486,7 @@ function v2cmpOptions(sel,cur){
   var h='<option value="ytd"'+(sel==='ytd'?' selected':'')+'>Site average (same products, YTD when not on a promo)</option>';
   h+='<option value="rest"'+(sel==='rest'?' selected':'')+'>Rest of ecommerce, same dates</option>';
   var curSyn=V2M.some(function(q){return q.i===cur;});
-  h+='<option value="prior"'+(sel==='prior'?' selected':'')+'>'+(curSyn?(v2findP(cur).prevSame?'Previous month, same dates':'Previous month'):'Previous promotion')+'</option>';
+  if(!(curSyn&&!v2findP(cur).prevSame&&V2M.indexOf(v2findP(cur))===0))h+='<option value="prior"'+(sel==='prior'?' selected':'')+'>'+(curSyn?(v2findP(cur).prevSame?'Previous month, same dates':'Previous month'):'Previous promotion')+'</option>';
   if(curSyn)return h;
   h+='<optgroup label="A specific promotion">';
   V2P.slice().reverse().forEach(function(q){if(q.i===cur)return;var nm=(q.w.promo.indexOf('(')>=0?q.w.promo:q.w.promo+' ('+v2rangeLabel(q.w.sd,q.w.ed)+')')+v2yrTag(q.w);h+='<option value="'+q.i+'"'+(String(sel)===String(q.i)?' selected':'')+'>'+v2esc(nm)+'</option>';});
@@ -606,13 +609,13 @@ function v2prodSection(p,cmpSel){
   var th=function(k,l,left){return '<th'+(left?' class="left"':'')+' style="cursor:pointer" onclick="v2pcSort(\''+k+'\')" title="Click to sort">'+l+arrow(k)+'</th>';};
   var baseTxt=mode==='ytd'?'the same SKUs\' YTD average when not on a promo':mode==='rest'?'all SKUs not on this promo, on the same dates':v2esc(cp.w.promo.replace(/\s*\(.*$/,''))+' ('+v2rangeLabel(cp.w.sd,cp.w.ed)+')';
   var h='<div class="exec-card"><div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px"><div class="exec-card-title" style="margin:0">Products and categories, promo vs '+(mode==='ytd'?'site average':'compared')+' '+v2s('AEF')+'</div><div style="display:flex;gap:10px;align-items:flex-end"><button id="v2onlyBtn" class="subpill" style="height:34px" onclick="v2pcOnly()">'+(v2pc.only?'Show groups not on this promo':'Hide groups not on this promo')+'</button><div class="filter-group" style="width:200px"><span class="filter-label">Show</span><select onchange="v2pcSet(\'level\',this.value)"><option value="sub"'+(lvl==='sub'?' selected':'')+'>Sub-categories</option><option value="cat"'+(lvl==='cat'?' selected':'')+'>Categories</option></select></div></div></div>';
-  h+='<div class="v2-note">Every product we have data for is counted, on promo or not. Green rows have SKUs on this promo. The first seven columns use the same metrics as the table above, for the promo SKUs in each row. Rows with no promo SKUs show all of their SKUs the same way, so you can see how the rest of the catalog is doing: bold is this promo and the small line is '+baseTxt+'. Per-day figures are totals for the promo SKUs. <b>Not in promo</b> are the sub-category\'s SKUs that are not on this promo, in orders a day now vs their own usual pace, so a drop points to the promo pulling sales from them. <b>Total sub-category</b> is all SKUs together vs a normal day with no promo in it. Cancellation rate is net cancelled orders over approved orders. Avg lease revenue builds up as agreements age, so its small line is the SKUs not in the promo on the same dates'+(hr?'':'. It is not in the exports from Oct 1 on, so this promo has none')+'. '+(mat?'':'In * columns, est. marks an estimate that assumes these SKUs behave at their YTD rate, until about '+MATURITY_DAYS+' days after the promo ends. ')+'A red <b>Cannibalized</b> flag means at least 3 SKUs not in the promo in that group are selling 10% or more below their usual pace while promo SKUs are on sale. Click a row to see its products, click a heading to sort.</div>';
+  h+='<div class="v2-note">Every product we have data for is counted, on promo or not. Green rows have SKUs on this promo. The first seven columns use the same metrics as the table above, for the promo SKUs in each row. Rows with no promo SKUs show all of their SKUs the same way, so you can see how the rest of the catalog is doing: bold is this promo and the small line is '+baseTxt+'. Per-day figures are totals for the promo SKUs. <b>Not in promo</b> are the sub-category\'s SKUs that are not on this promo, in orders a day now vs their own usual pace, so a drop may mean the promo is pulling sales from them, but other causes such as stock or seasonality are not ruled out. <b>Total sub-category</b> is all SKUs together vs a normal day with no promo in it. Cancellation rate is net cancelled orders over approved orders. Avg lease revenue builds up as agreements age, so its small line is the SKUs not in the promo on the same dates'+(hr?'':'. It is not in the exports from Oct 1 on, so this promo has none')+'. '+(mat?'':'In * columns, est. marks an estimate that assumes these SKUs behave at their YTD rate, until about '+MATURITY_DAYS+' days after the promo ends. ')+'A red <b>Possible cannibalization</b> flag means at least 3 SKUs not in the promo in that group are selling 10% or more below their usual pace while promo SKUs are on sale. Click a row to see its products, click a heading to sort.</div>';
   h+='<style>.v2-prodwrap{max-height:72vh;overflow:auto;border:1px solid var(--border);border-radius:6px}.v2-stick thead th{position:sticky;top:0;background:var(--surface);z-index:2}.v2-stick td:first-child,.v2-stick th:first-child{position:sticky;left:0;background:var(--surface);z-index:1;min-width:380px;max-width:380px;white-space:normal}.v2-stick thead th:first-child{z-index:3}.v2-stick tr.v2-on td:first-child{background:linear-gradient(rgba(22,163,74,0.07),rgba(22,163,74,0.07)),var(--surface)}.v2-stick tr.v2-onx td:first-child{background:linear-gradient(rgba(22,163,74,0.12),rgba(22,163,74,0.12)),var(--surface)}.v2-stick tr.v2-sub td:first-child{background:var(--surface2)}.v2-hideoff tr.v2-off{display:none!important}</style><div class="tbl-scroll v2-prodwrap"><table id="v2prodTbl" class="v2-big v2-stick'+(v2pc.only?' v2-hideoff':'')+'" data-sortable="1"><thead><tr>'+th('name','Category / sub-category',1)+th('apps','Applications / day')+th('ord','Gross orders / day')+th('a2o','App to order')+th('del','Deliveries / day *')+th('o2d','Order to delivery *')+th('canc','Cancellation rate *')+th('lease','Avg lease revenue *')+th('oth','Not in promo, orders / day')+th('whole','Total sub-category, orders / day')+'</tr></thead><tbody>';
   rows.forEach(function(r,gi){
     var ES=mode==='ytd'&&!mat&&!!r.mo&&!!r.mf,gid='g'+gi,can=r.rows.length>0,mo=r.mo,mf=r.mf,N=function(k){return mo?mo[k]:null;},F=function(k){return mf?mf[k]:null;};
     var oth=(r.othN&&r.onN)?'<td style="white-space:nowrap"><b>'+f0(r.othNow)+'</b><div class="v2-sub">'+f0(r.othUsual)+' usual'+pill(r.othNow,r.othUsual,0)+'</div></td>':'<td>-</td>';
     var who=r.whNow?'<td style="white-space:nowrap"><b>'+f0(r.whNow)+'</b>'+(r.whUsual?'<div class="v2-sub">'+f0(r.whUsual)+' usual'+pill(r.whNow,r.whUsual,0)+'</div>':'')+'</td>':'<td>-</td>';
-    var badge=(r.onN?' <span style="font-size:10px;font-weight:600;color:var(--green);background:rgba(22,163,74,0.12);border-radius:3px;padding:1px 6px;white-space:nowrap">On promo · '+r.onN+'</span>':'')+(r.can?' <span title="SKUs not in the promo here are selling '+Math.round((1-r.othNow/r.othUsual)*100)+'% below their usual pace, '+f0(r.othUsual-r.othNow)+' fewer orders a day" style="font-size:10px;font-weight:600;color:var(--red);background:var(--red-bg);border-radius:3px;padding:1px 6px;white-space:nowrap">Cannibalized</span>':'');
+    var badge=(r.onN?' <span style="font-size:10px;font-weight:600;color:var(--green);background:rgba(22,163,74,0.12);border-radius:3px;padding:1px 6px;white-space:nowrap">On promo · '+r.onN+'</span>':'')+(r.can?' <span title="SKUs not in the promo here are selling '+Math.round((1-r.othNow/r.othUsual)*100)+'% below their usual pace, '+f0(r.othUsual-r.othNow)+' fewer orders a day" style="font-size:10px;font-weight:600;color:var(--red);background:var(--red-bg);border-radius:3px;padding:1px 6px;white-space:nowrap">Possible cannibalization</span>':'');
     h+='<tr class="'+(r.onN?'v2-on':'v2-off')+'"'+(can?' style="cursor:pointer'+(r.onN?';background:rgba(22,163,74,0.06)':'')+'" onclick="v2pcTog(\''+gid+'\')" title="Click to show the products"':(r.onN?' style="background:rgba(22,163,74,0.06)"':''))+'><td class="left">'+(can?'<span id="car-'+gid+'" style="display:inline-block;width:12px;color:var(--text3)">&#9656;</span>':'<span style="display:inline-block;width:12px"></span>')+catBadge(r.cat)+' '+v2esc(r.sub)+badge+'</td>'
       +cell(N('apps'),F('apps'),fq,0,0,0,AV)+cell(N('ord'),F('ord'),fq,0,0,0,AV)+cell(N('a2o'),F('a2o'),fp,1,0,0,AV)
       +cell(mat?N('del'):(ES&&F('o2d')!==null&&N('ord')!==null?N('ord')*F('o2d')/100:null),F('del'),fq,0,0,mo&&!mat&&!ES,AV,!mat&&ES)+cell(mat?N('o2d'):(ES?F('o2d'):null),F('o2d'),fp,1,0,mo&&!mat&&!ES,AV,!mat&&ES)
@@ -655,11 +658,11 @@ function v2execSummary(p,L,va,vp,vo,col,bg){
   else perf='Promo SKUs account for '+share+'% of ecommerce orders. There is not enough history to compare them with their YTD average.';
   var fl=v2lastRecs.filter(function(g){return g.can;}).map(function(g){return {n:g.sub,lost:g.othUsual-g.othNow,pct:Math.round((1-g.othNow/g.othUsual)*100)};}).sort(function(a,b){return b.lost-a.lost;});
   var can;
-  if(!fl.length)can='<b>No.</b> Other SKUs in the promo sub-categories are holding their usual pace.';
+  if(!fl.length)can='<b>No sign.</b> Other SKUs in the promo sub-categories are holding their usual pace.';
   else{var nm=fl.slice(0,3).map(function(x){return v2esc(x.n);});var more=fl.length-nm.length;
-    can='<b>Yes.</b> Non-promo SKUs in '+(more>0?nm.join(', ')+' and '+more+' more':nm.length>2?nm.slice(0,-1).join(', ')+' and '+nm[nm.length-1]:nm.join(' and '))+' are generating '+f0(fl.reduce(function(s,x){return s+x.lost;},0))+' fewer orders a day than usual.';}
+    can='<b>Possible.</b> Non-promo SKUs in '+(more>0?nm.join(', ')+' and '+more+' more':nm.length>2?nm.slice(0,-1).join(', ')+' and '+nm[nm.length-1]:nm.join(' and '))+' are generating '+f0(fl.reduce(function(s,x){return s+x.lost;},0))+' fewer orders a day than usual. The data does not show the cause.';}
   var ch=v2chInsights(p.i),chT=!ch?'Channel data is not loaded for this promo.':ch.length?ch.slice(0,2).join(' '):'Channel mix is in its normal range.';
-  return '<div class="exec-card" style="border-left:4px solid '+col+';background:'+bg+'"><div class="exec-card-title">Executive summary '+v2s('AEF')+'</div><div style="font-size:14px;line-height:1.55">'+row('Promo SKU performance.',perf)+row('Cannibalization?',can)+'<div><b>Channels.</b> '+chT+'</div></div></div>';
+  return '<div class="exec-card" style="border-left:4px solid '+col+';background:'+bg+'"><div class="exec-card-title">Executive summary '+v2s('AEF')+'</div><div style="font-size:14px;line-height:1.55">'+row('Promo SKU performance.',perf)+row('Possible cannibalization',can)+'<div><b>Channels.</b> '+chT+'</div></div></div>';
 }
 function renderScorecard(){
   v2buildP();v2destroy();
@@ -767,7 +770,7 @@ function renderScorecard(){
   h+='</tbody></table></div><div class="v2-note">Per-day pace over the promo dates, so promos of different length compare fairly. Promo SKUs are the SKUs on the promo list, every other SKU is on the site but not in the promo. The export gives per-promo totals, so days inside a promo are spread evenly. '+(cmpSel==='rest'?'Small figures under Promo SKUs show the change vs all other SKUs. Volumes are compared per SKU, because the promo has far fewer SKUs than the rest of the site. Rates are in percentage points. Same SKUs, YTD avg is how these SKUs sold this year when not on a promo, and Promo vs YTD is the change from it. Under All other SKUs and All ecommerce, the figure is the change vs the site average, which is the same metric pooled over every other loaded date, other promos included. Under Promo share, it is the change vs the share these SKUs usually hold. Green is better and red is worse. ':'')+(pp?'Small figures under each number show the change vs the compared promo ('+v2short(pp.w.promo.replace(/\s*\(.*$/,''),40)+', '+v2rangeLabel(pp.w.sd,pp.w.ed)+'), in % or percentage points. Green is better and red is worse. ':'')+(mature?'':'Rows marked * need about '+MATURITY_DAYS+' days after the promo ends to settle. <b>est.</b> under Promo SKUs is an estimate. It assumes these SKUs convert from order to delivery, and cancel, at their YTD rate when not on a promo, so only order volume moves. Other columns stay blank until the data settles. ')+'</div></div>';
   }
   // chart
-  h+='<div class="exec-card"><div class="exec-card-title">Orders per day, promo SKUs vs every other SKU '+v2s('A')+'</div><div style="position:relative;height:250px"><canvas id="v2scChart"></canvas></div><div class="v2-note">'+(p.syn?'Each bar is a month with all its promos combined.':'The 10 promos ending with the one selected.')+' The dark bar is the selected promo. Blue is promo SKUs and gray is the rest of ecommerce, so the full bar is all ecommerce orders a day. The orange line is the promo share of those orders. Hover for the orders a day and the percent for each.</div></div>';
+  h+='<div class="exec-card"><div class="exec-card-title">Orders per day, promo SKUs vs every other SKU '+v2s('A')+'</div><div style="position:relative;height:250px"><canvas id="v2scChart"></canvas></div><div class="v2-note">'+(p.syn?'Each bar is a month with all its promos combined, up to 12 months ending with the one selected.':'The 10 promos ending with the one selected.')+' The dark bar is the selected promo. Blue is promo SKUs and gray is the rest of ecommerce, so the full bar is all ecommerce orders a day. The orange line is the promo share of those orders. Hover for the orders a day and the percent for each.</div></div>';
   var prodH=v2prodSection(p,cmpSel);
   h+=prodH;
   h=h.replace('<!--EXEC-->',v2execSummary(p,L,va,vp,vo,col,bg));
@@ -777,7 +780,7 @@ function renderScorecard(){
   h+=v2sourceLegend('ABEFG');
   el.innerHTML=h;
   // chart
-  var idx=V2P.indexOf(p),list=p.syn?V2M.slice():V2P.slice(Math.max(0,idx-9),idx+1);
+  var idx=V2P.indexOf(p),list=p.syn?V2M.slice(Math.max(0,V2M.indexOf(p)-11),V2M.indexOf(p)+1):V2P.slice(Math.max(0,idx-9),idx+1);
   var on=[],off=[],shr=[];list.forEach(function(q){var a=v2vecW(q.w,V2_ALL),o=v2vecW(q.w,V2_ON);var og=o.gross/q.w.days,fg=(a.gross-o.gross)/q.w.days;on.push(+og.toFixed(0));off.push(+fg.toFixed(0));shr.push(a.gross?Math.round(o.gross/a.gross*100):null);});
   var cv=document.getElementById('v2scChart');
   var fn=function(x){return Math.round(x).toLocaleString();};
@@ -1172,8 +1175,8 @@ function applyFilters(){
   renderActiveTab();
 }
 
-const TAB_GROUPS={scorecard:["scorecard"],promos:["assetsum","calendar","assets","journey","changelog"],tools:["tools"]};
-const SUB_LABELS={assetsum:"Asset summary",pc:"Products & category lift",summary:"Summary",scorecard:"Promo vs ecommerce",exec:"Previous overview",compare:"Compare",channels:"Channels",catlift:"Category lift",changelog:"Change log",promo:"Promotion detail",calendar:"Calendar",journey:"Tile journey",assets:"Creative & CTR",sku:"Products",catsum:"Categories",tools:"Definitions"};
+const TAB_GROUPS={scorecard:["scorecard"],promos:["assetsum","calendar","assets","journey","changelog"],plan:["plan"],tools:["tools"]};
+const SUB_LABELS={plan:"Plan a promo",assetsum:"Asset summary",pc:"Products & category lift",summary:"Summary",scorecard:"Promo vs ecommerce",exec:"Previous overview",compare:"Compare",channels:"Channels",catlift:"Category lift",changelog:"Change log",promo:"Promotion detail",calendar:"Calendar",journey:"Tile journey",assets:"Creative & CTR",sku:"Products",catsum:"Categories",tools:"Definitions"};
 const SUB_FILTERS={assets:1};
 const groupLastSub={};
 function showTab(t,skipRender){
@@ -1183,7 +1186,7 @@ function showTab(t,skipRender){
   const subs=TAB_GROUPS[g];
   const member=subs.indexOf(t)>=0?t:(groupLastSub[g]||subs[0]);
   groupLastSub[g]=member;activeTab=member;
-  ["summary","pc","assetsum","scorecard","compare","channels","catlift","changelog","exec","calendar","assets","journey","promo","sku","track","catsum","elasticity","skurank","lift","formulas","tools"].forEach(id=>{
+  ["summary","pc","assetsum","scorecard","plan","compare","channels","catlift","changelog","exec","calendar","assets","journey","promo","sku","track","catsum","elasticity","skurank","lift","formulas","tools"].forEach(id=>{
     const viewEl=document.getElementById("view-"+id);
     if(viewEl) viewEl.style.display=id===member?"block":"none";
   });
@@ -1410,8 +1413,146 @@ function renderElasticity(){
     });
   },50);
 }
+/* ---------- Plan a promo ---------- */
+var V2PLW={ev:0.5,se:0.25,rc:0.15,bs:0.10};
+var v2pl={ev:'',s:null,e:null,n:null};
+function v2plIso(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function v2plParse(t){var m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(t||'');return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
+var V2PLF=[
+ ['Memorial Day',function(n,d){return /memorial/i.test(n);}],
+ ['Labor Day',function(n,d){return /labor/i.test(n);}],
+ ["Presidents Day",function(n,d){return /president/i.test(n);}],
+ ['4th of July',function(n,d){return /4th of july|july 4|fourth of july/i.test(n);}],
+ ["Mother's Day",function(n,d){return /mother/i.test(n);}],
+ ['Spring Hot Deals',function(n,d){return /spring hot/i.test(n);}],
+ ['Black Friday in July',function(n,d){return /black friday/i.test(n)&&(d.getMonth()===5||d.getMonth()===6);}],
+ ['Summer sale',function(n,d){return /sizzling|summer/i.test(n);}],
+ ['Cyber Monday',function(n,d){return /cyber/i.test(n);}],
+ ['Black Friday',function(n,d){return /black friday|pre-black|countdown/i.test(n)&&d.getMonth()>=9;}],
+ ['Holiday',function(n,d){return /holiday/i.test(n);}]
+];
+function v2plFamOf(p){var n=p.w.promo||'',d=p.w.sd;for(var i=0;i<V2PLF.length;i++)if(V2PLF[i][1](n,d))return V2PLF[i][0];return null;}
+var v2plCache={};
+function v2plStats(p){
+  if(v2plCache[p.i])return v2plCache[p.i];
+  v2setYr(p);var o={};
+  Object.keys(p.skus).forEach(function(c){
+    var s=p.skus[c],sub=s.sub||'Other',x=o[sub]=o[sub]||{n:0,add:0,ad:0,nb:0};
+    x.n++;var b=V2SK()[c];
+    if(b&&b[0]>=7&&b[2]>=8){x.add+=s.ord-b[2]/b[0]*p.w.days;x.ad+=p.w.days;x.nb++;}
+  });
+  return v2plCache[p.i]=o;
+}
+function v2plAgg(list){
+  var o={},tn=0,ta=0;
+  list.forEach(function(p){var st=v2plStats(p);for(var k in st){var x=o[k]=o[k]||{n:0,add:0,ad:0,nb:0};x.n+=st[k].n;x.add+=st[k].add;x.ad+=st[k].ad;x.nb+=st[k].nb;}});
+  for(var k in o){tn+=o[k].n;ta+=Math.max(0,o[k].add);}
+  return {m:o,tn:tn,ta:ta,runs:list.length};
+}
+function v2plAnchor(fam){ // average start day of year of the event
+  var ps=V2P.filter(function(p){return v2plFamOf(p)===fam;});if(!ps.length)return null;
+  var s=0;ps.forEach(function(p){s+=p.w.sd-new Date(p.w.sd.getFullYear(),0,1);});
+  return s/ps.length/864e5;
+}
+function v2plCalc(fam,sd,ed){
+  var famP=fam?V2P.filter(function(p){return v2plFamOf(p)===fam;}):[];
+  var years={};famP.forEach(function(p){years[p.w.sd.getFullYear()]=1;});
+  var pyr=sd.getFullYear(),span=Math.round((ed-sd)/864e5),seasonP=V2P.filter(function(p){
+    if(fam&&v2plFamOf(p)===fam)return false;
+    var y=p.w.sd.getFullYear();if(y===pyr)return false;
+    var a=new Date(y,sd.getMonth(),sd.getDate()).getTime()-14*864e5,e=new Date(y,sd.getMonth(),sd.getDate()).getTime()+(span+1+14)*864e5;
+    return p.w.sd.getTime()<e&&p.w.ed.getTime()>a;});
+  var recentP=V2P.filter(function(p){return V2_TODAY-p.w.ed<=366*864e5&&v2isMatureEnd(p.w.ed);});
+  var E=v2plAgg(famP),S=v2plAgg(seasonP),R=v2plAgg(recentP);
+  // baseline demand: share of off-promo orders by sub-category, restricted to sub-categories seen in a promo
+  var bs={},bt=0,seen={};[E,S,R].forEach(function(a){for(var k in a.m)seen[k]=1;});
+  v2setYr({w:{sd:V2_TODAY,ed:V2_TODAY}});
+  var cache={};V2ALL.S.forEach(function(q){cache[q[0]]=q[3]||'Other';});
+  var sk=V2SK();for(var c in sk){var sub=cache[c];if(!sub||!seen[sub])continue;var b=sk[c];if(b&&b[0]>0){bs[sub]=(bs[sub]||0)+b[2]/b[0];bt+=b[2]/b[0];}}
+  var sig=[['ev',E],['se',S],['rc',R]].filter(function(x){return x[1].ta>0;});
+  var wsum=sig.reduce(function(s,x){return s+V2PLW[x[0]];},0)+(bt>0?V2PLW.bs:0);
+  var rows=Object.keys(seen).map(function(k){
+    var sc=0,sh={};
+    var sl=0;
+    sig.forEach(function(x){var a=x[1],v=a.m[k]?Math.max(0,a.m[k].add)/a.ta:0;sh[x[0]]=v;sc+=V2PLW[x[0]]*v;sl+=V2PLW[x[0]]*(a.m[k]&&a.tn?a.m[k].n/a.tn:0);});
+    var b=bt>0?(bs[k]||0)/bt:0;if(bt>0){sc+=V2PLW.bs*b;sl+=V2PLW.bs*b;}
+    sc=0.75*sc+0.25*sl;
+    var REF=E.ta>0?E:S,em=REF.m[k],sm=S.m[k],rm=R.m[k],rk=E.ta>0?'ev':'se';
+    return {sub:k,score:sc/wsum,sh:sh,base:b,
+      evUsed:REF.tn&&em?em.n/REF.tn:0,evPer:em&&em.ad?em.add/em.ad:null,rk:rk,shRef:sh[rk]||0,
+      rcUsed:R.tn&&rm?rm.n/R.tn:0,rcAdd:sh.rc,
+      app:(em?em.n:0)+(E.ta>0&&sm?sm.n:0),inEv:!!em};
+  }).filter(function(r){return r.score>0;}).sort(function(a,b){return b.score-a.score;});
+  var tot=rows.reduce(function(s,r){return s+r.score;},0);rows.forEach(function(r){r.share=r.score/tot*100;});
+  return {ref:E.ta>0?'ev':'se',rows:rows,E:E,S:S,R:R,famP:famP,seasonP:seasonP,years:Object.keys(years).length,sig:sig.map(function(x){return x[0];}),hasBase:bt>0};
+}
+function v2plRound(rows,n){ // whole percents and SKU counts that sum exactly
+  var f=rows.map(function(r,i){return {i:i,v:r.share,b:Math.floor(r.share)};});
+  var left=100-f.reduce(function(s,x){return s+x.b;},0);
+  f.slice().sort(function(a,b){return (b.v-b.b)-(a.v-a.b);}).slice(0,left).forEach(function(x){x.b++;});
+  f.forEach(function(x){rows[x.i].pct=x.b;});
+  var g=rows.map(function(r,i){return {i:i,v:r.share/100*n,b:Math.floor(r.share/100*n)};});
+  var l2=n-g.reduce(function(s,x){return s+x.b;},0);
+  g.slice().sort(function(a,b){return (b.v-b.b)-(a.v-a.b);}).slice(0,l2).forEach(function(x){x.b++;});
+  g.forEach(function(x){rows[x.i].cnt=x.b;});
+}
+function v2plSet(k,v){
+  v2pl[k]=v;
+  if(k==='ev'&&v){var ps=V2P.filter(function(p){return v2plFamOf(p)===v;}),a=v2plAnchor(v),dl=Math.round(ps.reduce(function(t,p){return t+p.w.days;},0)/ps.length);
+    var y=V2_TODAY.getFullYear(),st=new Date(new Date(y,0,1).getTime()+a*864e5);if(st<=V2_TODAY)st=new Date(new Date(y+1,0,1).getTime()+a*864e5);
+    v2pl.s=v2plIso(st);v2pl.e=v2plIso(new Date(st.getTime()+(dl-1)*864e5));}
+  if(k!=='n')v2pl.n=null;
+  renderPlan();
+}
+function renderPlan(){
+  v2buildP();v2destroy&&v2destroy();
+  var el=document.getElementById('view-plan');if(!el)return;
+  var fams=V2PLF.map(function(f){return f[0];}).filter(function(f){return V2P.some(function(p){return v2plFamOf(p)===f;});});
+  if(!v2pl.s){var t=new Date(V2_TODAY.getTime()+864e5);v2pl.s=v2plIso(t);v2pl.e=v2plIso(new Date(t.getTime()+6*864e5));}
+  var sd=v2plParse(v2pl.s),ed=v2plParse(v2pl.e);
+  if(!sd||!ed||ed<sd){ed=new Date((sd||V2_TODAY).getTime()+6*864e5);v2pl.e=v2plIso(ed);}
+  var fam=v2pl.ev,C=v2plCalc(fam,sd,ed),span=Math.round((ed-sd)/864e5)+1;
+  var yrs={};C.famP.forEach(function(p){var y=p.w.sd.getFullYear();yrs[y]=yrs[y]||{};Object.keys(p.skus).forEach(function(c){yrs[y][c]=1;});});
+  var ys=Object.keys(yrs),avgN;
+  if(ys.length)avgN=Math.round(ys.reduce(function(s,y){return s+Object.keys(yrs[y]).length;},0)/ys.length);
+  else{var ref=C.seasonP.length?C.seasonP:V2P.filter(function(p){return V2_TODAY-p.w.ed<=366*864e5;});avgN=Math.round(ref.reduce(function(s,p){return s+p.N;},0)/Math.max(1,ref.length))||60;}
+  var N=v2pl.n||avgN;
+  var big=C.rows.filter(function(r){return r.share>=2;}),small=C.rows.filter(function(r){return r.share<2;});
+  var other=null;
+  if(small.length)other={sub:'Other ('+small.length+' sub-categories)',share:small.reduce(function(s,r){return s+r.share;},0),other:1};
+  var rows=big.slice();if(other)rows.push(other);
+  v2plRound(rows,N);
+  var pc=function(x){return x===null||x===undefined||!isFinite(x)?'-':Math.round(x*100)+'%';};
+  var h='<div style="margin-bottom:12px"><div style="font-size:20px;font-weight:500;letter-spacing:-.01em">Plan a promo</div><div style="font-size:13px;color:var(--muted)">Suggested share of promo SKUs by sub-category, built from past results.</div></div>';
+  var inp='padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:inherit;font:inherit;width:100%';
+  h+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px"><div class="filter-group" style="min-width:150px"><span class="filter-label">Promo starts</span><input type="date" value="'+v2pl.s+'" onchange="v2plSet(\'s\',this.value)" style="'+inp+'"></div>';
+  h+='<div class="filter-group" style="min-width:150px"><span class="filter-label">Promo ends</span><input type="date" value="'+v2pl.e+'" onchange="v2plSet(\'e\',this.value)" style="'+inp+'"></div>';
+  h+='<div class="filter-group" style="min-width:240px"><span class="filter-label">Similar past event (optional)</span><select onchange="v2plSet(\'ev\',this.value)"><option value="">None, use the dates only</option>'+fams.map(function(f){return '<option value="'+v2esc(f)+'"'+(f===fam?' selected':'')+'>'+v2esc(f)+'</option>';}).join('')+'</select></div>';
+  h+='<div class="filter-group" style="min-width:130px"><span class="filter-label">Promo SKUs planned</span><input type="number" min="5" max="500" value="'+N+'" onchange="v2plSet(\'n\',Math.max(5,Math.min(500,+this.value||'+avgN+')))" style="'+inp+'"></div></div>';
+  var runs=C.famP.length;
+  var mo=function(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});};
+  h+='<div class="v2-note" style="margin:0 0 12px;padding:8px 12px;border:1px solid var(--border);border-radius:6px">Planning a '+span+'-day promo, '+mo(sd)+' to '+mo(ed)+'. Based on '+C.S.runs+' promotion'+(C.S.runs===1?'':'s')+' that ran at the same time of year (within 2 weeks of these dates in past years)'+(fam?', '+runs+' past '+v2esc(fam)+' promotion'+(runs===1?'':'s'):'')+' and '+C.R.runs+' promotions in the last 12 months. The default of '+avgN+' SKUs is the average used in similar past promos.</div>';
+  h+='<style>#view-plan th,#view-plan td{white-space:normal!important;padding:7px 8px!important;vertical-align:top}#view-plan th{line-height:1.25}</style><div style="overflow-x:auto"><table><thead><tr><th>Sub-category</th><th>Suggested share</th><th>SKUs of '+N+'</th><th>Used before</th><th>Added orders per SKU a day</th>'+(fam?'<th>Event results</th>':'')+'<th>Season results</th><th>12-month results</th><th style="text-align:left">Why</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    if(r.other){h+='<tr><td>'+v2esc(r.sub)+'</td><td><b>'+r.pct+'%</b></td><td>'+r.cnt+'</td><td>-</td><td>-</td>'+(fam?'<td>-</td>':'')+'<td>-</td><td>-</td><td>Each under 2%.</td></tr>';return;}
+    var why0='';var conf=r.inEv&&r.app>=8&&(fam?C.years:C.S.runs)>=2?'High':r.app>=4?'Medium':'Low';
+    var why;if(conf!=='High')why0=conf==='Medium'?'Limited history. ':'Very little history. ';
+    if(!r.inEv)why=why0+'Not used in past promos like this. Based on the other signals.';
+    else{
+      why=why0+(r.shRef>=r.evUsed+0.03?'Stronger than average per SKU. ':r.shRef<=r.evUsed-0.03?'Weaker than average per SKU. ':'About average per SKU. ');
+      if(r.rcAdd-r.shRef>=0.04)why+='Rising lately.';else if(r.shRef-r.rcAdd>=0.04)why+='Slower lately.';
+    }
+    h+='<tr><td>'+v2esc(r.sub)+'</td><td><b>'+r.pct+'%</b></td><td>'+r.cnt+'</td><td>'+(r.inEv?pc(r.evUsed):'-')+'</td><td>'+(r.evPer===null?'-':r.evPer.toFixed(1))+'</td>'+(fam?'<td>'+(C.sig.indexOf('ev')>=0?pc(r.sh.ev):'-')+'</td>':'')+'<td>'+(C.sig.indexOf('se')>=0?pc(r.sh.se):'-')+'</td><td>'+(C.sig.indexOf('rc')>=0?pc(r.sh.rc):'-')+'</td><td style="white-space:normal;min-width:170px;text-align:left">'+why+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div class="v2-note" style="margin-top:14px;line-height:1.55"><b>Reading the table.</b> Used before is the share of promo SKUs this sub-category held in the past promos used (the chosen event, or the same time of year). Event, season and 12-month results are its share of the added orders in each period. Event results appear only when you pick a similar event.<br><b>How the suggestion is built.</b> Each sub-category gets a score from its share of the orders that promo SKUs added above their usual off-promo pace in up to four places: past runs of a similar event if you pick one (50%), promotions near the same dates in past years (25%), the last 12 months (15%), and baseline demand, meaning its share of off-promo orders (10%). The weights are rescaled when no event is picked, so the dates count for 50%, the last 12 months 30% and baseline 20%. A quarter of the score comes from how many slots each sub-category held, so the mix moves toward the results without swinging all the way. A sub-category whose SKUs did better than average gains slots, and one whose SKUs did worse loses them.<br><b>Limits.</b> This is a starting point and not a forecast. Most events have only one or two past runs. Returns likely fall as a sub-category gets more slots. It does not see inventory, margin, vendor funding or pricing. Added orders are gross orders and are not adjusted for cancels.</div>';
+  el.innerHTML=h;
+  if(typeof postRender==='function')postRender();
+}
+
 function renderActiveTab(){
   if(activeTab==="scorecard") renderScorecard();
+  else if(activeTab==="plan") renderPlan();
   else if(activeTab==="pc") renderPC();
   else if(activeTab==="assetsum") renderAssetSummary();
   else if(activeTab==="changelog") renderChangeLog();
