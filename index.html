@@ -259,6 +259,7 @@ function v2setYr(p){V2CURYR=p&&p.w?v2yrW(p.w):2026;}
 function v2inYr(w){return !w.syn&&v2yrW(w)===V2CURYR;}
 function v2excl(x,w){return w.syn?(x.ed>w.sd&&x.sd<w.ed):x.s===w.s;}
 var V2M=null;
+function v2prevOf(p){return p.syn?(p.prevSame||V2M[V2M.indexOf(p)-1]):V2P[V2P.indexOf(p)-1];}
 function v2findP(i){v2buildP();return V2P.concat(V2M||[]).filter(function(x){return x.i===i;})[0];}
 function V2SK(){return V2CURYR===2025?V2SKU25:V2SKU;}
 function V2BB(){return V2CURYR===2025?V2ALL.B25:V2ALL.B;}
@@ -403,11 +404,10 @@ function v2buildP(){
 function v2buildMonths(){
   if(V2M)return;V2M=[];
   var real=V2W.slice(),MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  [[2026,4],[2026,5],[2026,6],[2026,7],[2026,8],[2026,9],[2026,10]].forEach(function(ym){
-    var st=new Date(ym[0],ym[1],1),nx=new Date(ym[0],ym[1]+1,1),en=nx>V2_END?V2_END:nx,toDate=nx>V2_END;
-    var parts=v2overlap(st,en,real);if(!parts.length)return;
+  var mk=function(st,en,label){
+    var parts=v2overlap(st,en,real);if(!parts.length)return null;
     var days=v2diff(st,en);
-    var W={promo:MN[ym[1]]+' '+ym[0]+(toDate?' to date':''),s:v2iso(st),e:v2iso(en),sd:st,ed:en,days:days,syn:true,tot:[0,0,0,0,0,0,0,0],cats:{}};
+    var W={promo:label,s:v2iso(st),e:v2iso(en),sd:st,ed:en,days:days,syn:true,tot:[0,0,0,0,0,0,0,0],cats:{}};
     var dsum=0;parts.forEach(function(pt){dsum+=pt.w.days*pt.frac;});
     var map={};
     parts.forEach(function(pt){
@@ -415,13 +415,19 @@ function v2buildMonths(){
       for(var t=0;t<8;t++)W.tot[t]+=(w.tot[t]||0)*f;
       for(var k in w.cats){var v=w.cats[k],o=W.cats[k]=W.cats[k]||[0,0,0,0,0,0,0,0];for(var q=0;q<7;q++)o[q]+=v[q]*f;o[7]+=v[7]*w.days*f/dsum;}
       var pr=V2P.filter(function(x){return x.i===j;})[0];
-      (V2ALL.D[j]||[]).forEach(function(r){var code=V2ALL.S[r[0]][0],on=pr&&pr.skus[code]?1:0,mk=r[0]+'|'+on,o=map[mk]=map[mk]||[r[0],0,0,0,0,0,0,on,0];for(var q=1;q<=6;q++)o[q]+=(r[q]||0)*f;o[8]+=w.days*f;});
+      (V2ALL.D[j]||[]).forEach(function(r){var code=V2ALL.S[r[0]][0],on=pr&&pr.skus[code]?1:0,mk2=r[0]+'|'+on,o=map[mk2]=map[mk2]||[r[0],0,0,0,0,0,0,on,0];for(var q=1;q<=6;q++)o[q]+=(r[q]||0)*f;o[8]+=w.days*f;});
     });
     V2W.push(W);var idx=V2W.length-1;
     V2ALL.D[idx]=Object.keys(map).map(function(k){return map[k];});
     var skus={};
     V2ALL.D[idx].forEach(function(r){if(!r[7])return;var q=V2ALL.S[r[0]],x=skus[q[0]]=skus[q[0]]||{apps:0,ord:0,del:0,cat:q[2],sub:q[3],d:0};x.apps+=r[1];x.ord+=r[2];x.del+=r[5];x.d+=r[8];});
-    V2M.push({w:W,i:idx,skus:skus,N:Object.keys(skus).length,pe:null,syn:true});
+    return {w:W,i:idx,skus:skus,N:Object.keys(skus).length,pe:null,syn:true};
+  };
+  [[2026,4],[2026,5],[2026,6],[2026,7],[2026,8],[2026,9],[2026,10]].forEach(function(ym){
+    var st=new Date(ym[0],ym[1],1),nx=new Date(ym[0],ym[1]+1,1),en=nx>V2_END?V2_END:nx,toDate=nx>V2_END;
+    var p=mk(st,en,MN[ym[1]]+' '+ym[0]+(toDate?' to date':''));if(!p)return;
+    if(toDate){var ps=new Date(ym[0],ym[1]-1,1),pe=new Date(ym[0],ym[1]-1,1+v2diff(st,en));p.prevSame=mk(ps,pe,MN[ym[1]-1]+' '+v2rangeLabel(ps,pe).replace(/^[A-Za-z]+ /,'').replace(' - ',' to '));}
+    V2M.push(p);
   });
 }
 
@@ -476,8 +482,9 @@ function v2cmpOptions(sel,cur){
   v2buildP();
   var h='<option value="ytd"'+(sel==='ytd'?' selected':'')+'>Site average (same products, YTD when not on a promo)</option>';
   h+='<option value="rest"'+(sel==='rest'?' selected':'')+'>Rest of ecommerce, same dates</option>';
-  if(V2M.some(function(q){return q.i===cur;}))return h;
-  h+='<option value="prior"'+(sel==='prior'?' selected':'')+'>Previous promotion</option>';
+  var curSyn=V2M.some(function(q){return q.i===cur;});
+  h+='<option value="prior"'+(sel==='prior'?' selected':'')+'>'+(curSyn?(v2findP(cur).prevSame?'Previous month, same dates':'Previous month'):'Previous promotion')+'</option>';
+  if(curSyn)return h;
   h+='<optgroup label="A specific promotion">';
   V2P.slice().reverse().forEach(function(q){if(q.i===cur)return;var nm=(q.w.promo.indexOf('(')>=0?q.w.promo:q.w.promo+' ('+v2rangeLabel(q.w.sd,q.w.ed)+')')+v2yrTag(q.w);h+='<option value="'+q.i+'"'+(String(sel)===String(q.i)?' selected':'')+'>'+v2esc(nm)+'</option>';});
   return h+'</optgroup>';
@@ -514,7 +521,7 @@ function v2pn(p){return p.w.promo.replace(/\s*\(.*$/,'')+v2yrTag(p.w);}
 function v2cmpName(p,cmpSel){
   if(cmpSel==='ytd')return 'site average';
   if(cmpSel==='rest')return 'the rest of ecommerce';
-  var cp=cmpSel==='prior'?V2P[V2P.indexOf(p)-1]:V2P.filter(function(x){return String(x.i)===String(cmpSel);})[0];
+  var cp=cmpSel==='prior'?v2prevOf(p):v2findP(+cmpSel);
   return cp?v2pn(cp):'the compared promo';
 }
 function v2prodSection(p,cmpSel){
@@ -523,7 +530,7 @@ function v2prodSection(p,cmpSel){
   var mat=v2isMatureEnd(w.ed),hr=V2W[p.i].tot[7]>0;
   var mode=cmpSel==='ytd'?'ytd':cmpSel==='rest'?'rest':'promo';
   var cp=null;
-  if(mode==='promo')cp=cmpSel==='prior'?V2P[V2P.indexOf(p)-1]:V2P.filter(function(x){return String(x.i)===String(cmpSel);})[0];
+  if(mode==='promo')cp=cmpSel==='prior'?v2prevOf(p):v2findP(+cmpSel);
   if(mode==='promo'&&!cp)mode='ytd';
   var rowsW=v2winRows(p),rowsC=mode==='promo'?v2winRows(cp):[];
   var cmat=cp?v2isMatureEnd(cp.w.ed):true,chr=cp?V2W[cp.i].tot[7]>0:true;
@@ -665,7 +672,8 @@ function renderScorecard(){
   var L=v2offLift(p.i);
   var h='<div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:12px"><div><div style="font-size:20px;font-weight:500;letter-spacing:-.01em">Promo vs ecommerce</div><div style="font-size:12px;color:var(--text3);font-family:\'DM Mono\',monospace">'+v2rangeLabel(w.sd,w.ed)+v2yrTag(w).replace(' ',', ')+' · '+w.days+' day'+(w.days>1?'s':'')+' of data · '+p.N+' promo SKUs'+(live?' · live, data through '+v2md(v2addDays(V2_END,-1)):'')+'</div></div>';
   var cmpSel=v2sc.cmp===null||String(v2sc.cmp)===String(p.i)?'ytd':v2sc.cmp;
-  if(p.syn&&cmpSel!=='ytd'&&cmpSel!=='rest')cmpSel=v2sc.cmp='ytd';
+  if(p.syn&&cmpSel!=='ytd'&&cmpSel!=='rest'&&cmpSel!=='prior')cmpSel=v2sc.cmp='ytd';
+  if(!p.syn&&cmpSel!=='ytd'&&cmpSel!=='rest'&&cmpSel!=='prior'){var cq=v2findP(+cmpSel);if(cq&&cq.syn)cmpSel=v2sc.cmp='ytd';}
   h+='<div style="display:flex;gap:12px;flex-wrap:wrap"><div class="filter-group" style="min-width:300px"><span class="filter-label">Promotion</span><select onchange="v2scSet(\'win\',+this.value)">'+v2promoOptions(p.i,false)+'</select></div><div class="filter-group" style="min-width:300px"><span class="filter-label">Compared to</span><select onchange="v2scSet(\'cmp\',this.value)">'+v2cmpOptions(cmpSel,p.i)+'</select></div></div></div>';
   // promos that started but have no data yet
   var pend={};ALL_ROWS.forEach(function(r){var sd=parseDate(r['Start Date']);if(sd&&sd.getFullYear()===2026&&sd>=V2_END&&sd<=V2_TODAY)pend[r['Promotion'].replace(/\s*\(.*$/,'')]=r['Start Date'];});
@@ -705,7 +713,7 @@ function renderScorecard(){
   var Yr=cmpSel==='rest'?v2ytd(p):null,restY=!!Yr,ykeep={apps:1,ord:1,a2o:1,del:1,o2d:1},YE=Yr||v2ytd(p);
   h+='<div class="exec-card"><div class="exec-card-title">'+v2esc(v2pn(p))+' vs '+v2esc(v2cmpName(p,cmpSel))+(cmpSel==='rest'?', same dates':'')+' '+v2s('A')+'</div><div class="tbl-scroll"><table><thead><tr><th class="left">Metric</th><th>Promo SKUs</th>'+(restY?'<th>Same SKUs, YTD avg</th><th>Promo vs YTD</th>':'')+'<th>All other SKUs</th><th>All ecommerce</th><th>Promo share of ecommerce</th></tr></thead><tbody>';
   var shareKeys={apps:1,ord:1,net:1,del:1};
-  var pp=cmpSel==='prior'?V2P[V2P.indexOf(p)-1]:(cmpSel==='ytd'||cmpSel==='rest')?null:V2P.filter(function(x){return String(x.i)===String(cmpSel);})[0],ppM=pp?v2isMatureEnd(pp.w.ed):false;
+  var pp=cmpSel==='prior'?v2prevOf(p):(cmpSel==='ytd'||cmpSel==='rest')?null:v2findP(+cmpSel),ppM=pp?v2isMatureEnd(pp.w.ed):false;
   var wp=pp?[{w:pp.w,frac:1}]:null,pvp=pp?v2period(wp,V2_ON):null,pvo=pp?v2period(wp,V2_OFF):null,pva=pp?v2period(wp,V2_ALL):null;
   var dlt=function(m,cur,prev,hide,noPP){
     if((!pp&&!noPP)||hide||m.nodelta===0||(m.mat&&!ppM&&!noPP))return '';
@@ -763,7 +771,7 @@ function renderScorecard(){
   var prodH=v2prodSection(p,cmpSel);
   h+=prodH;
   h=h.replace('<!--EXEC-->',v2execSummary(p,L,va,vp,vo,col,bg));
-  var chc=(cmpSel==='ytd'||cmpSel==='rest')?'avg':cmpSel==='prior'?(V2P[V2P.indexOf(p)-1]?V2P[V2P.indexOf(p)-1].i:'avg'):cmpSel;
+  var chc=(cmpSel==='ytd'||cmpSel==='rest')?'avg':cmpSel==='prior'?(v2prevOf(p)?v2prevOf(p).i:'avg'):cmpSel;
   h+=p.syn?'<div class="exec-card"><div class="exec-card-title">Channel mix</div><div class="v2-note" style="margin-top:0">Channel mix is not available for month views. The channel exports are cut at promo dates, so they do not split cleanly by month. Pick a single promotion to see channels.</div></div>':v2chSection(p.i,chc);
   h+=v2changesFor([{start:w.sd,end:w.ed}]);
   h+=v2sourceLegend('ABEFG');
