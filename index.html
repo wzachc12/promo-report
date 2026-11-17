@@ -256,7 +256,10 @@ V2C.forEach(function(w){w.sd=v2dt(w.s);w.ed=v2dt(w.e);w.days=v2diff(w.sd,w.ed);}
 var V2CURYR=2026;
 function v2yrW(w){return v2addDays(w.ed,-1).getFullYear();}
 function v2setYr(p){V2CURYR=p&&p.w?v2yrW(p.w):2026;}
-function v2inYr(w){return v2yrW(w)===V2CURYR;}
+function v2inYr(w){return !w.syn&&v2yrW(w)===V2CURYR;}
+function v2excl(x,w){return w.syn?(x.ed>w.sd&&x.sd<w.ed):x.s===w.s;}
+var V2M=null;
+function v2findP(i){v2buildP();return V2P.concat(V2M||[]).filter(function(x){return x.i===i;})[0];}
 function V2SK(){return V2CURYR===2025?V2SKU25:V2SKU;}
 function V2BB(){return V2CURYR===2025?V2ALL.B25:V2ALL.B;}
 function v2yrTag(w){return v2yrW(w)===2025?' 2025':'';}
@@ -352,11 +355,11 @@ function v2lastPromoIdx(offset){
 }
 function v2offLift(i){
   v2buildP();
-  var p=V2P.filter(function(x){return x.i===i;})[0];if(!p)return null;v2setYr(p);
-  var on=0,offD=0,offO=0,n=0;
-  Object.keys(p.skus).forEach(function(c){var v=V2SK()[c];if(v&&v[0]>=7&&v[2]>=8){n++;on+=p.skus[c].ord;offD+=v[0];offO+=v[2];}});
+  var p=v2findP(i);if(!p)return null;v2setYr(p);
+  var on=0,offD=0,offO=0,n=0,nd=0;
+  Object.keys(p.skus).forEach(function(c){var v=V2SK()[c];if(v&&v[0]>=7&&v[2]>=8){n++;nd+=(p.skus[c].d||p.w.days)/p.w.days;on+=p.skus[c].ord;offD+=v[0];offO+=v[2];}});
   if(n<5)return null;
-  var onD=on/p.w.days,offDay=offO/offD*n;
+  var onD=on/p.w.days,offDay=offO/offD*(p.syn?nd:n);
   return {n:n,tot:p.N,on:onD,off:offDay,added:onD-offDay,pct:(onD/offDay-1)*100};
 }
 function v2skuMetrics(a){ // a = {d,apps,ord,del,dM,aM,oM}
@@ -394,6 +397,32 @@ function v2buildP(){
     var pe=s.__pe;delete s.__pe;
     V2P.push({w:w,i:i,skus:s,N:Object.keys(s).length,pe:pe?v2addDays(pe,1):null});
   });
+  v2buildMonths();
+}
+/* month views: every promo day in the month combined. Each SKU counts as promo only on the days it was on a promo. */
+function v2buildMonths(){
+  if(V2M)return;V2M=[];
+  var real=V2W.slice(),MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  [[2026,4],[2026,5],[2026,6],[2026,7],[2026,8],[2026,9],[2026,10]].forEach(function(ym){
+    var st=new Date(ym[0],ym[1],1),nx=new Date(ym[0],ym[1]+1,1),en=nx>V2_END?V2_END:nx,toDate=nx>V2_END;
+    var parts=v2overlap(st,en,real);if(!parts.length)return;
+    var days=v2diff(st,en);
+    var W={promo:MN[ym[1]]+' '+ym[0]+(toDate?' to date':''),s:v2iso(st),e:v2iso(en),sd:st,ed:en,days:days,syn:true,tot:[0,0,0,0,0,0,0,0],cats:{}};
+    var dsum=0;parts.forEach(function(pt){dsum+=pt.w.days*pt.frac;});
+    var map={};
+    parts.forEach(function(pt){
+      var w=pt.w,j=real.indexOf(w),f=pt.frac;
+      for(var t=0;t<8;t++)W.tot[t]+=(w.tot[t]||0)*f;
+      for(var k in w.cats){var v=w.cats[k],o=W.cats[k]=W.cats[k]||[0,0,0,0,0,0,0,0];for(var q=0;q<7;q++)o[q]+=v[q]*f;o[7]+=v[7]*w.days*f/dsum;}
+      var pr=V2P.filter(function(x){return x.i===j;})[0];
+      (V2ALL.D[j]||[]).forEach(function(r){var code=V2ALL.S[r[0]][0],on=pr&&pr.skus[code]?1:0,mk=r[0]+'|'+on,o=map[mk]=map[mk]||[r[0],0,0,0,0,0,0,on,0];for(var q=1;q<=6;q++)o[q]+=(r[q]||0)*f;o[8]+=w.days*f;});
+    });
+    V2W.push(W);var idx=V2W.length-1;
+    V2ALL.D[idx]=Object.keys(map).map(function(k){return map[k];});
+    var skus={};
+    V2ALL.D[idx].forEach(function(r){if(!r[7])return;var q=V2ALL.S[r[0]],x=skus[q[0]]=skus[q[0]]||{apps:0,ord:0,del:0,cat:q[2],sub:q[3],d:0};x.apps+=r[1];x.ord+=r[2];x.del+=r[5];x.d+=r[8];});
+    V2M.push({w:W,i:idx,skus:skus,N:Object.keys(skus).length,pe:null,syn:true});
+  });
 }
 
 /* ============================================================ */
@@ -404,25 +433,28 @@ function v2destroy(){['v2tileChart','v2artChart'].forEach(function(k){if(window[
 function v2promoOptions(sel,withAll){
   v2buildP();
   var h=withAll?'<option value="all"'+(sel==='all'?' selected':'')+'>All 2026 promotions combined</option>':'';
+  h+='<optgroup label="All promos combined, by month">';
+  V2M.slice().reverse().forEach(function(q){h+='<option value="'+q.i+'"'+(String(sel)===String(q.i)?' selected':'')+'>'+v2esc(q.w.promo+' ('+v2rangeLabel(q.w.sd,q.w.ed)+')')+'</option>';});
+  h+='</optgroup><optgroup label="Single promotions">';
   V2P.slice().reverse().forEach(function(q){var nm=(q.w.promo.indexOf('(')>=0?q.w.promo:q.w.promo+' ('+v2rangeLabel(q.w.sd,q.w.ed)+')')+v2yrTag(q.w);h+='<option value="'+q.i+'"'+(String(sel)===String(q.i)?' selected':'')+'>'+v2esc(nm)+'</option>';});
-  return h;
+  return h+'</optgroup>';
 }
 function v2ytd(p){
   v2setYr(p);
-  var n=0,onA=0,onO=0,oD=0,oA=0,oO=0,n2=0,onDel=0,onOM=0,oDM=0,oDel=0,oOM=0;
+  var n=0,nd=0,n2d=0,onA=0,onO=0,oD=0,oA=0,oO=0,n2=0,onDel=0,onOM=0,oDM=0,oDel=0,oOM=0;
   Object.keys(p.skus).forEach(function(c){
     var v=V2SK()[c];if(!(v&&v[0]>=7&&v[2]>=8))return;var x=p.skus[c];
-    n++;onA+=x.apps;onO+=x.ord;oD+=v[0];oA+=v[1];oO+=v[2];
-    if(v[3]>=3){n2++;onDel+=x.del;onOM+=x.ord;oDM+=v[3];oDel+=v[6];oOM+=v[5];}
+    var fx=(x.d||p.w.days)/p.w.days;n++;nd+=fx;onA+=x.apps;onO+=x.ord;oD+=v[0];oA+=v[1];oO+=v[2];
+    if(v[3]>=3){n2++;n2d+=fx;onDel+=x.del;onOM+=x.ord;oDM+=v[3];oDel+=v[6];oOM+=v[5];}
   });
   if(n<5)return null;
-  var d=p.w.days,r={n:n,N:p.N};
-  r.apps=[onA/d,oD?oA/oD*n:null];
-  r.ord=[onO/d,oD?oO/oD*n:null];
+  var d=p.w.days,r={n:n,N:p.N},ne=p.syn?nd:n,ne2=p.syn?n2d:n2;
+  r.apps=[onA/d,oD?oA/oD*ne:null];
+  r.ord=[onO/d,oD?oO/oD*ne:null];
   r.a2o=[onA?onO/onA*100:null,oA?oO/oA*100:null];
   r.sku=[n,null];
-  r.ops=[onO/d/n,oD?oO/oD:null];
-  r.del=n2?[onDel/d,oDM?oDel/oDM*n2:null]:[null,null];
+  r.ops=[onO/d/ne,oD?oO/oD:null];
+  r.del=n2?[onDel/d,oDM?oDel/oDM*ne2:null]:[null,null];
   r.o2d=n2?[onOM?onDel/onOM*100:null,oOM?oDel/oOM*100:null]:[null,null];
   var mt=v2isMatureEnd(p.w.ed),hr=V2W[p.i].tot[7]>0,aOn=v2acc(),aOff=v2acc(),aOth=v2acc();
   v2winRows(p).forEach(function(x){var b=V2BB()[x.i];
@@ -444,6 +476,7 @@ function v2cmpOptions(sel,cur){
   v2buildP();
   var h='<option value="ytd"'+(sel==='ytd'?' selected':'')+'>Site average (same products, YTD when not on a promo)</option>';
   h+='<option value="rest"'+(sel==='rest'?' selected':'')+'>Rest of ecommerce, same dates</option>';
+  if(V2M.some(function(q){return q.i===cur;}))return h;
   h+='<option value="prior"'+(sel==='prior'?' selected':'')+'>Previous promotion</option>';
   h+='<optgroup label="A specific promotion">';
   V2P.slice().reverse().forEach(function(q){if(q.i===cur)return;var nm=(q.w.promo.indexOf('(')>=0?q.w.promo:q.w.promo+' ('+v2rangeLabel(q.w.sd,q.w.ed)+')')+v2yrTag(q.w);h+='<option value="'+q.i+'"'+(String(sel)===String(q.i)?' selected':'')+'>'+v2esc(nm)+'</option>';});
@@ -457,7 +490,7 @@ function v2pcSort(k){if(v2pc.sort===k)v2pc.dir=v2pc.dir==='desc'?'asc':'desc';el
 function v2pcTog(id){var rs=document.querySelectorAll('tr[data-g="'+id+'"]'),open=rs.length&&rs[0].style.display==='none';rs.forEach(function(r){r.style.display=open?'':'none';});var c=document.getElementById('car-'+id);if(c)c.innerHTML=open?'&#9662;':'&#9656;';}
 /* ---- all-SKU helpers ---- */
 function v2acc(){return {sd:0,a:0,g:0,ap:0,nc:0,rev:0,dl:0,dv:0,om:0};}
-function v2addOn(o,r,days,mat,hr){o.sd+=days;o.a+=r.a;o.g+=r.g;if(mat){o.ap+=r.ap;o.nc+=r.nc;o.dv+=r.dl;o.om+=r.g;if(hr){o.rev+=r.rev;o.dl+=r.dl;}}}
+function v2addOn(o,r,days,mat,hr){o.sd+=(r.dd||days);o.a+=r.a;o.g+=r.g;if(mat){o.ap+=r.ap;o.nc+=r.nc;o.dv+=r.dl;o.om+=r.g;if(hr){o.rev+=r.rev;o.dl+=r.dl;}}}
 function v2addBase(o,b){o.sd+=b[0];o.a+=b[1];o.g+=b[2];o.ap+=b[7];o.nc+=b[8];o.rev+=b[9];o.dl+=b[10];}
 function v2addAcc(o,x){if(!x)return;for(var k in o)o[k]+=x[k];}
 function v2m(o){return o&&o.sd?{apps:o.a/o.sd,ord:o.g/o.sd,a2o:o.a?o.g/o.a*100:null,canc:o.ap?o.nc/o.ap*100:null,lease:o.dl?o.rev/o.dl:null}:null;}
@@ -465,7 +498,7 @@ function v2match(b){return !!(b&&b[0]>=7&&b[2]>=8);}
 function v2sInYr(){var k='s'+V2CURYR;if(v2sInYr[k])return v2sInYr[k];var o={};V2W.forEach(function(w,i){if(v2inYr(w)&&V2ALL.D[i])V2ALL.D[i].forEach(function(r){o[r[0]]=1;});});Object.keys(V2BB()).forEach(function(i){o[i]=1;});return v2sInYr[k]=o;}
 function v2winRows(p){
   v2setYr(p);
-  return (V2ALL.D[p.i]||[]).map(function(r){var q=V2ALL.S[r[0]];return {i:r[0],code:q[0],name:q[1],cat:q[2],sub:q[3],a:r[1],g:r[2],ap:r[3],nc:r[4],dl:r[5],rev:r[6],on:!!p.skus[q[0]]};});
+  return (V2ALL.D[p.i]||[]).map(function(r){var q=V2ALL.S[r[0]];return {i:r[0],code:q[0],name:q[1],cat:q[2],sub:q[3],a:r[1],g:r[2],ap:r[3],nc:r[4],dl:r[5],rev:r[6],on:r[7]!==undefined?!!r[7]:!!p.skus[q[0]],dd:r[8]};});
 }
 function v2usualWhole(){
   var YK='c'+V2CURYR;if(v2usualWhole[YK])return v2usualWhole[YK];
@@ -504,16 +537,16 @@ function v2prodSection(p,cmpSel){
   rowsW.forEach(function(r){if(r.on)rec(r.cat,r.sub).hasPS=true;});
   rowsW.forEach(function(r){
     var g=rec(r.cat,r.sub);g.rows.push(r);g.whNow+=r.g/days;
-    var b=V2BB()[r.i],m=v2match(b);
+    var b=V2BB()[r.i],m=v2match(b),fr=(r.dd||days)/days;
     if(!r.on)v2addOn(g.lo,r,days,mat,hr);
     if(r.on||(mode==='ytd'&&!g.hasPS)){if(r.on){g.onN++;v2addOn(g.anyOn,r,days,mat,hr);}
       if(mode==='ytd'){
         if(m){v2addOn(g.on,r,days,mat,hr);v2addBase(g.off,b);g.hasOn=true;g.hasOff=true;
-          g.x.bAr+=b[1]/b[0];g.x.bOr+=b[2]/b[0];
-          if(b[3]>=3){g.x.bDr+=b[6]/b[3];g.x.bDel+=b[6];g.x.bOM+=b[5];g.x.dOn+=r.dl;g.x.oOn+=r.g;}}
+          g.x.bAr+=b[1]/b[0]*fr;g.x.bOr+=b[2]/b[0]*fr;
+          if(b[3]>=3){g.x.bDr+=b[6]/b[3]*fr;g.x.bDel+=b[6];g.x.bOM+=b[5];g.x.dOn+=r.dl;g.x.oOn+=r.g;}}
       }else{v2addOn(g.on,r,days,mat,hr);g.hasOn=true;}
     }else{
-      if(m){g.othNow+=r.g/days;g.othUsual+=b[2]/b[0];g.othN++;}
+      if(m){g.othNow+=r.g/days;g.othUsual+=b[2]/b[0]*fr;g.othN++;}
       if(mode==='rest'){v2addOn(g.off,r,days,mat,hr);g.hasOff=true;}
     }
   });
@@ -592,7 +625,7 @@ function v2prodSection(p,cmpSel){
   return h;
 }
 
-function v2selP(){v2buildP();var p=V2P.filter(function(x){return x.i===v2sc.win;})[0];return p||V2P[V2P.length-1];}
+function v2selP(){v2buildP();var p=v2findP(v2sc.win);return p||V2P[V2P.length-1];}
 function v2nrm(x){return String(x||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function v2pstrMatch(str,p){
   var m=String(str||'').match(/^([A-Za-z]+)\.?\s+(\d+)/);if(!m)return false;
@@ -609,7 +642,7 @@ function v2execSummary(p,L,va,vp,vo,col,bg){
   var tot=va.gross/va.days,share=va.gross?Math.round(vp.gross/va.gross*100):null;
   var row=function(l,t){return '<div style="margin:0 0 9px"><b>'+l+'</b> '+t+'</div>';};
   var perf;
-  var yt=0,yd=0;V2W.forEach(function(x){if(x.s===V2W[p.i].s||!v2inYr(x))return;yt+=x.tot[3];yd+=x.days;});
+  var yt=0,yd=0;V2W.forEach(function(x){if(v2excl(x,V2W[p.i])||!v2inYr(x))return;yt+=x.tot[3];yd+=x.days;});
   if(L){var shN=Math.round(L.on/tot*100),shY=yd?Math.round(L.off/(yt/yd)*100):null;
     perf='Promo SKUs are generating <b>'+f0(L.on)+'</b> orders a day, '+f0(L.added)+' '+(L.added>=0?'above':'below')+' their YTD average of '+f0(L.off)+'. They account for '+shN+'% of ecommerce orders'+(shY===null?'.':', '+(shN>=shY?'up':'down')+' from a '+shY+'% YTD average.');}
   else perf='Promo SKUs account for '+share+'% of ecommerce orders. There is not enough history to compare them with their YTD average.';
@@ -625,13 +658,14 @@ function renderScorecard(){
   v2buildP();v2destroy();
   var el=document.getElementById('view-scorecard');if(!el)return;
   if(v2sc.win===null)v2sc.win=V2P[V2P.length-1].i;
-  var p=V2P.filter(function(x){return x.i===v2sc.win;})[0]||V2P[V2P.length-1];
+  var p=v2findP(v2sc.win)||V2P[V2P.length-1];
   v2setYr(p);
   var w=p.w,mature=v2isMatureEnd(w.ed),live=!!(p.pe&&p.pe.getTime()>w.ed.getTime());
   var vp=v2period([{w:w,frac:1}],V2_ON),vo=v2period([{w:w,frac:1}],V2_OFF),va=v2period([{w:w,frac:1}],V2_ALL);
   var L=v2offLift(p.i);
   var h='<div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:12px"><div><div style="font-size:20px;font-weight:500;letter-spacing:-.01em">Promo vs ecommerce</div><div style="font-size:12px;color:var(--text3);font-family:\'DM Mono\',monospace">'+v2rangeLabel(w.sd,w.ed)+v2yrTag(w).replace(' ',', ')+' · '+w.days+' day'+(w.days>1?'s':'')+' of data · '+p.N+' promo SKUs'+(live?' · live, data through '+v2md(v2addDays(V2_END,-1)):'')+'</div></div>';
   var cmpSel=v2sc.cmp===null||String(v2sc.cmp)===String(p.i)?'ytd':v2sc.cmp;
+  if(p.syn&&cmpSel!=='ytd'&&cmpSel!=='rest')cmpSel=v2sc.cmp='ytd';
   h+='<div style="display:flex;gap:12px;flex-wrap:wrap"><div class="filter-group" style="min-width:300px"><span class="filter-label">Promotion</span><select onchange="v2scSet(\'win\',+this.value)">'+v2promoOptions(p.i,false)+'</select></div><div class="filter-group" style="min-width:300px"><span class="filter-label">Compared to</span><select onchange="v2scSet(\'cmp\',this.value)">'+v2cmpOptions(cmpSel,p.i)+'</select></div></div></div>';
   // promos that started but have no data yet
   var pend={};ALL_ROWS.forEach(function(r){var sd=parseDate(r['Start Date']);if(sd&&sd.getFullYear()===2026&&sd>=V2_END&&sd<=V2_TODAY)pend[r['Promotion'].replace(/\s*\(.*$/,'')]=r['Start Date'];});
@@ -678,13 +712,13 @@ function renderScorecard(){
     var a=m.f(cur),b=m.f(prev);
     if(a===null||b===null||a===undefined||b===undefined||!isFinite(a)||!isFinite(b))return '';
     var t,txt;
-    if(m.pts){t=a-b;txt=Math.round(t)===0?'0 pts':(t>=0?'+':'-')+Math.abs(t).toFixed(0)+' pts';if(noPP)txt+=' vs others';}
+    if(m.pts){t=a-b;txt=Math.round(t)===0?'0 pts':(t>=0?'+':'-')+Math.abs(t).toFixed(0)+' pts';}
     else if(noPP){if(!(cur.n>0&&prev.n>0))return '';a=a/cur.n;b=b/prev.n;if(!b)return '';t=(a/b-1)*100;txt=Math.round(t)===0?'0% per SKU':(t>=0?'+':'-')+Math.abs(Math.round(t)).toLocaleString()+'% per SKU';}
     else{if(!b)return '';t=(a/b-1)*100;txt=Math.round(t)===0?'0%':(t>=0?'+':'-')+Math.abs(t).toFixed(0)+'%';}
     var good=m.inv?t<0:t>0,zero=Math.abs(t)<0.5,c=zero?'var(--text2)':good?'var(--green)':'var(--red)';
     return '<div style="font-size:11px;font-weight:400;color:'+c+';font-family:\'DM Mono\',monospace">'+txt+'</div>';
   };
-  var uPool=function(matOnly){var lst=V2W.filter(function(x){return x.s!==w.s&&v2inYr(x)&&(!matOnly||v2isMatureEnd(x.ed));}).map(function(x){return {w:x,frac:1};});return lst.length?{all:v2period(lst,V2_ALL),off:v2period(lst,V2_OFF)}:null;};
+  var uPool=function(matOnly){var lst=V2W.filter(function(x){return !v2excl(x,w)&&v2inYr(x)&&(!matOnly||v2isMatureEnd(x.ed));}).map(function(x){return {w:x,frac:1};});return lst.length?{all:v2period(lst,V2_ALL),off:v2period(lst,V2_OFF)}:null;};
   var UPa=cmpSel==='rest'?uPool(false):null,UPm=cmpSel==='rest'?uPool(true):null;
   var ud=function(m,cur,base,hide){
     if(!base||hide||m.nodelta===0)return '';
@@ -725,21 +759,21 @@ function renderScorecard(){
   h+='</tbody></table></div><div class="v2-note">Per-day pace over the promo dates, so promos of different length compare fairly. Promo SKUs are the SKUs on the promo list, every other SKU is on the site but not in the promo. The export gives per-promo totals, so days inside a promo are spread evenly. '+(cmpSel==='rest'?'Small figures under Promo SKUs show the change vs all other SKUs. Volumes are compared per SKU, because the promo has far fewer SKUs than the rest of the site. Rates are in percentage points. Same SKUs, YTD avg is how these SKUs sold this year when not on a promo, and Promo vs YTD is the change from it. Under All other SKUs and All ecommerce, the figure is the change vs the site average, which is the same metric pooled over every other loaded date, other promos included. Under Promo share, it is the change vs the share these SKUs usually hold. Green is better and red is worse. ':'')+(pp?'Small figures under each number show the change vs the compared promo ('+v2short(pp.w.promo.replace(/\s*\(.*$/,''),40)+', '+v2rangeLabel(pp.w.sd,pp.w.ed)+'), in % or percentage points. Green is better and red is worse. ':'')+(mature?'':'Rows marked * need about '+MATURITY_DAYS+' days after the promo ends to settle. <b>est.</b> under Promo SKUs is an estimate. It assumes these SKUs convert from order to delivery, and cancel, at their YTD rate when not on a promo, so only order volume moves. Other columns stay blank until the data settles. ')+'</div></div>';
   }
   // chart
-  h+='<div class="exec-card"><div class="exec-card-title">Orders per day, promo SKUs vs every other SKU '+v2s('A')+'</div><div style="position:relative;height:250px"><canvas id="v2scChart"></canvas></div><div class="v2-note">The 10 promos ending with the one selected. The dark bar is the selected promo. Blue is promo SKUs and gray is the rest of ecommerce, so the full bar is all ecommerce orders a day. The orange line is the promo share of those orders. Hover for the orders a day and the percent for each.</div></div>';
+  h+='<div class="exec-card"><div class="exec-card-title">Orders per day, promo SKUs vs every other SKU '+v2s('A')+'</div><div style="position:relative;height:250px"><canvas id="v2scChart"></canvas></div><div class="v2-note">'+(p.syn?'Each bar is a month with all its promos combined.':'The 10 promos ending with the one selected.')+' The dark bar is the selected promo. Blue is promo SKUs and gray is the rest of ecommerce, so the full bar is all ecommerce orders a day. The orange line is the promo share of those orders. Hover for the orders a day and the percent for each.</div></div>';
   var prodH=v2prodSection(p,cmpSel);
   h+=prodH;
   h=h.replace('<!--EXEC-->',v2execSummary(p,L,va,vp,vo,col,bg));
   var chc=(cmpSel==='ytd'||cmpSel==='rest')?'avg':cmpSel==='prior'?(V2P[V2P.indexOf(p)-1]?V2P[V2P.indexOf(p)-1].i:'avg'):cmpSel;
-  h+=v2chSection(p.i,chc);
+  h+=p.syn?'<div class="exec-card"><div class="exec-card-title">Channel mix</div><div class="v2-note" style="margin-top:0">Channel mix is not available for month views. The channel exports are cut at promo dates, so they do not split cleanly by month. Pick a single promotion to see channels.</div></div>':v2chSection(p.i,chc);
   h+=v2changesFor([{start:w.sd,end:w.ed}]);
   h+=v2sourceLegend('ABEFG');
   el.innerHTML=h;
   // chart
-  var idx=V2P.indexOf(p),list=V2P.slice(Math.max(0,idx-9),idx+1);
+  var idx=V2P.indexOf(p),list=p.syn?V2M.slice():V2P.slice(Math.max(0,idx-9),idx+1);
   var on=[],off=[],shr=[];list.forEach(function(q){var a=v2vecW(q.w,V2_ALL),o=v2vecW(q.w,V2_ON);var og=o.gross/q.w.days,fg=(a.gross-o.gross)/q.w.days;on.push(+og.toFixed(0));off.push(+fg.toFixed(0));shr.push(a.gross?Math.round(o.gross/a.gross*100):null);});
   var cv=document.getElementById('v2scChart');
   var fn=function(x){return Math.round(x).toLocaleString();};
-  if(cv)v2sc.chart=new Chart(cv,{type:'bar',data:{labels:list.map(function(q){return v2md(q.w.sd)+' '+v2short(q.w.promo.replace(/\s*\(.*$/,''),20);}),datasets:[
+  if(cv)v2sc.chart=new Chart(cv,{type:'bar',data:{labels:list.map(function(q){return (q.syn?'':v2md(q.w.sd)+' ')+v2short(q.w.promo.replace(/\s*\(.*$/,''),q.syn?30:20);}),datasets:[
     {label:'Promo SKUs',data:on,backgroundColor:list.map(function(q){return q===p?'#1f3a5f':'#2a5caa';}),stack:'s',order:2},
     {label:'All other SKUs',data:off,backgroundColor:'#c9c7c0',stack:'s',order:2},
     {type:'line',label:'Promo share of orders',data:shr,yAxisID:'y2',borderColor:'#c2410c',backgroundColor:'#c2410c',borderWidth:2.5,pointRadius:4,pointHoverRadius:6,tension:0.25,order:1}]},
@@ -818,7 +852,7 @@ function v2saveLog(a){try{localStorage.setItem('promoChangeLog',JSON.stringify(a
 function v2allLog(){
   var out=[];
   CHANGE_LOG.forEach(function(x){out.push({d:x.d,type:x.type,area:x.area||'',title:x.title,note:x.note||'',impact:x.impact||'',src:'file',tbc:!!x.tbc});});
-  V2W.forEach(function(w){if(w.promo&&w.sd.getFullYear()===2026)out.push({d:w.s,type:'Promotion',area:'',title:w.promo+' starts',note:v2rangeLabel(w.sd,w.ed)+', '+w.days+' days',impact:'',src:'auto'});});
+  V2W.forEach(function(w){if(w.promo&&!w.syn&&w.sd.getFullYear()===2026)out.push({d:w.s,type:'Promotion',area:'',title:w.promo+' starts',note:v2rangeLabel(w.sd,w.ed)+', '+w.days+' days',impact:'',src:'auto'});});
   v2userLog().forEach(function(x,i){out.push({d:x.d,type:x.type,area:x.area||'',title:x.title,note:x.note||'',impact:x.impact||'',src:'local',idx:i});});
   out.sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:0;});
   return out;
@@ -886,7 +920,7 @@ var V2CH_COLS=[
  {k:'del',l:'Deliveries / day *',f:function(v,d){return v[6]/d;},t:'n0',mat:1},
  {k:'o2d',l:'Order to delivery *',f:function(v){return v[4]?v[6]/v[4]*100:null;},t:'p1',pts:1,mat:1}
 ];
-function v2chWin(i){var w=V2W[i];if(!w)return null;var c=V2C.filter(function(x){return x.s===w.s&&x.e===w.e;})[0];var part=false;if(!c){c=V2C.filter(function(x){return x.s===w.s;})[0];part=!!c;}return c?{c:c,w:w,part:part,ce:c.e}:null;}
+function v2chWin(i){var w=V2W[i];if(!w||w.syn)return null;var c=V2C.filter(function(x){return x.s===w.s&&x.e===w.e;})[0];var part=false;if(!c){c=V2C.filter(function(x){return x.s===w.s;})[0];part=!!c;}return c?{c:c,w:w,part:part,ce:c.e}:null;}
 function v2chPool(A){
   var pool={},dd=0;V2C.forEach(function(c){if(c.s===A.c.s||v2yrW(c)!==v2yrW(A.c))return;dd+=c.days;Object.keys(c.d).forEach(function(k){var v=c.d[k],o=pool[k]=pool[k]||v.map(function(){return 0;});v.forEach(function(x,j){o[j]+=x||0;});});});
   return dd&&pool['Total']?{c:{d:pool,days:dd},w:{ed:new Date(2026,0,1)},part:false}:null;
