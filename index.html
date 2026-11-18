@@ -1414,7 +1414,7 @@ function renderElasticity(){
   },50);
 }
 /* ---------- Plan a promo ---------- */
-var V2PLW={ev:0.5,se:0.25,rc:0.15,bs:0.10};
+var V2PLW={ev:0.40,se:0.20,rc:0.10,bs:0.15,tr:0.15};
 var v2pl={ev:'',s:null,e:null,n:null};
 function v2plIso(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
 function v2plParse(t){var m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(t||'');return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
@@ -1454,6 +1454,25 @@ function v2plAnchor(fam){ // average start day of year of the event
   var s=0;ps.forEach(function(p){s+=p.w.sd-new Date(p.w.sd.getFullYear(),0,1);});
   return s/ps.length/864e5;
 }
+function v2plTrend(){ // sitewide orders by sub-category, last 90 days vs the same 90 days a year earlier
+  var e1=V2_END.getTime(),s1=e1-90*864e5,e0=e1-365*864e5,s0=s1-365*864e5,r={},p0={};
+  V2W.forEach(function(w,i){
+    if(w.syn||!V2ALL.D[i])return;
+    var a=w.sd.getTime(),b=w.ed.getTime(),d=(b-a)/864e5;if(d<=0)return;
+    var f1=Math.max(0,Math.min(b,e1)-Math.max(a,s1))/864e5/d,f0=Math.max(0,Math.min(b,e0)-Math.max(a,s0))/864e5/d;
+    if(!f1&&!f0)return;
+    V2ALL.D[i].forEach(function(row){var q=V2ALL.S[row[0]],k=(q&&q[3])||'Other',g=row[2]||0;if(f1)r[k]=(r[k]||0)+g*f1;if(f0)p0[k]=(p0[k]||0)+g*f0;});
+  });
+  var tr=0,tp=0;for(var k in r)tr+=r[k];for(var k in p0)tp+=p0[k];
+  var o={},sum=0;
+  for(var k in r){
+    var gr=(p0[k]||0)>=20?r[k]/p0[k]-1:null;
+    var idx=gr===null?1:Math.max(0.5,Math.min(2,1+gr));
+    o[k]={g:gr,v:(r[k]/tr)*idx};sum+=o[k].v;
+  }
+  for(var k in o)o[k].sh=sum?o[k].v/sum:0;
+  return {m:o,ok:sum>0&&tp>0};
+}
 function v2plCalc(fam,sd,ed){
   var famP=fam?V2P.filter(function(p){return v2plFamOf(p)===fam;}):[];
   var years={};famP.forEach(function(p){years[p.w.sd.getFullYear()]=1;});
@@ -1468,19 +1487,21 @@ function v2plCalc(fam,sd,ed){
   var bs={},bt=0,seen={};[E,S,R].forEach(function(a){for(var k in a.m)seen[k]=1;});
   v2setYr({w:{sd:V2_TODAY,ed:V2_TODAY}});
   var cache={};V2ALL.S.forEach(function(q){cache[q[0]]=q[3]||'Other';});
-  var sk=V2SK();for(var c in sk){var sub=cache[c];if(!sub||!seen[sub])continue;var b=sk[c];if(b&&b[0]>0){bs[sub]=(bs[sub]||0)+b[2]/b[0];bt+=b[2]/b[0];}}
+  var sk=V2SK();for(var c in sk){var sub=cache[c];if(!sub)continue;var b=sk[c];if(b&&b[0]>0){seen[sub]=1;bs[sub]=(bs[sub]||0)+b[2]/b[0];bt+=b[2]/b[0];}}
+  var T=v2plTrend();for(var tk in T.m)seen[tk]=1;
   var sig=[['ev',E],['se',S],['rc',R]].filter(function(x){return x[1].ta>0;});
-  var wsum=sig.reduce(function(s,x){return s+V2PLW[x[0]];},0)+(bt>0?V2PLW.bs:0);
+  var wsum=sig.reduce(function(s,x){return s+V2PLW[x[0]];},0)+(bt>0?V2PLW.bs:0)+(T.ok?V2PLW.tr:0);
   var rows=Object.keys(seen).map(function(k){
     var sc=0,sh={};
     var sl=0;
     sig.forEach(function(x){var a=x[1],v=a.m[k]?Math.max(0,a.m[k].add)/a.ta:0;sh[x[0]]=v;sc+=V2PLW[x[0]]*v;sl+=V2PLW[x[0]]*(a.m[k]&&a.tn?a.m[k].n/a.tn:0);});
     var b=bt>0?(bs[k]||0)/bt:0;if(bt>0){sc+=V2PLW.bs*b;sl+=V2PLW.bs*b;}
+    var tm=T.m[k],tsh=T.ok&&tm?tm.sh:0;if(T.ok){sc+=V2PLW.tr*tsh;sl+=V2PLW.tr*tsh;}
     sc=0.75*sc+0.25*sl;
     var REF=E.ta>0?E:S,em=REF.m[k],sm=S.m[k],rm=R.m[k],rk=E.ta>0?'ev':'se';
     return {sub:k,score:sc/wsum,sh:sh,base:b,
       evUsed:REF.tn&&em?em.n/REF.tn:0,evPer:em&&em.ad?em.add/em.ad:null,rk:rk,shRef:sh[rk]||0,
-      rcUsed:R.tn&&rm?rm.n/R.tn:0,rcAdd:sh.rc,
+      rcUsed:R.tn&&rm?rm.n/R.tn:0,rcAdd:sh.rc,trend:T.ok&&tm?tm.g:null,
       app:(em?em.n:0)+(E.ta>0&&sm?sm.n:0),inEv:!!em};
   }).filter(function(r){return r.score>0;}).sort(function(a,b){return b.score-a.score;});
   var tot=rows.reduce(function(s,r){return s+r.score;},0);rows.forEach(function(r){r.share=r.score/tot*100;});
@@ -1516,11 +1537,8 @@ function renderPlan(){
   var ys=Object.keys(yrs),avgN;
   if(ys.length)avgN=Math.round(ys.reduce(function(s,y){return s+Object.keys(yrs[y]).length;},0)/ys.length);
   else{var ref=C.seasonP.length?C.seasonP:V2P.filter(function(p){return V2_TODAY-p.w.ed<=366*864e5;});avgN=Math.round(ref.reduce(function(s,p){return s+p.N;},0)/Math.max(1,ref.length))||60;}
-  var N=v2pl.n||avgN;
-  var big=C.rows.filter(function(r){return r.share>=2;}),small=C.rows.filter(function(r){return r.share<2;});
-  var other=null;
-  if(small.length)other={sub:'Other ('+small.length+' sub-categories)',share:small.reduce(function(s,r){return s+r.share;},0),other:1};
-  var rows=big.slice();if(other)rows.push(other);
+  var N=v2pl.n||25;
+  var rows=C.rows.slice();
   v2plRound(rows,N);
   var pc=function(x){return x===null||x===undefined||!isFinite(x)?'-':Math.round(x*100)+'%';};
   var h='<div style="margin-bottom:12px"><div style="font-size:20px;font-weight:500;letter-spacing:-.01em">Plan a promo</div><div style="font-size:13px;color:var(--muted)">Suggested share of promo SKUs by sub-category, built from past results.</div></div>';
@@ -1528,24 +1546,28 @@ function renderPlan(){
   h+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px"><div class="filter-group" style="min-width:150px"><span class="filter-label">Promo starts</span><input type="date" value="'+v2pl.s+'" onchange="v2plSet(\'s\',this.value)" style="'+inp+'"></div>';
   h+='<div class="filter-group" style="min-width:150px"><span class="filter-label">Promo ends</span><input type="date" value="'+v2pl.e+'" onchange="v2plSet(\'e\',this.value)" style="'+inp+'"></div>';
   h+='<div class="filter-group" style="min-width:240px"><span class="filter-label">Similar past event (optional)</span><select onchange="v2plSet(\'ev\',this.value)"><option value="">None, use the dates only</option>'+fams.map(function(f){return '<option value="'+v2esc(f)+'"'+(f===fam?' selected':'')+'>'+v2esc(f)+'</option>';}).join('')+'</select></div>';
-  h+='<div class="filter-group" style="min-width:130px"><span class="filter-label">Promo SKUs planned</span><input type="number" min="5" max="500" value="'+N+'" onchange="v2plSet(\'n\',Math.max(5,Math.min(500,+this.value||'+avgN+')))" style="'+inp+'"></div></div>';
+  h+='<div class="filter-group" style="min-width:130px"><span class="filter-label">Promo SKUs planned</span><input type="number" min="5" max="500" value="'+N+'" onchange="v2plSet(\'n\',Math.max(5,Math.min(500,+this.value||25)))" style="'+inp+'"></div></div>';
   var runs=C.famP.length;
+  var oneSku=Math.round(100/N);
   var mo=function(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});};
-  h+='<div class="v2-note" style="margin:0 0 12px;padding:8px 12px;border:1px solid var(--border);border-radius:6px">Planning a '+span+'-day promo, '+mo(sd)+' to '+mo(ed)+'. Based on '+C.S.runs+' promotion'+(C.S.runs===1?'':'s')+' that ran at the same time of year (within 2 weeks of these dates in past years)'+(fam?', '+runs+' past '+v2esc(fam)+' promotion'+(runs===1?'':'s'):'')+' and '+C.R.runs+' promotions in the last 12 months. The default of '+avgN+' SKUs is the average used in similar past promos.</div>';
-  h+='<style>#view-plan th,#view-plan td{white-space:normal!important;padding:7px 8px!important;vertical-align:top}#view-plan th{line-height:1.25}</style><div style="overflow-x:auto"><table><thead><tr><th>Sub-category</th><th>Suggested share</th><th>SKUs of '+N+'</th><th>Used before</th><th>Added orders per SKU a day</th>'+(fam?'<th>Event results</th>':'')+'<th>Season results</th><th>12-month results</th><th style="text-align:left">Why</th></tr></thead><tbody>';
+  h+='<div class="v2-note" style="margin:0 0 12px;padding:8px 12px;border:1px solid var(--border);border-radius:6px">Planning a '+span+'-day promo, '+mo(sd)+' to '+mo(ed)+'. Based on '+C.S.runs+' promotion'+(C.S.runs===1?'':'s')+' that ran at the same time of year (within 2 weeks of these dates in past years)'+(fam?', '+runs+' past '+v2esc(fam)+' promotion'+(runs===1?'':'s'):'')+' and '+C.R.runs+' promotions in the last 12 months. With '+N+' SKUs, each SKU is about '+oneSku+'% of the promo, so a share under about '+Math.round(oneSku/2)+'% may not get a full SKU.</div>';
+  h+='<style>#view-plan th,#view-plan td{white-space:normal!important;padding:7px 8px!important;vertical-align:top}#view-plan th{line-height:1.25}#view-plan details{margin-top:14px}#view-plan summary{cursor:pointer;font-size:13px;font-weight:500}</style><div style="overflow-x:auto"><table><thead><tr><th>Sub-category</th><th>Suggested share</th><th>SKUs of '+N+'</th><th>Share of SKUs in past promos</th><th>Sitewide trend</th><th style="text-align:left">Why</th></tr></thead><tbody>';
+  var d2='<table><thead><tr><th>Sub-category</th><th>Added orders per SKU a day</th>'+(fam?'<th>Event results</th>':'')+'<th>Season results</th><th>12-month results</th></tr></thead><tbody>';
   rows.forEach(function(r){
-    if(r.other){h+='<tr><td>'+v2esc(r.sub)+'</td><td><b>'+r.pct+'%</b></td><td>'+r.cnt+'</td><td>-</td><td>-</td>'+(fam?'<td>-</td>':'')+'<td>-</td><td>-</td><td>Each under 2%.</td></tr>';return;}
     var why0='';var conf=r.inEv&&r.app>=8&&(fam?C.years:C.S.runs)>=2?'High':r.app>=4?'Medium':'Low';
-    var why;if(conf!=='High')why0=conf==='Medium'?'Limited history. ':'Very little history. ';
-    if(!r.inEv)why=why0+'Not used in past promos like this. Based on the other signals.';
+    var why;if(r.app<8)why0='Only '+r.app+' SKU'+(r.app===1?'':'s')+' in past promos, so this is rough. ';
+    if(!r.inEv)why='Never in a past promo like this. Based on sitewide sales and trend.';
     else{
       why=why0+(r.shRef>=r.evUsed+0.03?'Stronger than average per SKU. ':r.shRef<=r.evUsed-0.03?'Weaker than average per SKU. ':'About average per SKU. ');
       if(r.rcAdd-r.shRef>=0.04)why+='Rising lately.';else if(r.shRef-r.rcAdd>=0.04)why+='Slower lately.';
     }
-    h+='<tr><td>'+v2esc(r.sub)+'</td><td><b>'+r.pct+'%</b></td><td>'+r.cnt+'</td><td>'+(r.inEv?pc(r.evUsed):'-')+'</td><td>'+(r.evPer===null?'-':r.evPer.toFixed(1))+'</td>'+(fam?'<td>'+(C.sig.indexOf('ev')>=0?pc(r.sh.ev):'-')+'</td>':'')+'<td>'+(C.sig.indexOf('se')>=0?pc(r.sh.se):'-')+'</td><td>'+(C.sig.indexOf('rc')>=0?pc(r.sh.rc):'-')+'</td><td style="white-space:normal;min-width:170px;text-align:left">'+why+'</td></tr>';
+    var tr=r.trend===null||r.trend===undefined?'-':(r.trend>9.99?'>+999%':(r.trend>0?'+':'')+Math.round(r.trend*100)+'%');
+    h+='<tr><td>'+v2esc(r.sub)+'</td><td><b>'+(r.pct<1?'<1%':r.pct+'%')+'</b></td><td>'+(r.cnt===0?'<1':r.cnt)+'</td><td>'+(r.inEv?pc(r.evUsed):'-')+'</td><td>'+tr+'</td><td style="white-space:normal;min-width:200px;text-align:left">'+why+'</td></tr>';
+    d2+='<tr><td>'+v2esc(r.sub)+'</td><td>'+(r.evPer===null?'-':r.evPer.toFixed(1))+'</td>'+(fam?'<td>'+(C.sig.indexOf('ev')>=0?pc(r.sh.ev):'-')+'</td>':'')+'<td>'+(C.sig.indexOf('se')>=0?pc(r.sh.se):'-')+'</td><td>'+(C.sig.indexOf('rc')>=0?pc(r.sh.rc):'-')+'</td></tr>';
   });
   h+='</tbody></table></div>';
-  h+='<div class="v2-note" style="margin-top:14px;line-height:1.55"><b>Reading the table.</b> Used before is the share of promo SKUs this sub-category held in the past promos used (the chosen event, or the same time of year). Event, season and 12-month results are its share of the added orders in each period. Event results appear only when you pick a similar event.<br><b>How the suggestion is built.</b> Each sub-category gets a score from its share of the orders that promo SKUs added above their usual off-promo pace in up to four places: past runs of a similar event if you pick one (50%), promotions near the same dates in past years (25%), the last 12 months (15%), and baseline demand, meaning its share of off-promo orders (10%). The weights are rescaled when no event is picked, so the dates count for 50%, the last 12 months 30% and baseline 20%. A quarter of the score comes from how many slots each sub-category held, so the mix moves toward the results without swinging all the way. A sub-category whose SKUs did better than average gains slots, and one whose SKUs did worse loses them.<br><b>Limits.</b> This is a starting point and not a forecast. Most events have only one or two past runs. Returns likely fall as a sub-category gets more slots. It does not see inventory, margin, vendor funding or pricing. Added orders are gross orders and are not adjusted for cancels.</div>';
+  h+='<details><summary>Show the numbers behind the suggestion</summary><div style="overflow-x:auto;margin-top:8px">'+d2+'</tbody></table></div><div class="v2-note" style="margin-top:8px">Event, season and 12-month results are each sub-category&#39;s share of the orders that promo SKUs added above their usual pace in that period. Added orders per SKU a day is the same measure per SKU in the past promos used.</div></details>';
+  h+='<div class="v2-note" style="margin-top:14px;line-height:1.55"><b>Reading the table.</b> Share of SKUs in past promos is how many promo slots the sub-category held in the past promos used (the chosen event, or the same time of year). Sitewide trend is the change in its orders across all SKUs, on and off promo, over the last 90 days compared with the same 90 days last year.<br><b>How the suggestion is built.</b> Each sub-category gets a score from its share of the orders that promo SKUs added above their usual off-promo pace in up to five places: past runs of a similar event if you pick one (40%), promotions near the same dates in past years (20%), the last 12 months (10%), baseline demand, meaning its share of off-promo orders (15%), and sitewide trend (15%). Trend favors sub-categories whose orders across all products are growing, measured against the same 90 days last year so seasonality does not skew it. The weights are rescaled when no event is picked, so the dates count for 33%, the last 12 months 17%, baseline 25% and trend 25%. A quarter of the score comes from how many slots each sub-category held, so the mix moves toward the results without swinging all the way. A sub-category whose SKUs did better than average gains slots, and one whose SKUs did worse loses them.<br><b>Limits.</b> This is a starting point and not a forecast. Most events have only one or two past runs. Returns likely fall as a sub-category gets more slots. It does not see inventory, margin, vendor funding or pricing. Added orders are gross orders and are not adjusted for cancels.</div>';
   el.innerHTML=h;
   if(typeof postRender==='function')postRender();
 }
