@@ -579,12 +579,13 @@ function v2prodSection(p,cmpSel){
   V2W.forEach(function(x){if(!v2inYr(x))return;for(var k in x.cats){var q=k.split('|');rec(q[0],q[1]);}});
   var usual=v2usualWhole();
   rowsW.forEach(function(r){if(r.on)rec(r.cat,r.sub).hasPS=true;});
+  Object.keys(G).forEach(function(k){G[k].yl=mode==='ytd'||(mode==='rest'&&!G[k].hasPS);});
   rowsW.forEach(function(r){
     var g=rec(r.cat,r.sub);g.rows.push(r);g.whNow+=r.g/days;
     var b=V2BB()[r.i],m=v2match(b),fr=(r.dd||days)/days;
     if(!r.on)v2addOn(g.lo,r,days,mat,hr);
-    if(r.on||((mode==='ytd'||mode==='promo')&&!g.hasPS)){if(r.on){g.onN++;v2addOn(g.anyOn,r,days,mat,hr);}
-      if(mode==='ytd'){
+    if(r.on||!g.hasPS){if(r.on){g.onN++;v2addOn(g.anyOn,r,days,mat,hr);}
+      if(mode==='ytd'||(mode==='rest'&&!g.hasPS)){
         if(m){v2addOn(g.on,r,days,mat,hr);v2addBase(g.off,b);g.hasOn=true;g.hasOff=true;
           g.x.bAr+=b[1]/b[0]*fr;g.x.bOr+=b[2]/b[0]*fr;
           if(b[3]>=3){g.x.bDr+=b[6]/b[3]*fr;g.x.bDel+=b[6];g.x.bOM+=b[5];g.x.dOn+=r.dl;g.x.oOn+=r.g;}}
@@ -606,6 +607,7 @@ function v2prodSection(p,cmpSel){
     var C={};
     var catPS={};recs.forEach(function(g){if(g.hasPS)catPS[g.cat]=1;});
     recs.forEach(function(g){var c=C[g.cat]=C[g.cat]||{cat:g.cat,sub:'All sub-categories',rows:[],on:v2acc(),off:v2acc(),lo:v2acc(),oth:v2acc(),x:X0(),hasOn:false,hasOff:false,onN:0,othNow:0,othUsual:0,othN:0,whNow:0,whUsual:0};
+      c.yl=mode==='ytd'||(mode==='rest'&&!catPS[g.cat]);
       var use=g.hasPS||!catPS[g.cat];
       if(use){v2addAcc(c.on,g.on);v2addAcc(c.off,g.off);v2addAcc(c.lo,g.lo);for(var k in c.x)c.x[k]+=g.x[k];c.hasOn=c.hasOn||g.hasOn;c.hasOff=c.hasOff||g.hasOff;}
       c.rows=c.rows.concat(g.rows);c.onN+=g.onN;c.othNow+=g.othNow;c.othUsual+=g.othUsual;c.othN+=g.othN;c.whNow+=g.whNow;c.whUsual+=g.whUsual;});
@@ -616,10 +618,10 @@ function v2prodSection(p,cmpSel){
   rows.forEach(function(r){
     var o=r.on,f=r.off,x=r.x;
     r.mo=r.hasOn?{apps:o.a/days,ord:o.g/days,a2o:pc(o.g,o.a),canc:pc(o.nc,o.ap),lease:o.dl?o.rev/o.dl:null,
-      del:mode==='ytd'?(x.oOn?x.dOn/days:null):(o.om?o.dv/days:null),
-      o2d:mode==='ytd'?pc(x.dOn,x.oOn):pc(o.dv,o.om)}:null;
+      del:r.yl?(x.oOn?x.dOn/days:null):(o.om?o.dv/days:null),
+      o2d:r.yl?pc(x.dOn,x.oOn):pc(o.dv,o.om)}:null;
     if(r.hasOff){
-      if(mode==='ytd')r.mf={apps:x.bAr,ord:x.bOr,a2o:pc(f.g,f.a),canc:pc(f.nc,f.ap),lease:r.lo.dl?r.lo.rev/r.lo.dl:null,del:x.bOM?x.bDr:null,o2d:pc(x.bDel,x.bOM)};
+      if(r.yl)r.mf={apps:x.bAr,ord:x.bOr,a2o:pc(f.g,f.a),canc:pc(f.nc,f.ap),lease:r.lo.dl?r.lo.rev/r.lo.dl:null,del:x.bOM?x.bDr:null,o2d:pc(x.bDel,x.bOM)};
       else r.mf={apps:f.a/offDays,ord:f.g/offDays,a2o:pc(f.g,f.a),canc:pc(f.nc,f.ap),lease:f.dl?f.rev/f.dl:null,del:f.om?f.dv/offDays:null,o2d:pc(f.dv,f.om)};
     }else r.mf=null;
   });
@@ -641,19 +643,19 @@ function v2prodSection(p,cmpSel){
   var AV=mode==='ytd'?'YTD avg':mode==='rest'?'not in promo':'then';
   var arrow=function(k){return v2pc.sort===k?(v2pc.dir==='desc'?' ▼':' ▲'):'';};
   var th=function(k,l,left){return '<th'+(left?' class="left"':'')+' style="cursor:pointer" onclick="v2pcSort(\''+k+'\')" title="Click to sort">'+l+arrow(k)+'</th>';};
-  var baseTxt=mode==='ytd'?'the same SKUs\' YTD average when not on a promo':mode==='rest'?'all SKUs not on this promo, on the same dates':v2esc(cp.w.promo.replace(/\s*\(.*$/,''))+' ('+v2rangeLabel(cp.w.sd,cp.w.ed)+')';
+  var baseTxt=mode==='ytd'?'the same SKUs\' YTD average when not on a promo':mode==='rest'?'all SKUs not on this promo, on the same dates (rows with no promo SKUs use their own YTD average)':v2esc(cp.w.promo.replace(/\s*\(.*$/,''))+' ('+v2rangeLabel(cp.w.sd,cp.w.ed)+')';
   var h='<div class="exec-card"><div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px"><div class="exec-card-title" style="margin:0">Products and categories, promo vs '+(mode==='ytd'?'site average':'compared')+' '+v2s('AEF')+'</div><div style="display:flex;gap:10px;align-items:flex-end"><button id="v2onlyBtn" class="subpill" style="height:34px" onclick="v2pcOnly()">'+(v2pc.only?'Show groups not on this promo':'Hide groups not on this promo')+'</button><div class="filter-group" style="width:200px"><span class="filter-label">Show</span><select onchange="v2pcSet(\'level\',this.value)"><option value="sub"'+(lvl==='sub'?' selected':'')+'>Sub-categories</option><option value="cat"'+(lvl==='cat'?' selected':'')+'>Categories</option></select></div></div></div>';
   h+='<div class="v2-note">Every product we have data for is counted, on promo or not. Green rows have SKUs on this promo. The first seven columns use the same metrics as the table above, for the promo SKUs in each row. Rows with no promo SKUs show all of their SKUs the same way, so you can see how the rest of the catalog is doing: bold is this promo and the small line is '+baseTxt+'. Per-day figures are totals for the promo SKUs. <b>Not in promo</b> are the sub-category\'s SKUs that are not on this promo, in orders a day now vs their own usual pace, so a drop may mean the promo is pulling sales from them, but other causes such as stock or seasonality are not ruled out. <b>Total sub-category</b> is all SKUs together vs a normal day with no promo in it. Cancellation rate is net cancelled orders over approved orders. Avg lease revenue builds up as agreements age, so its small line is the SKUs not in the promo on the same dates'+(hr?'':'. It is not in the exports from Oct 1 on, so this promo has none')+'. '+(mat?'':'In * columns, est. marks an estimate that assumes these SKUs behave at their YTD rate, until about '+MATURITY_DAYS+' days after the promo ends. ')+'A red <b>Possible cannibalization</b> flag means at least 3 SKUs not in the promo in that group are selling 10% or more below their usual pace while promo SKUs are on sale. Click a row to see its products, click a heading to sort.</div>';
   h+='<style>.v2-prodwrap{max-height:72vh;overflow:auto;border:1px solid var(--border);border-radius:6px}.v2-stick thead th{position:sticky;top:0;background:var(--surface);z-index:2}.v2-stick td:first-child,.v2-stick th:first-child{position:sticky;left:0;background:var(--surface);z-index:1;min-width:380px;max-width:380px;white-space:normal}.v2-stick thead th:first-child{z-index:3}.v2-stick tr.v2-on td:first-child{background:linear-gradient(rgba(22,163,74,0.07),rgba(22,163,74,0.07)),var(--surface)}.v2-stick tr.v2-onx td:first-child{background:linear-gradient(rgba(22,163,74,0.12),rgba(22,163,74,0.12)),var(--surface)}.v2-stick tr.v2-sub td:first-child{background:var(--surface2)}.v2-hideoff tr.v2-off{display:none!important}</style><div class="tbl-scroll v2-prodwrap"><table id="v2prodTbl" class="v2-big v2-stick'+(v2pc.only?' v2-hideoff':'')+'" data-sortable="1"><thead><tr>'+th('name','Category / sub-category',1)+th('apps','Applications / day')+th('ord','Gross orders / day')+th('a2o','App to order')+th('del','Deliveries / day *')+th('o2d','Order to delivery *')+th('canc','Cancellation rate *')+th('lease','Avg lease revenue *')+th('oth','Not in promo, orders / day')+th('whole','Total sub-category, orders / day')+'</tr></thead><tbody>';
   rows.forEach(function(r,gi){
-    var ES=mode==='ytd'&&!mat&&!!r.mo&&!!r.mf,gid='g'+gi,can=r.rows.length>0,mo=r.mo,mf=r.mf,N=function(k){return mo?mo[k]:null;},F=function(k){return mf?mf[k]:null;};
+    var AV2=r.yl?'YTD avg':AV,ES=r.yl&&!mat&&!!r.mo&&!!r.mf,gid='g'+gi,can=r.rows.length>0,mo=r.mo,mf=r.mf,N=function(k){return mo?mo[k]:null;},F=function(k){return mf?mf[k]:null;};
     var oth=(r.othN&&r.onN)?'<td style="white-space:nowrap"><b>'+f0(r.othNow)+'</b><div class="v2-sub">'+f0(r.othUsual)+' usual'+pill(r.othNow,r.othUsual,0)+'</div></td>':'<td>-</td>';
     var who=r.whNow?'<td style="white-space:nowrap"><b>'+f0(r.whNow)+'</b>'+(r.whUsual?'<div class="v2-sub">'+f0(r.whUsual)+' usual'+pill(r.whNow,r.whUsual,0)+'</div>':'')+'</td>':'<td>-</td>';
     var badge=(r.onN?' <span style="font-size:10px;font-weight:600;color:var(--green);background:rgba(22,163,74,0.12);border-radius:3px;padding:1px 6px;white-space:nowrap">On promo · '+r.onN+'</span>':'')+(r.can?' <span title="SKUs not in the promo here are selling '+Math.round((1-r.othNow/r.othUsual)*100)+'% below their usual pace, '+f0(r.othUsual-r.othNow)+' fewer orders a day" style="font-size:10px;font-weight:600;color:var(--red);background:var(--red-bg);border-radius:3px;padding:1px 6px;white-space:nowrap">Possible cannibalization</span>':'');
     h+='<tr class="'+(r.onN?'v2-on':'v2-off')+'"'+(can?' style="cursor:pointer'+(r.onN?';background:rgba(22,163,74,0.06)':'')+'" onclick="v2pcTog(\''+gid+'\')" title="Click to show the products"':(r.onN?' style="background:rgba(22,163,74,0.06)"':''))+'><td class="left">'+(can?'<span id="car-'+gid+'" style="display:inline-block;width:12px;color:var(--text3)">&#9656;</span>':'<span style="display:inline-block;width:12px"></span>')+catBadge(r.cat)+' '+v2esc(r.sub)+badge+'</td>'
-      +cell(N('apps'),F('apps'),fq,0,0,0,AV)+cell(N('ord'),F('ord'),fq,0,0,0,AV)+cell(N('a2o'),F('a2o'),fp,1,0,0,AV)
-      +cell(mat?N('del'):(ES&&F('o2d')!==null&&N('ord')!==null?N('ord')*F('o2d')/100:null),F('del'),fq,0,0,mo&&!mat&&!ES,AV,!mat&&ES)+cell(mat?N('o2d'):(ES?F('o2d'):null),F('o2d'),fp,1,0,mo&&!mat&&!ES,AV,!mat&&ES)
-      +cell(mat?N('canc'):(ES?F('canc'):null),F('canc'),fp,1,1,mo&&!mat&&!ES,AV,!mat&&ES)+cell(mat&&hr?N('lease'):null,mode==='ytd'?(r.lo.dl?r.lo.rev/r.lo.dl:null):F('lease'),fd,0,0,mo&&!mat,mode==='ytd'?'not in promo':AV)+oth+who+'</tr>';
+      +cell(N('apps'),F('apps'),fq,0,0,0,AV2)+cell(N('ord'),F('ord'),fq,0,0,0,AV2)+cell(N('a2o'),F('a2o'),fp,1,0,0,AV2)
+      +cell(mat?N('del'):(ES&&F('o2d')!==null&&N('ord')!==null?N('ord')*F('o2d')/100:null),F('del'),fq,0,0,mo&&!mat&&!ES,AV2,!mat&&ES)+cell(mat?N('o2d'):(ES?F('o2d'):null),F('o2d'),fp,1,0,mo&&!mat&&!ES,AV2,!mat&&ES)
+      +cell(mat?N('canc'):(ES?F('canc'):null),F('canc'),fp,1,1,mo&&!mat&&!ES,AV2,!mat&&ES)+cell(mat&&hr?N('lease'):null,r.yl?(r.lo.dl?r.lo.rev/r.lo.dl:null):F('lease'),fd,0,0,mo&&!mat,r.yl?'not in promo':AV2)+oth+who+'</tr>';
     if(!can)return;
     var list=r.rows.slice().sort(function(a,b){return (b.on-a.on)||(b.g-a.g);});
     var total=list.length;list=list.slice(0,100);
@@ -2949,12 +2951,12 @@ function sortPromoView(col){
 const TILE_JOURNEY={
   source:"GA4 session segments: homepage > tile page. Events counted as sessions that fired the event anywhere in the session. Jan to Sep 2026 promos: sessions with a page view of the tile's exact destination path and filters, referred from the homepage, split by whether the session had app start, decision or purchase.",
   promos:[
-   {promo:"Nov 16 - 22: Pre-Black Friday Deals",range:"Nov 16, 2026 (day 1)",note:["Day 1 only. Hero counts the exact sale page, not its paginated views (1,201 more sessions)"],tiles:[
-    {name:"Homepage Hero",dest:"Pre-Black Friday sale page",sessions:5534,appStart:535,appDone:498,orders:200},
-    {name:"Limited Time Deal 1",dest:"Price filter listing ($24 to $179)",sessions:1913,appStart:460,appDone:434,orders:176},
-    {name:"Limited Time Deal 2",dest:"Laptops category",sessions:1475,appStart:109,appDone:101,orders:32,broad:true},
-    {name:"Limited Time Deal 3",dest:"Gaming consoles category",sessions:2250,appStart:307,appDone:294,orders:81,broad:true},
-    {name:"Limited Time Deal 4",dest:"Bedroom sets category",sessions:1095,appStart:127,appDone:116,orders:59,broad:true}]},
+   {promo:"Nov 16 - 22: Pre-Black Friday Deals",range:"Nov 16 - 22, 2026",note:["Hero counts the exact sale page, not its paginated views (13,471 more sessions)"],tiles:[
+    {name:"Homepage Hero",dest:"Pre-Black Friday sale page",sessions:39867,appStart:4603,appDone:4291,orders:1827},
+    {name:"Limited Time Deal 1",dest:"Price filter listing ($24 to $179)",sessions:17469,appStart:4576,appDone:4344,orders:1480},
+    {name:"Limited Time Deal 2",dest:"Laptops category",sessions:8919,appStart:996,appDone:949,orders:334,broad:true},
+    {name:"Limited Time Deal 3",dest:"Gaming consoles category",sessions:28484,appStart:3971,appDone:3684,orders:1228,broad:true},
+    {name:"Limited Time Deal 4",dest:"Bedroom sets category",sessions:7933,appStart:878,appDone:819,orders:423,broad:true}]},
    {promo:"Nov 6 - 15: Holiday Prep Product Sale",range:"Nov 6 - 15, 2026",tiles:[
     {name:"Homepage Hero",dest:"Current Deals listing",sessions:36636,appStart:3153,appDone:2883,orders:1368},
     {name:"Limited Time Deal 1",dest:"Price filter listing ($24 to $179)",sessions:15794,appStart:3606,appDone:3373,orders:1371},
